@@ -9,9 +9,6 @@ import type { Item } from "@/lib/types"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar"
-import { getInitials } from "@/lib/utils"
-import { Separator } from "./ui/separator"
 import { useUser } from "@/firebase"
 import { users } from "@/lib/data"
 import { useState, useEffect } from "react"
@@ -109,26 +106,13 @@ export function ItemCard({ item }: ItemCardProps) {
         </div>
         <p className="text-sm text-muted-foreground">📍 {item.locality}</p>
       </CardContent>
-      {item.ownerId && (
-        <>
-            <Separator />
-            <CardFooter className="p-3">
-                <div className="flex items-center gap-2 w-full">
-                        <Avatar className="h-8 w-8">
-                            <AvatarImage src={item.ownerAvatarUrl ?? undefined} alt={item.ownerName} />
-                            <AvatarFallback>{getInitials(item.ownerName)}</AvatarFallback>
-                        </Avatar>
-                        <div className="grid gap-0.5 text-sm flex-grow">
-                            <p className="font-semibold truncate">{item.ownerName.split(' ')[0]}</p>
-                        </div>
-                        <div className="flex items-center gap-1 text-sm text-muted-foreground">
-                            <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                            <span>{item.ownerRating.toFixed(1)}</span>
-                        </div>
-                    </div>
-            </CardFooter>
-        </>
-      )}
+      <CardFooter className="p-0">
+        <Button asChild className="w-full rounded-t-none">
+          <Link href={`/items/${item.id}`}>
+            View Now
+          </Link>
+        </Button>
+      </CardFooter>
     </Card>
   )
 }
