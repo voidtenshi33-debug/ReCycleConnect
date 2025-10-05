@@ -2,13 +2,15 @@
 import type { LucideIcon } from "lucide-react";
 
 export type User = {
-  id: string;
-  name: string;
-  avatarUrl: string;
-  memberSince: string;
-  location: string;
-  rating: number;
-  reviews: number;
+  id: string; // Corresponds to document ID user_01, user_02 etc.
+  userId: string;
+  displayName: string;
+  email: string;
+  photoURL: string | null;
+  createdAt: any; // Firestore Timestamp
+  lastKnownLocality: string;
+  averageRating: number;
+  ratingsCount: number;
 };
 
 export type Category = 'Laptops' | 'Phones' | 'Tablets' | 'Monitors' | 'Cameras' | 'Audio' | 'Accessories' | 'Other';
@@ -26,17 +28,21 @@ export type Item = {
   id: string;
   title: string;
   description: string;
-  images: string[];
-  category: Category;
+  category: string;
   condition: ItemCondition;
+  listingType: "Sell" | "Donate";
   price: number;
-  isFree: boolean;
-  location: string;
-  postedAt: string;
-  sellerId: string;
-  status: 'Available' | 'In Process' | 'Completed';
+  imageUrls: string[];
   locality: string;
+  ownerId: string;
+  ownerName: string;
+  ownerAvatarUrl: string | null;
+  ownerRating: number;
+  status: 'Available' | 'In Process' | 'Completed';
+  isFeatured: boolean;
+  createdAt: any; // Firestore Timestamp
 };
+
 
 export type ChatMessage = {
   id: string;

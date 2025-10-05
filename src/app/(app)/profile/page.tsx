@@ -1,3 +1,4 @@
+
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -7,6 +8,7 @@ import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { users } from "@/lib/data";
 import { Star } from "lucide-react";
+import { format } from "date-fns";
 
 export default function ProfilePage() {
     // Assuming we're viewing the profile of the first user in our mock data
@@ -18,16 +20,16 @@ export default function ProfilePage() {
                 <CardHeader>
                     <div className="flex flex-col md:flex-row items-start md:items-center gap-4">
                         <Avatar className="h-24 w-24">
-                            <AvatarImage src={user.avatarUrl} alt={user.name} />
-                            <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
+                            <AvatarImage src={user.photoURL ?? undefined} alt={user.displayName} />
+                            <AvatarFallback>{user.displayName.charAt(0)}</AvatarFallback>
                         </Avatar>
                         <div className="flex-grow">
-                            <CardTitle className="font-headline text-3xl">{user.name}</CardTitle>
-                            <CardDescription className="mt-1">Member since {user.memberSince}</CardDescription>
+                            <CardTitle className="font-headline text-3xl">{user.displayName}</CardTitle>
+                            <CardDescription className="mt-1">Member since {format(user.createdAt, "MMMM yyyy")}</CardDescription>
                             <div className="flex items-center gap-2 mt-2">
                                 <div className="flex items-center gap-1 text-sm text-muted-foreground">
                                     <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                                    <span>{user.rating.toFixed(1)} ({user.reviews} reviews)</span>
+                                    <span>{user.averageRating.toFixed(1)} ({user.ratingsCount} reviews)</span>
                                 </div>
                             </div>
                         </div>
@@ -74,16 +76,16 @@ export default function ProfilePage() {
                         <CardContent className="space-y-8">
                             <div className="grid gap-2 max-w-md">
                                 <Label htmlFor="name">Full Name</Label>
-                                <Input id="name" defaultValue={user.name} />
+                                <Input id="name" defaultValue={user.displayName} />
                             </div>
                              <div className="grid gap-2 max-w-md">
                                 <Label htmlFor="location">Location</Label>
-                                <Input id="location" defaultValue={user.location} />
+                                <Input id="location" defaultValue={user.lastKnownLocality} />
                             </div>
                              <Separator />
                             <div className="grid gap-2 max-w-md">
                                 <Label htmlFor="email">Email Address</Label>
-                                <Input id="email" type="email" defaultValue="jane.doe@example.com" disabled />
+                                <Input id="email" type="email" defaultValue={user.email} disabled />
                                 <p className="text-xs text-muted-foreground">Email cannot be changed.</p>
                             </div>
                             <Button>Save Changes</Button>

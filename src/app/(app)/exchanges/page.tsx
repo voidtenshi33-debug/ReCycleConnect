@@ -1,3 +1,4 @@
+
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { exchangeRequests, items, users } from "@/lib/data"
@@ -9,22 +10,24 @@ import Link from "next/link"
 
 const RequestCard = ({ request }: { request: typeof exchangeRequests[0] }) => {
     const item = items.find(i => i.id === request.itemId);
-    const otherUser = users.find(u => u.id === (request.sellerId === users[0].id ? request.requesterId : request.sellerId));
+    // Assuming current user is user_01
+    const myUserId = "user_01";
+    const otherUser = users.find(u => u.id === (request.sellerId === myUserId ? request.requesterId : request.sellerId));
 
     if (!item || !otherUser) return null;
 
     return (
         <div className="flex items-center justify-between p-4 border-b">
             <div className="flex items-center gap-4">
-                <Image src={item.images[0]} alt={item.title} width={64} height={64} className="rounded-md object-cover aspect-square" />
+                <Image src={item.imageUrls[0]} alt={item.title} width={64} height={64} className="rounded-md object-cover aspect-square" />
                 <div>
                     <Link href={`/items/${item.id}`} className="font-semibold hover:underline">{item.title}</Link>
                     <div className="text-sm text-muted-foreground flex items-center gap-2 mt-1">
                         <Avatar className="h-5 w-5">
-                            <AvatarImage src={otherUser.avatarUrl} />
-                            <AvatarFallback>{otherUser.name.charAt(0)}</AvatarFallback>
+                            <AvatarImage src={otherUser.photoURL ?? undefined} />
+                            <AvatarFallback>{otherUser.displayName.charAt(0)}</AvatarFallback>
                         </Avatar>
-                        <span>{otherUser.name}</span>
+                        <span>{otherUser.displayName}</span>
                     </div>
                 </div>
             </div>
@@ -38,7 +41,7 @@ const RequestCard = ({ request }: { request: typeof exchangeRequests[0] }) => {
 }
 
 export default function ExchangesPage() {
-    const myUserId = users[0].id;
+    const myUserId = "user_01";
     const incomingRequests = exchangeRequests.filter(r => r.sellerId === myUserId);
     const myRequests = exchangeRequests.filter(r => r.requesterId === myUserId);
     

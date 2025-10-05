@@ -7,10 +7,6 @@
       "type": "object",
       "description": "Represents a user profile in the ReCycleConnect application.",
       "properties": {
-        "id": {
-          "type": "string",
-          "description": "Unique identifier for the user profile."
-        },
         "userId": {
           "type": "string",
           "description": "The unique ID from Firebase Authentication."
@@ -38,30 +34,16 @@
           "type": "string",
           "description": "The user's last selected locality for browsing items."
         },
-        "ratingIds": {
-          "type": "array",
-          "description": "References to Ratings given or received by this user. (Relationship: User 1:N Rating)",
-          "items": {
-            "type": "string"
-          }
+        "averageRating": {
+          "type": "number",
+          "description": "The user's average rating from 1 to 5."
         },
-        "reportedItemIds": {
-          "type": "array",
-          "description": "References to Items reported by this user. (Relationship: User 1:N Item)",
-          "items": {
-            "type": "string"
-          }
-        },
-        "wishlistItemIds": {
-          "type": "array",
-          "description": "References to Items saved in user's wishlist. (Relationship: User 1:N Item)",
-          "items": {
-            "type": "string"
-          }
+        "ratingsCount": {
+          "type": "number",
+          "description": "The total number of ratings the user has received."
         }
       },
       "required": [
-        "id",
         "userId",
         "displayName",
         "email",
@@ -74,20 +56,23 @@
       "type": "object",
       "description": "Represents an item listed for exchange on ReCycleConnect.",
       "properties": {
-        "id": { "type": "string" },
         "title": { "type": "string" },
         "description": { "type": "string" },
-        "images": { "type": "array", "items": { "type": "string", "format": "uri" } },
+        "imageUrls": { "type": "array", "items": { "type": "string", "format": "uri" } },
         "category": { "type": "string" },
         "condition": { "type": "string", "enum": ["Working", "Needs Minor Repair", "For Spare Parts Only"] },
+        "listingType": { "type": "string", "enum": ["Sell", "Donate"] },
         "price": { "type": "number" },
-        "isFree": { "type": "boolean" },
         "locality": { "type": "string", "description": "The locality slug e.g. 'kothrud'" },
-        "postedAt": { "type": "string", "format": "date-time" },
-        "sellerId": { "type": "string" },
-        "status": { "type": "string", "enum": ["Available", "In Process", "Completed"] }
+        "createdAt": { "type": "string", "format": "date-time" },
+        "ownerId": { "type": "string" },
+        "ownerName": { "type": "string" },
+        "ownerAvatarUrl": { "type": "string", "format": "uri" },
+        "ownerRating": { "type": "number" },
+        "status": { "type": "string", "enum": ["Available", "In Process", "Completed"] },
+        "isFeatured": { "type": "boolean" }
       },
-      "required": ["id", "title", "description", "category", "condition", "locality", "postedAt", "sellerId", "status"]
+      "required": ["title", "description", "category", "condition", "listingType", "price", "locality", "createdAt", "ownerId", "ownerName", "status"]
     }
   },
   "auth": {

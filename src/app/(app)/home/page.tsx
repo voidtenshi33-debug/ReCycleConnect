@@ -16,9 +16,6 @@ import { ListFilter } from 'lucide-react';
 import { CategoryScroller } from '@/components/category-scroller';
 import { useUser } from '@/firebase';
 
-// Helper function to get seller info
-const getSeller = (sellerId: string) => users.find(u => u.id === sellerId);
-
 export default function HomePage() {
   const { user, isUserLoading } = useUser();
   const [activeCategory, setActiveCategory] = useState<string>('all');
@@ -40,8 +37,7 @@ export default function HomePage() {
       return currentItems;
     }
 
-    const categoryName = appCategories.find(c => c.slug === activeCategory)?.name;
-    return currentItems.filter(item => item.category === categoryName);
+    return currentItems.filter(item => item.category === activeCategory);
 
   }, [user, isUserLoading, activeCategory]);
 
@@ -85,11 +81,9 @@ export default function HomePage() {
         </div>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 lg:gap-6">
-        {filteredItems.map(item => {
-          const seller = getSeller(item.sellerId);
-          if (!seller) return null;
-          return <ItemCard key={item.id} item={item} seller={seller} />
-        })}
+        {filteredItems.map(item => (
+          <ItemCard key={item.id} item={item} />
+        ))}
       </div>
     </>
   );

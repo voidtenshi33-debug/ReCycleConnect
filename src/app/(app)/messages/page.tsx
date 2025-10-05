@@ -12,7 +12,7 @@ import { usePathname } from "next/navigation";
 
 
 export default function MessagesPage() {
-    const myUserId = users[0].id;
+    const myUserId = "user_01";
     const pathname = usePathname();
     
     return (
@@ -40,12 +40,12 @@ export default function MessagesPage() {
                                 isActive && "bg-muted"
                             )}>
                                 <Avatar className="h-12 w-12">
-                                    <AvatarImage src={otherUser.avatarUrl} alt={otherUser.name} />
-                                    <AvatarFallback>{otherUser.name.charAt(0)}</AvatarFallback>
+                                    <AvatarImage src={otherUser.photoURL ?? undefined} alt={otherUser.displayName} />
+                                    <AvatarFallback>{otherUser.displayName.charAt(0)}</AvatarFallback>
                                 </Avatar>
                                 <div className="flex-grow overflow-hidden">
                                     <div className="flex justify-between items-center">
-                                        <p className="font-semibold truncate">{otherUser.name}</p>
+                                        <p className="font-semibold truncate">{otherUser.displayName}</p>
                                         <p className="text-xs text-muted-foreground">{convo.lastMessage.timestamp}</p>
                                     </div>
                                     <p className="text-xs text-muted-foreground truncate mt-0.5">Re: {item.title}</p>

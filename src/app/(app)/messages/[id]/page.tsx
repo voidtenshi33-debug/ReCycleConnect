@@ -1,3 +1,4 @@
+
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,10 +9,7 @@ import { ArrowLeft, SendHorizonal, CheckCheck, MapPin } from "lucide-react";
 import { notFound } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
-import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
-
 
 const QuickReplyButton = ({ children }: { children: React.ReactNode }) => (
     <Button variant="outline" size="sm" className="rounded-full h-auto py-1.5 px-4 text-xs">
@@ -24,12 +22,13 @@ export default function MessageDetailPage({ params }: { params: { id: string } }
     const convo = conversations.find(c => c.id === params.id);
     if (!convo) notFound();
 
-    const myUserId = users[0].id;
+    const myUserId = "user_01";
     const otherUserId = convo.participants.find(p => p !== myUserId);
     const otherUser = users.find(u => u.id === otherUserId);
+    const me = users.find(u => u.id === myUserId);
     const item = items.find(i => i.id === convo.itemId);
     
-    if (!otherUser || !item) notFound();
+    if (!otherUser || !item || !me) notFound();
 
     return (
         <div className="flex flex-col h-full bg-background">
@@ -40,11 +39,11 @@ export default function MessageDetailPage({ params }: { params: { id: string } }
                     <span className="sr-only">Back to messages</span>
                 </Link>
                 <Avatar>
-                    <AvatarImage src={otherUser.avatarUrl} />
-                    <AvatarFallback>{otherUser.name.charAt(0)}</AvatarFallback>
+                    <AvatarImage src={otherUser.photoURL ?? undefined} />
+                    <AvatarFallback>{otherUser.displayName.charAt(0)}</AvatarFallback>
                 </Avatar>
                 <div className="flex-grow overflow-hidden">
-                    <p className="font-semibold truncate">{otherUser.name}</p>
+                    <p className="font-semibold truncate">{otherUser.displayName}</p>
                     <p className="text-sm text-muted-foreground truncate">Online</p>
                 </div>
             </div>
@@ -54,11 +53,11 @@ export default function MessageDetailPage({ params }: { params: { id: string } }
                 <CardContent className="p-3">
                     <div className="flex items-center gap-4">
                         <div className="relative h-16 w-16 rounded-md overflow-hidden flex-shrink-0">
-                            <Image src={item.images[0]} alt={item.title} fill className="object-cover" />
+                            <Image src={item.imageUrls[0]} alt={item.title} fill className="object-cover" />
                         </div>
                         <div className="flex-grow overflow-hidden">
                             <p className="font-semibold truncate">{item.title}</p>
-                            <p className="text-xl font-bold text-primary mt-1">{item.isFree ? 'DONATE' : `$${item.price}`}</p>
+                            <p className="text-xl font-bold text-primary mt-1">{item.listingType === 'Donate' ? 'DONATE' : `₹${item.price}`}</p>
                         </div>
                         <Button asChild variant="secondary" size="sm">
                             <Link href={`/items/${item.id}`}>View Item</Link>
@@ -76,8 +75,8 @@ export default function MessageDetailPage({ params }: { params: { id: string } }
                             message.senderId === myUserId ? "ml-auto flex-row-reverse" : "mr-auto"
                         )}>
                             <Avatar className="h-8 w-8">
-                                <AvatarImage src={message.senderId === myUserId ? users[0].avatarUrl : otherUser.avatarUrl} />
-                                <AvatarFallback>{(message.senderId === myUserId ? users[0].name : otherUser.name).charAt(0)}</AvatarFallback>
+                                <AvatarImage src={message.senderId === myUserId ? me.photoURL ?? undefined : otherUser.photoURL ?? undefined} />
+                                <AvatarFallback>{(message.senderId === myUserId ? me.displayName : otherUser.displayName).charAt(0)}</AvatarFallback>
                             </Avatar>
                             <div className={cn(
                                 "rounded-lg px-3 py-2 text-sm relative group",
@@ -94,8 +93,8 @@ export default function MessageDetailPage({ params }: { params: { id: string } }
                     {/* Typing indicator example */}
                      <div className="flex items-center gap-2 max-w-[75%] mr-auto">
                          <Avatar className="h-8 w-8">
-                            <AvatarImage src={otherUser.avatarUrl} />
-                            <AvatarFallback>{otherUser.name.charAt(0)}</AvatarFallback>
+                            <AvatarImage src={otherUser.photoURL ?? undefined} />
+                            <AvatarFallback>{otherUser.displayName.charAt(0)}</AvatarFallback>
                         </Avatar>
                         <div className="rounded-lg px-4 py-2 bg-muted text-muted-foreground text-sm">
                             <span className="animate-pulse">●</span>
