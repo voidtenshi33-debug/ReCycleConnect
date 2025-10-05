@@ -41,6 +41,12 @@ export const useSpeechRecognition = (): SpeechRecognitionHook => {
       };
 
       recognition.onerror = (event: SpeechRecognitionErrorEvent) => {
+        // The 'no-speech' error is triggered when the user doesn't say anything.
+        // It's not a critical error, so we can safely ignore it to avoid console spam.
+        if (event.error === 'no-speech') {
+          setIsListening(false);
+          return;
+        }
         console.error('Speech recognition error:', event.error);
         setIsListening(false);
       };
