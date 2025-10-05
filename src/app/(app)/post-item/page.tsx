@@ -1,3 +1,4 @@
+
 "use client"
 
 import { useState } from 'react';
@@ -9,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Textarea } from '@/components/ui/textarea';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { ImageUploadWithAI } from '@/components/image-upload-with-ai';
-import { categories } from '@/lib/data';
+import { itemCategories } from '@/lib/data';
 import type { ItemCondition } from '@/lib/types';
 import { ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
@@ -69,7 +70,7 @@ export default function PostItemPage() {
                                     <SelectValue placeholder="Select a category" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    {categories.map(cat => <SelectItem key={cat} value={cat}>{cat}</SelectItem>)}
+                                    {itemCategories.map(cat => <SelectItem key={cat} value={cat}>{cat}</SelectItem>)}
                                 </SelectContent>
                             </Select>
                         </div>

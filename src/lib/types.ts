@@ -1,3 +1,5 @@
+import type { LucideIcon } from "lucide-react";
+
 export type User = {
   id: string;
   name: string;
@@ -9,6 +11,13 @@ export type User = {
 };
 
 export type Category = 'Laptops' | 'Phones' | 'Tablets' | 'Monitors' | 'Cameras' | 'Audio' | 'Accessories' | 'Other';
+
+export type AppCategory = {
+    id: string;
+    name: string;
+    icon: LucideIcon;
+    slug: string;
+}
 
 export type ItemCondition = 'Working' | 'Needs Minor Repair' | 'For Spare Parts Only';
 

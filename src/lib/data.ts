@@ -1,4 +1,5 @@
-import type { User, Item, Category, Conversation, ChatMessage, ExchangeRequest, Notification } from './types';
+import type { User, Item, Category, Conversation, ChatMessage, ExchangeRequest, Notification, AppCategory } from './types';
+import { Smartphone, Laptop, Keyboard, Monitor, Plug, Cable, Headphones, Speaker, MemoryStick, HardDrive, SquarePlus } from 'lucide-react';
 
 export const users: User[] = [
   { id: 'user-1', name: 'Jane Doe', avatarUrl: 'https://picsum.photos/seed/user1/100/100', memberSince: '2023-05-15', location: 'San Francisco, CA', rating: 4.8, reviews: 24 },
@@ -50,4 +51,15 @@ export const notifications: Notification[] = [
     { id: 'notif-3', userId: 'user-3', type: 'new_rating', text: 'Jane Doe left you a 5-star rating!', link: '/users/user-3', isRead: true, createdAt: '4 days ago' },
 ];
 
-export const categories: Category[] = ['Laptops', 'Phones', 'Tablets', 'Monitors', 'Cameras', 'Audio', 'Accessories', 'Other'];
+export const itemCategories: Category[] = ['Laptops', 'Phones', 'Tablets', 'Monitors', 'Cameras', 'Audio', 'Accessories', 'Other'];
+
+export const categories: AppCategory[] = [
+  { id: 'mobiles', name: 'Mobiles', icon: Smartphone, slug: 'mobiles' },
+  { id: 'laptops', name: 'Laptops', icon: Laptop, slug: 'laptops' },
+  { id: 'keyboards', name: 'Keyboards', icon: Keyboard, slug: 'keyboards-mice' },
+  { id: 'monitors', name: 'Monitors', icon: Monitor, slug: 'monitors' },
+  { id: 'cables', name: 'Cables', icon: Cable, slug: 'chargers-cables' },
+  { id: 'audio', name: 'Audio', icon: Headphones, slug: 'audio-devices' },
+  { id: 'components', name: 'Components', icon: MemoryStick, slug: 'components' },
+  { id: 'other', name: 'Other', icon: SquarePlus, slug: 'other-accessories' },
+];
