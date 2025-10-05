@@ -1,5 +1,6 @@
+
 import { ItemCard } from '@/components/item-card';
-import { items } from '@/lib/data';
+import { items, users } from '@/lib/data';
 import {
   Select,
   SelectContent,
@@ -9,6 +10,9 @@ import {
 } from "@/components/ui/select"
 import { Button } from '@/components/ui/button';
 import { ListFilter } from 'lucide-react';
+
+const getSeller = (sellerId: string) => users.find(u => u.id === sellerId);
+
 
 export default function HomePage() {
   return (
@@ -36,9 +40,11 @@ export default function HomePage() {
             </div>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 lg:gap-6">
-            {items.map(item => (
-                <ItemCard key={item.id} item={item} />
-            ))}
+            {items.map(item => {
+                const seller = getSeller(item.sellerId);
+                if (!seller) return null;
+                return <ItemCard key={item.id} item={item} seller={seller} />
+            })}
         </div>
     </>
   );

@@ -14,7 +14,7 @@ import { Separator } from "./ui/separator"
 
 interface ItemCardProps {
   item: Item;
-  seller: User;
+  seller?: User;
 }
 
 export function ItemCard({ item, seller }: ItemCardProps) {
@@ -37,7 +37,7 @@ export function ItemCard({ item, seller }: ItemCardProps) {
             <span className="sr-only">Add to wishlist</span>
         </Button>
          <div className="absolute top-2 left-2 flex gap-2">
-            <Badge variant="secondary">Working ✓</Badge>
+            <Badge variant="secondary">{item.condition}</Badge>
         </div>
       </CardHeader>
       <CardContent className="p-4 flex-grow grid gap-2">
@@ -49,22 +49,26 @@ export function ItemCard({ item, seller }: ItemCardProps) {
         </div>
         <p className="text-sm text-muted-foreground">📍 {item.location}</p>
       </CardContent>
-      <Separator />
-      <CardFooter className="p-3">
-          <div className="flex items-center gap-2 w-full">
-                <Avatar className="h-8 w-8">
-                    <AvatarImage src={seller.avatarUrl} alt={seller.name} />
-                    <AvatarFallback>{getInitials(seller.name)}</AvatarFallback>
-                </Avatar>
-                <div className="grid gap-0.5 text-sm flex-grow">
-                    <p className="font-semibold truncate">{seller.name.split(' ')[0]}</p>
-                </div>
-                 <div className="flex items-center gap-1 text-sm text-muted-foreground">
-                    <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                    <span>{seller.rating.toFixed(1)}</span>
-                </div>
-            </div>
-      </CardFooter>
+      {seller && (
+        <>
+            <Separator />
+            <CardFooter className="p-3">
+                <div className="flex items-center gap-2 w-full">
+                        <Avatar className="h-8 w-8">
+                            <AvatarImage src={seller.avatarUrl} alt={seller.name} />
+                            <AvatarFallback>{getInitials(seller.name)}</AvatarFallback>
+                        </Avatar>
+                        <div className="grid gap-0.5 text-sm flex-grow">
+                            <p className="font-semibold truncate">{seller.name.split(' ')[0]}</p>
+                        </div>
+                        <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                            <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+                            <span>{seller.rating.toFixed(1)}</span>
+                        </div>
+                    </div>
+            </CardFooter>
+        </>
+      )}
     </Card>
   )
 }
