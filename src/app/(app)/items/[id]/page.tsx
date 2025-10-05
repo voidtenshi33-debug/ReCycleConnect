@@ -13,7 +13,6 @@ import { format } from "date-fns";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import { Separator } from "@/components/ui/separator";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { cn } from "@/lib/utils";
 import { useDoc, useFirebase } from "@/firebase";
 import { doc } from "firebase/firestore";
 import type { Item, User } from "@/lib/types";
@@ -43,10 +42,8 @@ const getConditionIcon = (condition: string) => {
     }
 }
 
-
-export default function ItemDetailPage({ params }: { params: { id: string } }) {
+function ItemDetailContent({ itemId }: { itemId: string }) {
     const { firestore } = useFirebase();
-    const itemId = params.id;
 
     const itemRef = useMemoFirebase(() => firestore ? doc(firestore, 'items', itemId) : null, [firestore, itemId]);
     const { data: item, isLoading: isItemLoading } = useDoc<Item>(itemRef);
@@ -223,4 +220,9 @@ export default function ItemDetailPage({ params }: { params: { id: string } }) {
             </div>
         </div>
     );
+}
+
+
+export default function ItemDetailPage({ params }: { params: { id: string } }) {
+    return <ItemDetailContent itemId={params.id} />;
 }
