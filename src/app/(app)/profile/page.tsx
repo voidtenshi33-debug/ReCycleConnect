@@ -15,6 +15,7 @@ import { format } from "date-fns";
 import { doc } from "firebase/firestore";
 import Link from "next/link";
 import { useMemoFirebase } from "@/firebase/provider";
+import { Skeleton } from "@/components/ui/skeleton";
 
 
 function ProfileSkeleton() {
