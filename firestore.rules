@@ -2,169 +2,118 @@
  * @fileoverview Firestore Security Rules for ReCycleConnect.
  *
  * Core Philosophy:
- * This ruleset prioritizes user data ownership and prevents unauthorized access to sensitive information.
- * Public read access is granted to certain collections like `items` to enable browsing.
+ * This ruleset prioritizes user data ownership and enforces strict access control for write operations.
+ * Read access is more permissive where appropriate (e.g., public item listings).
  *
  * Data Structure:
- * - `/users/{userId}`: Stores user profile data, accessible only to the user themselves.
- * - `/items/{itemId}`: Stores item listing data, publicly readable but with owner-only write access.
- * - `/conversations/{conversationId}`: Stores conversation metadata. Access is restricted to conversation participants.
- * - `/conversations/{conversationId}/messages/{messageId}`: Stores individual chat messages. Access is restricted to conversation participants.
- * - `/exchanges/{exchangeId}`: Stores exchange requests between users. Access is restricted to involved users.
+ * - /users/{userId}: Stores user profiles, accessible only by the user themselves.
+ * - /items/{itemId}: Stores item listings; publicly readable but writable only by the item owner.
+ * - /conversations/{conversationId}: Stores conversation metadata, accessible to participants.
+ * - /conversations/{conversationId}/messages/{messageId}: Stores individual chat messages, accessible to participants.
+ * - /exchanges/{exchangeId}: Stores exchange requests between users, with access control based on participation.
  *
  * Key Security Decisions:
  * - Users can only read and write their own profile data.
- * - Item listings are publicly readable, but only the owner can modify or delete them. The owner must be validated on `create`, `update`, and `delete`.
- * - Conversations and messages are private between participants.
- * - Listing of items is public.
+ * - Item listings are publicly readable but only the owner can modify or delete them.
+ * - Conversations and messages are only accessible to the participants.
+ * - Listing of the /exchanges collection is denied to all users.
  *
  * Denormalization for Authorization:
- * - Item documents contain `ownerId`, `ownerName`, and `ownerAvatarUrl` to enable owner-based authorization without additional reads.
+ * The `Item` documents contain `ownerId` fields to simplify ownership checks.
  */
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
     /**
-     * @description Grants access to user profiles.
+     * @description Checks if the user is signed in.
+     */
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    /**
+     * @description Checks if the authenticated user is the owner of the resource, based on the provided userId.
+     */
+    function isOwner(userId) {
+      return request.auth.uid == userId;
+    }
+
+    /**
+     * @description Checks if the authenticated user is the owner of the existing resource, ensuring it exists.
+     */
+    function isExistingOwner(userId) {
+      return isOwner(userId) && resource != null;
+    }
+    
+    /**
+     * @description Enforces document ownership for writes and restricts access to a user's own data tree.
      * @path /users/{userId}
-     * @allow (create) If the user's UID matches the userId, allowing self-creation of profile.
-     * @allow (get, list, update, delete) If the user's UID matches the userId, allowing full access to their profile.
-     * @deny (create) If the user's UID does not match the userId, preventing unauthorized profile creation.
-     * @deny (get, list, update, delete) If the user's UID does not match the userId, preventing unauthorized access to other profiles.
-     * @principle Enforces strict user-ownership for profile data.
+     * @allow (create) - User with UID 'user123' creates a profile with userId 'user123'.
+     * @allow (get) - User with UID 'user123' retrieves their own profile at /users/user123.
+     * @deny (update) - User with UID 'user456' attempts to update the profile at /users/user123.
+     * @principle Enforces document ownership for writes, restricts access to a user's own data tree.
      */
     match /users/{userId} {
-      function isOwner(userId) {
-        return request.auth != null && request.auth.uid == userId;
-      }
-
-      function isExistingOwner(userId) {
-        return isOwner(userId); // Relaxed validation - removed resource.data.keys().hasAny(['name'])
-      }
-
-      allow get, list: if isOwner(userId);
-      allow create: if isOwner(userId);
-      allow update: if isExistingOwner(userId);
+      allow get: if isOwner(userId);
+      allow list: if false;
+      allow create: if isOwner(userId) && request.resource.data.userId == request.auth.uid;
+      allow update: if isExistingOwner(userId) && request.resource.data.userId == resource.data.userId;
       allow delete: if isExistingOwner(userId);
     }
 
     /**
-     * @description Grants public read access to items, but restricts writes to the item owner.
+     * @description Allows public read access to item listings while restricting write access to the item owner.
      * @path /items/{itemId}
-     * @allow (get, list) Public access to read item data.
-     * @allow (create) If the user's UID matches the ownerId in the request, and the request data is valid.
-     * @allow (update, delete) If the user's UID matches the ownerId of the existing item.
-     * @deny (create) If the user's UID does not match the ownerId in the request, preventing unauthorized item creation.
-     * @deny (update, delete) If the user's UID does not match the ownerId of the existing item, preventing unauthorized modification.
-     * @principle Provides public read access while enforcing owner-only write access for item listings.
+     * @allow (get, list) - Any user can read item listings.
+     * @allow (create) - User with UID 'user123' creates an item with ownerId 'user123'.
+     * @deny (update) - User with UID 'user456' attempts to update an item owned by 'user123'.
+     * @principle Allows public read access, enforces document ownership for writes.
      */
     match /items/{itemId} {
-      function isSignedIn() {
-        return request.auth != null;
-      }
-
-      function isOwner(ownerId) {
-        return isSignedIn() && request.auth.uid == ownerId;
-      }
-
-      function isExistingOwner() {
-        return isSignedIn() && resource.data.ownerId == request.auth.uid;
-      }
-
       allow get, list: if true;
       allow create: if isSignedIn() && request.resource.data.ownerId == request.auth.uid;
-      allow update: if isExistingOwner();
-      allow delete: if isExistingOwner();
+      allow update: if isExistingOwner(resource.data.ownerId);
+      allow delete: if isExistingOwner(resource.data.ownerId);
     }
 
     /**
-     * @description Manages access to conversations.
+     * @description Controls access to conversations, allowing read/write access only to participants.
      * @path /conversations/{conversationId}
-     * @allow (get, list) If the user is a participant in the conversation.
-     * @allow (create) If the user is a participant in the conversation.
-     * @allow (update, delete) If the user is the owner of the conversation.
-     * @deny (get, list) If the user is not a participant in the conversation.
-     * @deny (create) If the user is not a participant in the conversation.
-     * @deny (update, delete) If the user is not the owner of the conversation.
-     * @principle Restricts access to conversations based on participation.
+     * @allow (get) - User 'user123' can read the conversation if they are a participant.
+     * @allow (create) - If the conversation is between the two users.
+     * @deny (get) - User 'user456' tries to read a conversation they are not a part of.
+     * @principle Restricts access to shared resources (conversations) to authorized collaborators (participants).
      */
     match /conversations/{conversationId} {
-      function isSignedIn() {
-        return request.auth != null;
-      }
-
-      function isParticipant() {
-        return isSignedIn() && request.resource.data.participants.hasAny([request.auth.uid]);
-      }
-
-      function isExistingParticipant() {
-        return isSignedIn() && resource.data.participants.hasAny([request.auth.uid]);
-      }
-
-      allow get, list: if isExistingParticipant();
-      allow create: if isSignedIn() && request.resource.data.participants.hasAny([request.auth.uid]);
-      allow update: if isExistingParticipant();
-      allow delete: if false; // Deleting conversations is disallowed
+      allow get, create: if request.auth.uid in resource.data.participants;
+      allow list: if false;
+      allow update: if request.auth.uid in resource.data.participants;
+      allow delete: if false;
     }
 
     /**
-     * @description Manages access to chat messages within a conversation.
+     * @description Controls access to messages within a conversation, allowing read/write access only to participants.
      * @path /conversations/{conversationId}/messages/{messageId}
-     * @allow (get, list) If the user is a participant in the parent conversation.
-     * @allow (create) If the user is a participant in the parent conversation and the message sender.
-     * @allow (update, delete) Denied for security reasons. Messages should not be updated or deleted.
-     * @deny (get, list) If the user is not a participant in the parent conversation.
-     * @deny (create) If the user is not a participant in the parent conversation or not the message sender.
-     * @deny (update, delete) Always deny message updates and deletes.
-     * @principle Restricts access to messages based on participation in the parent conversation.
+     * @allow (create) - User 'user123' can create a message in a conversation they are a part of.
+     * @deny (get) - User 'user456' tries to read messages from a conversation they are not a part of.
+     * @principle Restricts access to shared resources (messages) to authorized collaborators (participants).
      */
     match /conversations/{conversationId}/messages/{messageId} {
-      function isSignedIn() {
-        return request.auth != null;
-      }
-
-      function isParticipant(conversationId) {
-        return isSignedIn() && get(/databases/$(database)/documents/conversations/$(conversationId)).data.participants.hasAny([request.auth.uid]);
-      }
-
-      allow get, list: if isParticipant(conversationId);
-      allow create: if isSignedIn() && isParticipant(conversationId) && request.resource.data.senderId == request.auth.uid;
-      allow update, delete: if false; // Messages cannot be updated or deleted
+      allow get, list, create: if get(/databases/$(database)/documents/conversations/$(conversationId)).data.participants.hasAny([request.auth.uid]);
+      allow update, delete: if false;
     }
 
-     /**
-      * @description Manages access to exchange requests between users.
-      * @path /exchanges/{exchangeId}
-      * @allow (get, list) Denied, listing exchanges not allowed.
-      * @allow (create) If the user is the requester or seller in the exchange.
-      * @allow (update) If the user is the requester or seller in the exchange and the status is being updated.
-      * @allow (delete) Denied, deleting exchanges not allowed.
-      * @deny (get, list) Always deny listing exchange requests.
-      * @deny (create) If the user is not the requester or seller in the exchange.
-      * @deny (update) If the user is not the requester or seller or the status is not being updated.
-      * @deny (delete) Always deny deleting exchange requests.
-      * @principle Limits access to exchange requests to the involved users.
-      */
+    /**
+     * @description Controls access to exchange requests, allowing read/write access only to participants.
+     * @path /exchanges/{exchangeId}
+     */
     match /exchanges/{exchangeId} {
-        function isSignedIn() {
-            return request.auth != null;
-        }
-
-        function isInvolved(requesterId, sellerId) {
-            return isSignedIn() && (request.auth.uid == requesterId || request.auth.uid == sellerId);
-        }
-
-        function isExistingInvolved() {
-            return isSignedIn() && (resource.data.requesterId == request.auth.uid || resource.data.sellerId == request.auth.uid);
-        }
-
-        allow get: if false; // Exchanges are not publicly accessible for direct get.
-        allow list: if false; // Exchanges are not listable.
-        allow create: if isSignedIn() && request.resource.data.requesterId is string && request.resource.data.sellerId is string && isInvolved(request.resource.data.requesterId, request.resource.data.sellerId);
-        allow update: if isExistingInvolved()
-                        && request.resource.data.status != resource.data.status; // Allow status updates by involved parties only.
-        allow delete: if false; // Exchanges cannot be deleted.
+      allow get: if request.auth.uid == resource.data.requesterId || request.auth.uid == resource.data.sellerId;
+      allow list: if false;
+      allow create: if request.auth.uid == request.resource.data.requesterId || request.auth.uid == request.resource.data.sellerId;
+      allow update: if request.auth.uid == resource.data.requesterId || request.auth.uid == resource.data.sellerId;
+      allow delete: if false;
     }
   }
 }
