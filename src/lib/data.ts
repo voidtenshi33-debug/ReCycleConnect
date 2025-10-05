@@ -73,7 +73,7 @@ export const items: Item[] = [
     condition: "Needs Minor Repair",
     listingType: "Donate",
     price: 0,
-    imageUrls: ["https://images.unsplash.com/photo-1592224907029-2b5e03a088a2"],
+    imageUrls: ["https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSjIsQWn3Snxqlvj8gM8SBzw7a-pghK6Jf9vg&s"],
     locality: "viman-nagar",
     ownerId: "user_02",
     ownerName: "Anjali Sharma",
