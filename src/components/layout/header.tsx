@@ -1,5 +1,5 @@
 
-"use client"
+'use client'
 
 import Link from "next/link"
 import { Bell, CircleUser, Home, Leaf, Menu, Search, Heart, Repeat2, MessageSquare, User as UserIcon, Mic, MapPin, ChevronDown, Languages } from "lucide-react"
@@ -30,6 +30,7 @@ import { useLanguage } from "@/context/language-context"
 import { T } from "../t"
 import { useSpeechRecognition } from "@/hooks/use-speech-recognition"
 import { useToast } from "@/hooks/use-toast"
+import { ListeningOverlay } from "../listening-overlay"
 
 
 const MobileNavLink = ({ href, icon: Icon, children }: { href: string, icon: React.ElementType, children: React.ReactNode }) => {
@@ -77,10 +78,10 @@ export default function Header() {
 
   const handleSearchSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (pathname !== '/home') {
+    if (pathname !== '/home' && searchQuery.trim()) {
       router.push(`/home?q=${encodeURIComponent(searchQuery)}`);
     }
-    // On the home page, the search is handled by the component's state
+    // On the home page, the search is handled by the component's state automatically
   };
   
   const handleLogout = async () => {
@@ -109,6 +110,7 @@ export default function Header() {
   const currentLocation = locations.find(l => l.slug === user?.lastKnownLocality)?.name || "Select Location";
 
   return (
+    <>
     <header className="flex h-14 items-center gap-4 border-b bg-muted/40 px-4 lg:h-[60px] lg:px-6">
       <Sheet>
         <SheetTrigger asChild>
@@ -151,22 +153,21 @@ export default function Header() {
             <Input
               type="search"
               placeholder="Search products..."
-              className="w-full appearance-none bg-background pl-8 pr-10 shadow-none md:w-2/3 lg:w-1/3"
+              className={cn("w-full appearance-none bg-background pl-8 shadow-none md:w-2/3 lg:w-1/3", hasRecognitionSupport && "pr-10")}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
-            <Button
-              type="button"
-              variant="ghost"
-              size="icon"
-              className={cn(
-                "absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8 rounded-full",
-                isListening && "bg-destructive text-destructive-foreground animate-pulse"
-              )}
-              onClick={handleMicClick}
-            >
-              <Mic className="h-4 w-4" />
-            </Button>
+            {hasRecognitionSupport && (
+                <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8 rounded-full"
+                onClick={handleMicClick}
+                >
+                <Mic className="h-4 w-4" />
+                </Button>
+            )}
           </form>
         </div>
         
@@ -232,5 +233,9 @@ export default function Header() {
         setIsOpen={setLocationModalOpen}
       />
     </header>
+    <ListeningOverlay isOpen={isListening} />
+    </>
   )
 }
+
+    

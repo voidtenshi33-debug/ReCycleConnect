@@ -92,7 +92,7 @@ export default function Sidebar() {
             <Button asChild size="sm" className="w-full">
                 <Link href="/post-item">
                     <PlusCircle className="mr-2 h-4 w-4" />
-                    Post Your E-Waste
+                    <T>Post Your E-Waste</T>
                 </Link>
             </Button>
         </div>
@@ -100,3 +100,5 @@ export default function Sidebar() {
     </div>
   )
 }
+
+    
