@@ -47,9 +47,9 @@ export default function Sidebar() {
           </nav>
         </div>
         <div className="mt-auto p-4">
-          <Button size="sm" className="w-full" asChild>
+          <Button size="lg" className="w-full" asChild>
             <Link href="/post-item">
-              <PlusCircle className="mr-2 h-4 w-4" /> Post an Item
+              <PlusCircle className="mr-2 h-5 w-5" /> Post an Item
             </Link>
           </Button>
         </div>

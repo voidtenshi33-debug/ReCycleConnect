@@ -1,6 +1,9 @@
 import Header from '@/components/layout/header';
 import Sidebar from '@/components/layout/sidebar';
 import { FirebaseClientProvider } from '@/firebase/client-provider';
+import Link from 'next/link';
+import { Button } from '@/components/ui/button';
+import { Plus } from 'lucide-react';
 
 export default function AppLayout({
   children,
@@ -17,6 +20,12 @@ export default function AppLayout({
             {children}
           </main>
         </div>
+        <Button asChild className="fixed bottom-6 right-6 h-16 w-16 rounded-full shadow-lg lg:hidden" size="icon">
+          <Link href="/post-item">
+            <Plus className="h-8 w-8" />
+            <span className="sr-only">Post Item</span>
+          </Link>
+        </Button>
       </div>
     </FirebaseClientProvider>
   );
