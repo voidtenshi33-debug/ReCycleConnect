@@ -1,4 +1,3 @@
-
 'use client';
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -35,12 +34,12 @@ function MessageSkeleton() {
     );
 }
 
-export default function MessageDetailPage({ params }: { params: { id: string } }) {
+function MessageDetailContent({ conversationId }: { conversationId: string }) {
     const { firestore, user } = useFirebase();
     const [messageText, setMessageText] = useState("");
     const scrollAreaRef = useRef<HTMLDivElement>(null);
 
-    const convoRef = useMemoFirebase(() => firestore ? doc(firestore, 'conversations', params.id) : null, [firestore, params.id]);
+    const convoRef = useMemoFirebase(() => firestore ? doc(firestore, 'conversations', conversationId) : null, [firestore, conversationId]);
     const { data: convo, isLoading: isConvoLoading } = useDoc<Conversation>(convoRef);
 
     const otherUserId = useMemo(() => convo?.participants.find(p => p !== user?.uid), [convo, user]);
@@ -62,7 +61,7 @@ export default function MessageDetailPage({ params }: { params: { id: string } }
 
     const handleSendMessage = async (e: FormEvent) => {
         e.preventDefault();
-        if (!messageText.trim() || !user || !firestore || !convo) return;
+        if (!messageText.trim() || !user || !firestore || !convo || !otherUserId) return;
         
         const textToSend = messageText;
         setMessageText(""); // Optimistic UI update
@@ -81,7 +80,7 @@ export default function MessageDetailPage({ params }: { params: { id: string } }
             await updateDoc(convoRef, {
                 lastMessage: textToSend,
                 lastMessageTimestamp: serverTimestamp(),
-                [`unreadCount.${otherUserId}`]: (convo.unreadCount[otherUserId!] || 0) + 1
+                [`unreadCount.${otherUserId}`]: (convo.unreadCount[otherUserId] || 0) + 1
             });
         } catch (error) {
             console.error("Error sending message:", error);
@@ -195,4 +194,9 @@ export default function MessageDetailPage({ params }: { params: { id: string } }
             </div>
         </div>
     );
+}
+
+
+export default function MessageDetailPage({ params }: { params: { id: string } }) {
+    return <MessageDetailContent conversationId={params.id} />;
 }
