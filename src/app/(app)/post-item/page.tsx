@@ -10,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Textarea } from '@/components/ui/textarea';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { ImageUploadWithAI } from '@/components/image-upload-with-ai';
-import { itemCategories, locations, users as mockUsers } from '@/lib/data';
+import { categories as appCategories, locations, users as mockUsers } from '@/lib/data';
 import type { Item, ItemCondition } from '@/lib/types';
 import { ArrowLeft, Loader2 } from 'lucide-react';
 import Link from 'next/link';
@@ -32,8 +32,13 @@ export default function PostItemPage() {
 
     const handleCategoriesSuggested = (categories: string[]) => {
         setSuggestedCategories(categories);
+        // Auto-select the first suggested category if it exists in our app categories
         if (categories.length > 0) {
-            setSelectedCategory(categories[0]);
+           const suggestedSlug = categories[0].toLowerCase().replace(/\s/g, '-');
+           const matchingCategory = appCategories.find(c => c.slug === suggestedSlug || c.name.toLowerCase() === categories[0].toLowerCase());
+           if(matchingCategory) {
+               setSelectedCategory(matchingCategory.slug);
+           }
         }
     };
 
@@ -64,15 +69,17 @@ export default function PostItemPage() {
 
         const price = Number(formValues.price) || 0;
         
-        // Find mock user data for owner fields - in a real app, this might come from a user profile hook
-        const ownerProfile = mockUsers.find(u => u.userId === user.uid) || { ownerName: user.displayName, ownerAvatarUrl: user.photoURL, ownerRating: 0 };
+        const ownerProfile = mockUsers.find(u => u.userId === user.uid) || { displayName: user.displayName, photoURL: user.photoURL, averageRating: 0 };
 
 
         try {
+             // In a real app, this would come from a file upload service
+            const imageUrl = imageDataUri;
+
             const newItem: Omit<Item, 'id'> = {
                 title: formValues.title as string,
                 description: formValues.description as string,
-                imageUrls: [imageDataUri], // In a real app, you'd upload the file and get a URL
+                imageUrls: [imageUrl],
                 category: formValues.category as string,
                 condition: formValues.condition as ItemCondition,
                 listingType: price === 0 ? "Donate" : "Sell",
@@ -128,6 +135,7 @@ export default function PostItemPage() {
 
                         <div className="grid gap-2">
                             <Label>Item Image</Label>
+                            <p className="text-sm text-muted-foreground">Start by uploading a photo. Our AI will help suggest a category.</p>
                             <ImageUploadWithAI 
                                 onCategoriesSuggested={handleCategoriesSuggested}
                                 onImageSelected={setImageDataUri}
@@ -139,11 +147,17 @@ export default function PostItemPage() {
                             {suggestedCategories.length > 0 && (
                                 <div className="flex flex-wrap gap-2 mb-2">
                                     <p className="text-sm text-muted-foreground w-full">AI Suggestions:</p>
-                                    {suggestedCategories.map(cat => (
-                                        <Button key={cat} type="button" variant={selectedCategory === cat ? "default" : "secondary"} size="sm" onClick={() => setSelectedCategory(cat)}>
-                                            {cat}
-                                        </Button>
-                                    ))}
+                                    {suggestedCategories.map(cat => {
+                                        const catSlug = cat.toLowerCase().replace(/\s/g, '-');
+                                        const matchingAppCat = appCategories.find(c => c.slug === catSlug || c.name.toLowerCase() === cat.toLowerCase());
+                                        if (!matchingAppCat) return null;
+
+                                        return (
+                                            <Button key={cat} type="button" variant={selectedCategory === matchingAppCat.slug ? "default" : "secondary"} size="sm" onClick={() => setSelectedCategory(matchingAppCat.slug)}>
+                                                {cat}
+                                            </Button>
+                                        )
+                                    })}
                                 </div>
                             )}
                             <Select name="category" value={selectedCategory} onValueChange={setSelectedCategory} required>
@@ -151,7 +165,7 @@ export default function PostItemPage() {
                                     <SelectValue placeholder="Select a category" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    {itemCategories.map(cat => <SelectItem key={cat} value={cat}>{cat}</SelectItem>)}
+                                    {appCategories.map(cat => <SelectItem key={cat.slug} value={cat.slug}>{cat.name}</SelectItem>)}
                                 </SelectContent>
                             </Select>
                         </div>
