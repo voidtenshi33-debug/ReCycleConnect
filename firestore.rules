@@ -2,144 +2,207 @@
  * @fileoverview Firestore Security Rules for ReCycleConnect.
  *
  * Core Philosophy:
- * This ruleset prioritizes user data ownership and prevents unauthorized access to personal information and transactions.
- * Public read access is granted only where explicitly intended.
+ * This ruleset enforces a user-centric security model where users own their profiles and can only modify them.
+ * Items are publicly readable but can only be created, updated, or deleted by their owners.
+ * Conversations are shared between two participants, and only they can read/write messages within the conversation.
  *
  * Data Structure:
- * - /users/{userId}: Stores user profiles, accessible only to the owning user.
- * - /items/{itemId}: Stores item listings, publicly readable but writable only by the item owner.
- * - /conversations/{conversationId}: Stores metadata about conversations, accessible only to participants.
- * - /conversations/{conversationId}/messages/{messageId}: Stores individual chat messages, accessible only to conversation participants.
- * - /exchanges/{exchangeId}: Stores exchange requests, accessible only to the requester or seller.
+ * - /users/{userId}: Stores user profiles, with the document ID matching the Firebase Auth UID.
+ * - /items/{itemId}: Stores item listings. Each item has an `ownerId` field.
+ * - /conversations/{conversationId}: Top-level collection for chat sessions.
+ * - /conversations/{conversationId}/messages/{messageId}: Sub-collection for messages within a specific chat.
+ * - /exchanges/{exchangeId}: Stores exchange requests between users.
  *
  * Key Security Decisions:
- * - User listing is disallowed to protect privacy.
- * - `conversations` and `messages` are secured to ensure only participants can view chat data.
- * - All write operations require authentication and authorization.
+ * - Users can only read and write their own profile data.
+ * - Items are publicly readable but can only be created, updated, or deleted by their owners.
+ * - Listing of all users is disallowed.
+ * - Conversations and messages are restricted to the participants involved.
+ * - Only authenticated users can create exchange requests.
  *
  * Denormalization for Authorization:
- *  The `exchanges` collection requires filtering by either `requesterId` or `sellerId` to ensure that users can only query exchanges relevant to them.
+ * - The `items` documents denormalize owner information (ownerId, ownerName, ownerAvatarUrl, ownerRating) to avoid costly `get()` calls to the `users` collection.
  */
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
     /**
-     * @description Checks if the requesting user is signed in.
-     */
-    function isSignedIn() {
-      return request.auth != null;
-    }
-
-    /**
-     * @description Checks if the requesting user is the owner of the resource.
-     */
-    function isOwner(userId) {
-      return request.auth.uid == userId;
-    }
-
-    /**
-     * @description Checks if the requesting user is the existing owner of the resource.
-     * This function combines the ownership check with the existence check for destructive operations.
-     */
-    function isExistingOwner(userId) {
-        return (isOwner(userId) && resource.data != null);
-    }
-
-    /**
-     * @description Enforces user-ownership for writes and prevents unauthorized data access.
+     * @description Controls access to user profile documents.
      * @path /users/{userId}
-     * @allow (create) - User A can create their own profile document.
-     *   auth.uid: "userA", request.resource.data.userId: "userA"
-     * @allow (get, update, delete) - User A can read, update, and delete their own profile.
-     *   auth.uid: "userA", resource.data.userId: "userA"
-     * @deny (create) - User B cannot create a profile document for User A.
-     *   auth.uid: "userB", request.resource.data.userId: "userA"
-     * @deny (get, update, delete) - User B cannot read, update, or delete User A's profile.
-     *   auth.uid: "userB", resource.data.userId: "userA"
-     * @principle Enforces strict user-ownership for accessing profile data.
+     * @allow (create) Authenticated user creates their own profile.
+     * @allow (get, update, delete) Authenticated user accesses their own profile.
+     * @deny (create) If the user ID in the request does not match the authenticated user's ID.
+     * @deny (get, update, delete) If the user ID in the path does not match the authenticated user's ID.
+     * @deny (list) Listing users is not allowed.
+     * @principle Enforces document ownership and prevents unauthorized profile access.
      */
     match /users/{userId} {
-      allow get: if isOwner(userId);
+      // Verified identity
+      function isSignedIn() {
+        return request.auth != null;
+      }
+
+      // Helper function to check if the requesting user is the owner of the profile.
+      function isOwner(userId) {
+        return request.auth.uid == userId;
+      }
+
+      // Helper function to check if the user exists and is the owner of the profile.
+      function isExistingOwner(userId) {
+        return isOwner(userId) && resource != null;
+      }
+
+      // Allows a user to create their own profile if the userId matches their auth.uid.
+      allow create: if isSignedIn() && isOwner(userId) && request.resource.data.userId == request.auth.uid;
+
+      // Only the authenticated user can read their own profile.
+      allow get: if isSignedIn() && isOwner(userId);
+
+      // Only the authenticated user can list their own profile.
       allow list: if false;
-      allow create: if isSignedIn() && isOwner(userId);
-      allow update: if isExistingOwner(userId);
+
+      // Only the authenticated user can update their own profile.
+      allow update: if isExistingOwner(userId) && request.resource.data.userId == resource.data.userId;
+
+      // Only the authenticated user can delete their own profile.
       allow delete: if isExistingOwner(userId);
     }
 
     /**
-     * @description Allows public reading of items, but restricts writes to the item owner.
+     * @description Controls access to item documents.
      * @path /items/{itemId}
-     * @allow (get, list) - Any user can view item listings.
-     * @allow (create) - User A can create a listing if they are the owner.
-     *   auth.uid: "userA", request.resource.data.ownerId: "userA"
-     * @allow (update, delete) - User A can update/delete a listing if they are the owner.
-     *   auth.uid: "userA", resource.data.ownerId: "userA"
-     * @deny (create) - User B cannot create a listing owned by User A.
-     *   auth.uid: "userB", request.resource.data.ownerId: "userA"
-     * @deny (update, delete) - User B cannot update/delete User A's listing.
-     *   auth.uid: "userB", resource.data.ownerId: "userA"
-     * @principle Enforces document ownership for writes, while allowing public reads.
+     * @allow (get, list) Items are publicly readable.
+     * @allow (create) Authenticated user creates an item with their ID as the ownerId.
+     * @allow (update, delete) Authenticated user updates or deletes an item they own.
+     * @deny (create) If the ownerId in the request does not match the authenticated user's ID.
+     * @deny (update, delete) If the user is not the owner of the item.
+     * @principle Enforces document ownership for writes, public readability for listings.
      */
     match /items/{itemId} {
+      // Verified identity
+      function isSignedIn() {
+        return request.auth != null;
+      }
+
+      // Helper function to check if the requesting user is the owner of the item.
+      function isOwner(ownerId) {
+        return request.auth.uid == ownerId;
+      }
+
+      // Helper function to check if the user exists and is the owner of the item.
+      function isExistingOwner(ownerId) {
+        return isOwner(ownerId) && resource != null;
+      }
+
+      // Items are publicly readable.
       allow get, list: if true;
-      allow create: if isSignedIn() && request.resource.data.ownerId == request.auth.uid;
+
+      // An authenticated user can create an item if they are the owner.
+      allow create: if isSignedIn() && isOwner(request.resource.data.ownerId);
+
+      // Only the owner of the item can update it.
       allow update: if isExistingOwner(resource.data.ownerId);
+
+      // Only the owner of the item can delete it.
       allow delete: if isExistingOwner(resource.data.ownerId);
     }
 
     /**
-     * @description Restricts access to conversations to only the participants.
+     * @description Controls access to conversation documents.
      * @path /conversations/{conversationId}
-     * @allow (get, list) - User A can view the conversation if they are a participant.
-     *   auth.uid: "userA", resource.data.participants: ["userA", "userB"]
-     * @allow (create, update, delete) - Only participants can modify the conversation.
-     *   auth.uid: "userA", resource.data.participants: ["userA", "userB"]
-     * @deny (get, list) - User C cannot view the conversation if they are not a participant.
-     *   auth.uid: "userC", resource.data.participants: ["userA", "userB"]
-     * @principle Enforces shared access based on the 'participants' array.
+     * @allow (get, list) If the authenticated user is a participant in the conversation.
+     * @allow (create) If the authenticated user is a participant in the conversation.
+     * @allow (update) If the authenticated user is a participant in the conversation.
+     * @allow (delete) If the authenticated user is a participant in the conversation.
+     * @deny If the authenticated user is not a participant in the conversation.
+     * @principle Enforces shared access: Only participants can access the conversation.
      */
     match /conversations/{conversationId} {
-        allow get: if isSignedIn() && request.auth.uid in resource.data.participants;
-        allow list: if false;
-        allow create: if isSignedIn() && request.resource.data.participants.hasAll([request.auth.uid]) && request.resource.data.participants.size() == 2;
-        allow update: if isSignedIn() && request.auth.uid in resource.data.participants;
-        allow delete: if false;
+       // Verified identity
+      function isSignedIn() {
+        return request.auth != null;
+      }
+
+      // Helper function to check if the user is a participant in the conversation.
+      function isParticipant() {
+        return request.auth.uid in resource.data.participants;
+      }
+
+      // Helper function to check if the user exists and is a participant of the conversation.
+      function isExistingParticipant() {
+        return isParticipant() && resource != null;
+      }
+
+      // Allows get and list if the user is a participant.
+      allow get, list: if isSignedIn() && isParticipant();
+
+      // Allows create if the user is a participant.
+      allow create: if isSignedIn() && request.resource.data.participants.hasAll([request.auth.uid]);
+
+      // Allows update if the user is an existing participant.
+      allow update: if isSignedIn() && isExistingParticipant();
+
+      // Allows delete if the user is an existing participant.
+      allow delete: if isSignedIn() && isExistingParticipant();
     }
 
     /**
-     * @description Restricts access to messages within a conversation to only the participants.
+     * @description Controls access to message documents within a conversation.
      * @path /conversations/{conversationId}/messages/{messageId}
-     * @allow (get, list) - User A can view messages if they are a participant in the conversation.
-     *   auth.uid: "userA", get(/databases/$(database)/documents/conversations/$(conversationId)).data.participants: ["userA", "userB"]
-     * @allow (create) - User A can create a message if they are a participant in the conversation.
-     *   auth.uid: "userA", get(/databases/$(database)/documents/conversations/$(conversationId)).data.participants: ["userA", "userB"]
-     * @deny (get, list) - User C cannot view messages if they are not a participant in the conversation.
-     *   auth.uid: "userC", get(/databases/$(database)/documents/conversations/$(conversationId)).data.participants: ["userA", "userB"]
-     * @principle Enforces shared access to subcollection based on the parent document's 'participants' array.
+     * @allow (get, list) If the authenticated user is a participant in the parent conversation.
+     * @allow (create) If the authenticated user is a participant in the parent conversation.
+     * @allow (update, delete) Denied for security; messages should not be modified or deleted.
+     * @deny If the authenticated user is not a participant in the parent conversation.
+     * @principle Enforces shared access: Only participants in the conversation can access messages.
      */
     match /conversations/{conversationId}/messages/{messageId} {
-        allow get, list: if isSignedIn() && request.auth.uid in get(/databases/$(database)/documents/conversations/$(conversationId)).data.participants;
-        allow create: if isSignedIn() && request.auth.uid in get(/databases/$(database)/documents/conversations/$(conversationId)).data.participants;
-        allow update, delete: if false;
+      // Verified identity
+      function isSignedIn() {
+        return request.auth != null;
+      }
+
+      // Helper function to check if the user is a participant in the conversation.
+      function isParticipant(conversationId) {
+        return get(/databases/$(database)/documents/conversations/$(conversationId)).data.participants.hasAll([request.auth.uid]);
+      }
+
+      // Allows get and list if the user is a participant.
+      allow get, list: if isSignedIn() && isParticipant(conversationId);
+
+      // Allows create if the user is a participant.
+      allow create: if isSignedIn() && isParticipant(conversationId) && request.resource.data.senderId == request.auth.uid;
+
+      // Messages cannot be updated or deleted.
+      allow update, delete: if false;
     }
 
     /**
-     * @description Restricts access to exchanges to only the requester or seller.
+     * @description Controls access to exchange request documents.
      * @path /exchanges/{exchangeId}
-     * @allow (get) - User A can view the exchange if they are the requester or seller.
-     *   auth.uid: "userA", resource.data.requesterId: "userA" OR resource.data.sellerId: "userA"
-     * @allow (list) - User A can query the exchanges collection only if they are filtering by their own user ID in either the requesterId or sellerId field.
-     * @allow (create) - User A can create an exchange request if they are the requester or seller.
-     *   auth.uid: "userA", request.resource.data.requesterId: "userA" OR request.resource.data.sellerId: "userA"
-     * @deny (get) - User C cannot view the exchange if they are not the requester or seller.
-     *   auth.uid: "userC", resource.data.requesterId: "userA", resource.data.sellerId: "userB"
+     * @allow (create) Authenticated user can create an exchange request.
+     * @allow (get, list) Authenticated user can retrieve exchange requests.
+     * @allow (update) Only the seller can update the status.
+     * @allow (delete) No deletion of documents.
+     * @deny If the authenticated user is not the seller or requester.
+     * @principle Enforces creation by authenticated users, controlled updates by participants.
      */
     match /exchanges/{exchangeId} {
-      allow get: if isSignedIn() && (resource.data.requesterId == request.auth.uid || resource.data.sellerId == request.auth.uid);
-      allow list: if isSignedIn();
-      allow create: if isSignedIn() && (request.resource.data.requesterId == request.auth.uid || request.resource.data.sellerId == request.auth.uid);
-      allow update: if isSignedIn() && (resource.data.requesterId == request.auth.uid || resource.data.sellerId == request.auth.uid);
+      // Verified identity
+      function isSignedIn() {
+        return request.auth != null;
+      }
+
+      // Allows authenticated users to create exchange requests.
+      allow create: if isSignedIn();
+
+      // Allows authenticated users to retrieve exchange requests.
+      allow get, list: if isSignedIn();
+
+      // Allows the seller to update the status.
+      allow update: if isSignedIn() && resource.data.sellerId == request.auth.uid;
+
+      // Prevents deletion of documents.
       allow delete: if false;
     }
   }

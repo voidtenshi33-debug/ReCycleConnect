@@ -4,13 +4,13 @@
 import Image from "next/image"
 import Link from "next/link"
 import { Heart, Star, Zap, MoreVertical, Trash2, Edit } from "lucide-react"
+import { doc, updateDoc, arrayUnion, arrayRemove } from "firebase/firestore";
 
-import type { Item } from "@/lib/types"
+import type { Item, User as UserProfile } from "@/lib/types"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { useUser } from "@/firebase"
-import { users } from "@/lib/data"
+import { useDoc, useFirebase, useUser } from "@/firebase"
 import { useState, useEffect } from "react"
 import { cn } from "@/lib/utils"
 import { T } from "./t"
@@ -20,6 +20,9 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { useMemoFirebase } from "@/firebase/provider";
+import { useToast } from "@/hooks/use-toast";
+
 
 interface ItemCardProps {
   item: Item;
@@ -28,49 +31,53 @@ interface ItemCardProps {
 }
 
 export function ItemCard({ item, showControls = false, onRemove }: ItemCardProps) {
-  const { user, isUserLoading } = useUser();
+  const { firestore, user, isUserLoading } = useFirebase();
+  const { toast } = useToast();
   
-  // In a real app, this would come from a Firestore hook or a context provider
-  // For now, we simulate finding the logged-in user from our mock data.
-  // We'll default to 'user_01' if Firebase auth is loading or there's no user.
-  const loggedInUserId = user?.uid || "user_01"; 
-  const userProfile = users.find(u => u.userId === loggedInUserId);
-  
+  const userProfileRef = useMemoFirebase(() => {
+    if (!firestore || !user?.uid) return null;
+    return doc(firestore, 'users', user.uid);
+  }, [firestore, user?.uid]);
+
+  const { data: userProfile } = useDoc<UserProfile>(userProfileRef);
+
   const [isWishlisted, setIsWishlisted] = useState(false);
 
   useEffect(() => {
-    // Initialize wishlist state based on the current user's data
     if (userProfile?.wishlist) {
       setIsWishlisted(userProfile.wishlist.includes(item.id));
     }
   }, [userProfile, item.id]);
 
-  const handleWishlistToggle = () => {
-    // In a real app, we would check for the user object before proceeding
-    if (isUserLoading || !userProfile) return;
-    
-    // This is where you would call the Firestore update logic.
-    // For now, we just toggle the state locally for immediate UI feedback.
-    const newWishlistedState = !isWishlisted;
-    setIsWishlisted(newWishlistedState);
-
-    // Mock update the local user data object to simulate the database change
-    // This is a temporary solution for the prototype.
-    if (newWishlistedState) {
-        userProfile.wishlist.push(item.id);
-    } else {
-        const index = userProfile.wishlist.indexOf(item.id);
-        if (index > -1) {
-            userProfile.wishlist.splice(index, 1);
-        }
+  const handleWishlistToggle = async () => {
+    if (isUserLoading || !user || !userProfileRef) {
+        toast({
+            variant: "destructive",
+            title: "Please log in",
+            description: "You need to be logged in to add items to your wishlist.",
+        });
+        return;
     }
+    
+    const newWishlistedState = !isWishlisted;
+    setIsWishlisted(newWishlistedState); // Optimistic UI update
 
-    console.log(`Item ${item.id} ${newWishlistedState ? 'added to' : 'removed from'} wishlist for user ${userProfile.userId}.`);
-    // In a real app, you'd use a Firestore function:
-    // const userRef = doc(db, 'users', user.uid);
-    // await updateDoc(userRef, {
-    //   wishlist: newWishlistedState ? arrayUnion(item.id) : arrayRemove(item.id)
-    // });
+    try {
+      await updateDoc(userProfileRef, {
+        wishlist: newWishlistedState ? arrayUnion(item.id) : arrayRemove(item.id)
+      });
+       toast({
+            title: newWishlistedState ? "Added to Wishlist" : "Removed from Wishlist",
+        });
+    } catch (error) {
+      console.error("Error updating wishlist:", error);
+      setIsWishlisted(!newWishlistedState); // Revert on error
+      toast({
+            variant: "destructive",
+            title: "Something went wrong",
+            description: "Could not update your wishlist. Please try again.",
+      });
+    }
   }
 
   const categoryName = typeof item.category === 'string' ? item.category : item.category.name;
