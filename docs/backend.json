@@ -41,6 +41,17 @@
         "ratingsCount": {
           "type": "number",
           "description": "The total number of ratings the user has received."
+        },
+        "isTrusted": {
+            "type": "boolean",
+            "description": "Whether the user is a trusted seller."
+        },
+        "wishlist": {
+            "type": "array",
+            "description": "An array of item IDs that the user has wishlisted.",
+            "items": {
+                "type": "string"
+            }
         }
       },
       "required": [

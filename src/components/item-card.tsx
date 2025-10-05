@@ -1,4 +1,6 @@
 
+'use client'
+
 import Image from "next/image"
 import Link from "next/link"
 import { Heart, Star, Zap } from "lucide-react"
@@ -10,12 +12,54 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/componen
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar"
 import { getInitials } from "@/lib/utils"
 import { Separator } from "./ui/separator"
+import { useFirebase } from "@/firebase"
+import { users } from "@/lib/data"
+import { useState, useEffect } from "react"
+import { cn } from "@/lib/utils"
 
 interface ItemCardProps {
   item: Item;
 }
 
 export function ItemCard({ item }: ItemCardProps) {
+  const { user, isUserLoading } = useFirebase();
+  // Find the current user's profile from mock data
+  const userProfile = users.find(u => u.userId === user?.uid);
+  
+  const [isWishlisted, setIsWishlisted] = useState(false);
+
+  useEffect(() => {
+    if (userProfile?.wishlist) {
+      setIsWishlisted(userProfile.wishlist.includes(item.id));
+    }
+  }, [userProfile, item.id]);
+
+  const handleWishlistToggle = () => {
+    if (isUserLoading || !userProfile) return;
+    
+    // This is where you would call the Firestore update logic
+    // For now, we just toggle the state locally
+    const newWishlistedState = !isWishlisted;
+    setIsWishlisted(newWishlistedState);
+
+    // Mock update the local user data for immediate feedback
+    if (newWishlistedState) {
+        userProfile.wishlist.push(item.id);
+    } else {
+        const index = userProfile.wishlist.indexOf(item.id);
+        if (index > -1) {
+            userProfile.wishlist.splice(index, 1);
+        }
+    }
+
+    console.log(`Item ${item.id} ${newWishlistedState ? 'added to' : 'removed from'} wishlist.`);
+    // In a real app:
+    // const userRef = doc(db, 'users', user.uid);
+    // await updateDoc(userRef, {
+    //   wishlist: newWishlistedState ? arrayUnion(item.id) : arrayRemove(item.id)
+    // });
+  }
+
   return (
     <Card className="w-full overflow-hidden flex flex-col transition-all hover:shadow-lg">
       <CardHeader className="p-0 relative">
@@ -30,9 +74,15 @@ export function ItemCard({ item }: ItemCardProps) {
             />
           </div>
         </Link>
-        <Button variant="ghost" size="icon" className="absolute top-2 right-2 bg-background/50 backdrop-blur-sm rounded-full hover:bg-background/70">
-            <Heart className="w-5 h-5 text-destructive" />
-            <span className="sr-only">Add to wishlist</span>
+        <Button 
+          variant="ghost" 
+          size="icon" 
+          className="absolute top-2 right-2 bg-background/50 backdrop-blur-sm rounded-full hover:bg-background/70 group"
+          onClick={handleWishlistToggle}
+          disabled={isUserLoading}
+          aria-label="Toggle Wishlist"
+        >
+            <Heart className={cn("w-5 h-5 text-destructive transition-all group-hover:scale-110", isWishlisted && "fill-destructive")} />
         </Button>
          <div className="absolute top-2 left-2 flex gap-2">
             {item.isFeatured && (
@@ -48,7 +98,7 @@ export function ItemCard({ item }: ItemCardProps) {
             <CardTitle className="font-headline text-lg hover:underline leading-tight">{item.title}</CardTitle>
           </Link>
         <div className="text-2xl font-bold text-primary">
-          {item.listingType === 'Donate' ? 'DONATE' : `₹${item.price.toLocaleString()}`}
+          {item.listingType === 'Donate' ? 'DONATE' : `₹${item.price.toLocaleString('en-IN')}`}
         </div>
         <p className="text-sm text-muted-foreground">📍 {item.locality}</p>
       </CardContent>

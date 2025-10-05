@@ -12,6 +12,7 @@ export type User = {
   averageRating: number;
   ratingsCount: number;
   isTrusted: boolean;
+  wishlist: string[];
 };
 
 export type Category = 'Laptops' | 'Phones' | 'Tablets' | 'Monitors' | 'Cameras' | 'Audio' | 'Accessories' | 'Other';

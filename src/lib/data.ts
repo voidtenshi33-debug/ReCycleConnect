@@ -10,10 +10,11 @@ export const users: User[] = [
     email: "rohan.k@example.com",
     photoURL: "https://i.pravatar.cc/150?u=rohan",
     createdAt: new Date("2025-10-04T13:10:00"),
-    lastKnownLocality: "Kothrud",
+    lastKnownLocality: "kothrud",
     averageRating: 4.8,
     ratingsCount: 12,
     isTrusted: true,
+    wishlist: ['item-3']
   },
   {
     id: "user_02",
@@ -22,10 +23,11 @@ export const users: User[] = [
     email: "anjali.s@example.com",
     photoURL: "https://i.pravatar.cc/150?u=anjali",
     createdAt: new Date("2025-10-03T09:30:00"),
-    lastKnownLocality: "Viman Nagar",
+    lastKnownLocality: "viman-nagar",
     averageRating: 4.9,
     ratingsCount: 8,
     isTrusted: true,
+    wishlist: []
   },
   {
     id: "user_03",
@@ -34,10 +36,11 @@ export const users: User[] = [
     email: "vikram.s@example.com",
     photoURL: null,
     createdAt: new Date("2025-10-01T17:00:00"),
-    lastKnownLocality: "Hadapsar",
+    lastKnownLocality: "hadapsar",
     averageRating: 4.5,
     ratingsCount: 4,
     isTrusted: false,
+    wishlist: []
   }
 ];
 
@@ -131,6 +134,24 @@ export const items: Item[] = [
     status: "Available",
     isFeatured: false,
     createdAt: new Date("2025-10-01T14:00:00")
+  },
+   {
+    id: 'item-6',
+    title: "Sony Noise-Cancelling Headphones",
+    description: "WH-1000XM4 model. Excellent condition, comes with the original case. The sound quality is amazing.",
+    category: "audio-devices",
+    condition: "Working",
+    listingType: "Sell",
+    price: 8000,
+    imageUrls: ["https://images.unsplash.com/photo-1546435770-a3e426bf40B1"],
+    locality: "baner",
+    ownerId: "user_02",
+    ownerName: "Anjali Sharma",
+    ownerAvatarUrl: "https://i.pravatar.cc/150?u=anjali",
+    ownerRating: 4.9,
+    status: "Available",
+    isFeatured: true,
+    createdAt: new Date("2025-10-04T14:00:00")
   }
 ];
 
