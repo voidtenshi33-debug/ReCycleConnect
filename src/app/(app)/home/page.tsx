@@ -85,7 +85,6 @@ function HomePageContent() {
   const searchParams = useSearchParams();
   const [activeCategory, setActiveCategory] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState('');
-  const [currentItems, setCurrentItems] = useState<Item[]>([]);
 
   const itemsQuery = useMemoFirebase(() => {
     if (!firestore) return null;
@@ -105,14 +104,7 @@ function HomePageContent() {
   }, [allItems]);
 
 
-  useEffect(() => {
-    const queryFromUrl = searchParams.get('q');
-    if (queryFromUrl) {
-      setSearchQuery(queryFromUrl);
-    }
-  }, [searchParams]);
-
-  useEffect(() => {
+  const currentItems = useMemo(() => {
     let filtered = displayedItems;
     // @ts-ignore - user has no lastKnownLocality
     const userLocation = user?.lastKnownLocality;
@@ -136,11 +128,18 @@ function HomePageContent() {
       );
     }
 
-    setCurrentItems(filtered);
+    return filtered;
   }, [user, isUserLoading, activeCategory, searchQuery, displayedItems]);
 
+
+  useEffect(() => {
+    const queryFromUrl = searchParams.get('q');
+    if (queryFromUrl) {
+      setSearchQuery(queryFromUrl);
+    }
+  }, [searchParams]);
+
   const { featuredItems, donationItems } = useMemo(() => {
-    if (!displayedItems) return { featuredItems: [], donationItems: [] };
     const featured = displayedItems.filter(item => item.isFeatured);
     const donations = displayedItems.filter(item => item.listingType === 'Donate');
 
@@ -194,12 +193,12 @@ function HomePageContent() {
            <h2 className="text-2xl font-headline font-semibold mb-4">
              {searchQuery ? <T>Search Results</T> : getHeading()}
           </h2>
-          {areItemsLoading ? (
+          {areItemsLoading && currentItems.length === 0 ? (
             <div className="col-span-full text-center py-12 text-muted-foreground">
                 <p><T>Loading items...</T></p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 lg:gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 lg:gap-6">
                 {currentItems.length > 0 ? (
                 currentItems.map(item => (
                     <ItemCard key={item.id} item={item} />
@@ -227,3 +226,5 @@ export default function HomePage() {
     </Suspense>
   )
 }
+
+    
