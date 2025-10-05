@@ -31,7 +31,7 @@ export type AppCategory = {
     slug: string;
 }
 
-export type ItemCondition = 'Working' | 'Needs Minor Repair' | 'For Spare Parts Only';
+export type ItemCondition = 'Like New' | 'Good' | 'Working' | 'Needs Minor Repair' | 'Needs Major Repair' | 'For Spare Parts Only' | 'Not Working';
 
 export type Item = {
   id: string;

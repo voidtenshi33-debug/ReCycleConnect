@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { MultiImageUpload } from '@/components/multi-image-upload';
+import { MultiImageUpload } from '@/components/image-upload-with-ai';
 import { categories as appCategories, locations, users as mockUsers } from '@/lib/data';
 import type { Item, ItemCondition } from '@/lib/types';
 import { Loader2, Sparkles } from 'lucide-react';
@@ -19,6 +19,17 @@ import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
 import { PriceSlider } from './price-slider';
 import { handleGenerateDescription } from '@/app/actions';
 import { Card } from './ui/card';
+
+const conditionOptions: ItemCondition[] = [
+    "Like New",
+    "Good",
+    "Working",
+    "Needs Minor Repair",
+    "Needs Major Repair",
+    "For Spare Parts Only",
+    "Not Working"
+];
+
 
 export function PostItemForm() {
     const router = useRouter();
@@ -218,11 +229,11 @@ export function PostItemForm() {
 
             <div className="grid gap-2">
                 <Label>Condition</Label>
-                <RadioGroup name="condition" defaultValue="Working" className="flex flex-col sm:flex-row gap-4 pt-2">
-                    {(["Working", "Needs Minor Repair", "For Spare Parts Only"] as ItemCondition[]).map(cond => (
+                <RadioGroup name="condition" defaultValue="Working" className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 pt-2">
+                    {conditionOptions.map(cond => (
                         <div key={cond} className="flex items-center space-x-2">
                             <RadioGroupItem value={cond} id={cond} />
-                            <Label htmlFor={cond}>{cond}</Label>
+                            <Label htmlFor={cond} className="font-normal">{cond}</Label>
                         </div>
                     ))}
                 </RadioGroup>

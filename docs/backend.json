@@ -76,7 +76,7 @@
         "imageUrls": { "type": "array", "items": { "type": "string", "format": "uri" } },
         "category": { "type": "string" },
         "brand": { "type": "string" },
-        "condition": { "type": "string", "enum": ["Working", "Needs Minor Repair", "For Spare Parts Only"] },
+        "condition": { "type": "string", "enum": ["Like New", "Good", "Working", "Needs Minor Repair", "Needs Major Repair", "For Spare Parts Only", "Not Working"] },
         "listingType": { "type": "string", "enum": ["Sell", "Donate"] },
         "price": { "type": "number" },
         "locality": { "type": "string", "description": "The locality slug e.g. 'kothrud'" },
@@ -236,5 +236,3 @@
     "reasoning": "The Firestore data structure is designed to support the ReCycleConnect application's core features. The `users` collection stores public profiles. The `items` collection holds all listings. The `conversations` collection is introduced to manage chat sessions between users, with a `messages` sub-collection for individual messages. This nested approach is efficient for loading a specific chat's history. Denormalizing fields like `lastMessage` and `unreadCount` in the parent `conversations` document allows for efficient loading of the chat list view without needing to query sub-collections. The `exchanges` collection tracks the state of transactions."
   }
 }
-
-    

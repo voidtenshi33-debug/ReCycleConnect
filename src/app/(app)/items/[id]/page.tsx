@@ -7,11 +7,12 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { items, users } from "@/lib/data";
 import { notFound } from "next/navigation";
-import { ArrowLeft, ChevronRight, Flag, MessageSquare, Share2, Star, ShieldCheck, CreditCard, Award, Zap, CheckCircle } from "lucide-react";
+import { ArrowLeft, ChevronRight, Flag, MessageSquare, Share2, Star, ShieldCheck, CreditCard, Award, Zap, CheckCircle, Wrench, XCircle } from "lucide-react";
 import { format } from "date-fns";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import { Separator } from "@/components/ui/separator";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { cn } from "@/lib/utils";
 
 const TrustBadge = ({ icon: Icon, children }: { icon: React.ElementType, children: React.ReactNode }) => (
     <div className="flex items-center gap-2 text-sm text-muted-foreground">
@@ -19,6 +20,23 @@ const TrustBadge = ({ icon: Icon, children }: { icon: React.ElementType, childre
         <span className="font-medium">{children}</span>
     </div>
 );
+
+const getConditionIcon = (condition: string) => {
+    switch (condition) {
+        case 'Like New':
+        case 'Good':
+        case 'Working':
+            return <CheckCircle className="w-3.5 h-3.5 text-green-600" />;
+        case 'Needs Minor Repair':
+        case 'Needs Major Repair':
+            return <Wrench className="w-3.5 h-3.5 text-amber-600" />;
+        case 'For Spare Parts Only':
+        case 'Not Working':
+            return <XCircle className="w-3.5 h-3.5 text-red-600" />;
+        default:
+            return null;
+    }
+}
 
 
 export default function ItemDetailPage({ params }: { params: { id: string } }) {
@@ -71,7 +89,7 @@ export default function ItemDetailPage({ params }: { params: { id: string } }) {
                             <div className="flex flex-wrap items-center gap-2 pt-2">
                                 <Badge variant="secondary" className="text-sm">{item.category}</Badge>
                                 <Badge variant="outline" className="text-sm flex items-center gap-1">
-                                    {item.condition === 'Working' && <CheckCircle className="w-3.5 h-3.5 text-green-600" />}
+                                    {getConditionIcon(item.condition)}
                                     {item.condition}
                                 </Badge>
                                  {item.isFeatured && <Badge variant="default" className="bg-yellow-400 text-yellow-900 gap-1"><Zap className="w-3.5 h-3.5" /> Featured</Badge>}
