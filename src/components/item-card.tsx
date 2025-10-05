@@ -12,7 +12,7 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/componen
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar"
 import { getInitials } from "@/lib/utils"
 import { Separator } from "./ui/separator"
-import { useFirebase } from "@/firebase"
+import { useUser } from "@/firebase"
 import { users } from "@/lib/data"
 import { useState, useEffect } from "react"
 import { cn } from "@/lib/utils"
@@ -22,27 +22,34 @@ interface ItemCardProps {
 }
 
 export function ItemCard({ item }: ItemCardProps) {
-  const { user, isUserLoading } = useFirebase();
-  // Find the current user's profile from mock data
-  const userProfile = users.find(u => u.userId === user?.uid);
+  const { user, isUserLoading } = useUser();
+  
+  // In a real app, this would come from a Firestore hook or a context provider
+  // For now, we simulate finding the logged-in user from our mock data.
+  // We'll default to 'user_01' if Firebase auth is loading or there's no user.
+  const loggedInUserId = user?.uid || "user_01"; 
+  const userProfile = users.find(u => u.userId === loggedInUserId);
   
   const [isWishlisted, setIsWishlisted] = useState(false);
 
   useEffect(() => {
+    // Initialize wishlist state based on the current user's data
     if (userProfile?.wishlist) {
       setIsWishlisted(userProfile.wishlist.includes(item.id));
     }
   }, [userProfile, item.id]);
 
   const handleWishlistToggle = () => {
+    // In a real app, we would check for the user object before proceeding
     if (isUserLoading || !userProfile) return;
     
-    // This is where you would call the Firestore update logic
-    // For now, we just toggle the state locally
+    // This is where you would call the Firestore update logic.
+    // For now, we just toggle the state locally for immediate UI feedback.
     const newWishlistedState = !isWishlisted;
     setIsWishlisted(newWishlistedState);
 
-    // Mock update the local user data for immediate feedback
+    // Mock update the local user data object to simulate the database change
+    // This is a temporary solution for the prototype.
     if (newWishlistedState) {
         userProfile.wishlist.push(item.id);
     } else {
@@ -52,8 +59,8 @@ export function ItemCard({ item }: ItemCardProps) {
         }
     }
 
-    console.log(`Item ${item.id} ${newWishlistedState ? 'added to' : 'removed from'} wishlist.`);
-    // In a real app:
+    console.log(`Item ${item.id} ${newWishlistedState ? 'added to' : 'removed from'} wishlist for user ${userProfile.userId}.`);
+    // In a real app, you'd use a Firestore function:
     // const userRef = doc(db, 'users', user.uid);
     // await updateDoc(userRef, {
     //   wishlist: newWishlistedState ? arrayUnion(item.id) : arrayRemove(item.id)
