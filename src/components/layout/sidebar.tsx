@@ -81,7 +81,7 @@ export default function Sidebar() {
         <div className="flex-1 py-2">
           <nav className="grid items-start px-2 text-sm font-medium lg:px-4">
             <NavLink href="/home" icon={Home} exact><T>Home</T></NavLink>
-            <NavLink href="/exchanges" icon={Repeat2} badge="3"><T>Exchanges</T></NavLink>
+            <NavLink href="/exchanges" icon={Repeat2}><T>Exchanges</T></NavLink>
             <NavLink href="/messages" icon={MessageSquare}><T>Messages</T></NavLink>
             <NavLink href="/valuator" icon={WandSparkles}><T>AI Valuator</T></NavLink>
             <NavLink href="/wishlist" icon={Heart}><T>Wishlist</T></NavLink>
