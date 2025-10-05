@@ -69,13 +69,13 @@ export type Conversation = {
 };
 
 export type Rating = {
-  id: string;
+  id:string;
   itemId: string;
   raterId: string;
   ratedUserId: string;
   rating: number; // 1-5 stars
   comment: string;
-  createdAt: string;
+  createdAt: any; // Firestore Timestamp
 };
 
 export type ExchangeRequest = {
@@ -84,7 +84,7 @@ export type ExchangeRequest = {
   requesterId: string;
   sellerId: string;
   status: 'Pending' | 'Accepted' | 'Rejected' | 'Completed';
-  createdAt: string;
+  createdAt: any; // Firestore Timestamp
 };
 
 export type Notification = {
