@@ -4,10 +4,21 @@ import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { conversations, items, users } from "@/lib/data";
 import { cn } from "@/lib/utils";
-import { SendHorizonal } from "lucide-react";
+import { ArrowLeft, SendHorizonal, CheckCheck, MapPin } from "lucide-react";
 import { notFound } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
+
+
+const QuickReplyButton = ({ children }: { children: React.ReactNode }) => (
+    <Button variant="outline" size="sm" className="rounded-full h-auto py-1.5 px-4 text-xs">
+        {children}
+    </Button>
+)
+
 
 export default function MessageDetailPage({ params }: { params: { id: string } }) {
     const convo = conversations.find(c => c.id === params.id);
@@ -21,22 +32,45 @@ export default function MessageDetailPage({ params }: { params: { id: string } }
     if (!otherUser || !item) notFound();
 
     return (
-        <div className="col-span-3 lg:col-span-3 flex flex-col h-full bg-background">
+        <div className="flex flex-col h-full bg-background">
             {/* Chat Header */}
-            <div className="flex items-center gap-4 p-4 border-b">
-                <Link href={`/items/${item.id}`} className="flex items-center gap-2 flex-grow overflow-hidden">
-                    <Image src={item.images[0]} alt={item.title} width={40} height={40} className="rounded-md object-cover" />
-                    <div className="overflow-hidden">
-                        <p className="font-semibold truncate">{item.title}</p>
-                        <p className="text-sm text-muted-foreground truncate">Conversation with {otherUser.name}</p>
-                    </div>
+            <div className="flex items-center gap-4 p-2 md:p-4 border-b">
+                <Link href="/messages" className="p-2 md:hidden">
+                    <ArrowLeft className="h-5 w-5" />
+                    <span className="sr-only">Back to messages</span>
                 </Link>
+                <Avatar>
+                    <AvatarImage src={otherUser.avatarUrl} />
+                    <AvatarFallback>{otherUser.name.charAt(0)}</AvatarFallback>
+                </Avatar>
+                <div className="flex-grow overflow-hidden">
+                    <p className="font-semibold truncate">{otherUser.name}</p>
+                    <p className="text-sm text-muted-foreground truncate">Online</p>
+                </div>
             </div>
+            
+            {/* Contextual Item Header */}
+             <Card className="m-2 md:m-4 rounded-lg shadow-sm">
+                <CardContent className="p-3">
+                    <div className="flex items-center gap-4">
+                        <div className="relative h-16 w-16 rounded-md overflow-hidden flex-shrink-0">
+                            <Image src={item.images[0]} alt={item.title} fill className="object-cover" />
+                        </div>
+                        <div className="flex-grow overflow-hidden">
+                            <p className="font-semibold truncate">{item.title}</p>
+                            <p className="text-xl font-bold text-primary mt-1">{item.isFree ? 'DONATE' : `$${item.price}`}</p>
+                        </div>
+                        <Button asChild variant="secondary" size="sm">
+                            <Link href={`/items/${item.id}`}>View Item</Link>
+                        </Button>
+                    </div>
+                </CardContent>
+            </Card>
 
             {/* Messages */}
             <ScrollArea className="flex-grow p-4">
                 <div className="space-y-4">
-                    {convo.messages.map(message => (
+                    {convo.messages.map((message, index) => (
                         <div key={message.id} className={cn(
                             "flex items-end gap-2 max-w-[75%]",
                             message.senderId === myUserId ? "ml-auto flex-row-reverse" : "mr-auto"
@@ -46,20 +80,46 @@ export default function MessageDetailPage({ params }: { params: { id: string } }
                                 <AvatarFallback>{(message.senderId === myUserId ? users[0].name : otherUser.name).charAt(0)}</AvatarFallback>
                             </Avatar>
                             <div className={cn(
-                                "rounded-lg px-3 py-2 text-sm",
+                                "rounded-lg px-3 py-2 text-sm relative group",
                                 message.senderId === myUserId ? "bg-primary text-primary-foreground" : "bg-muted"
                             )}>
-                                {message.text}
+                                <p>{message.text}</p>
+                                <div className="flex items-center gap-1.5 text-xs text-right mt-1.5 opacity-70">
+                                    <span>{message.timestamp}</span>
+                                    {message.senderId === myUserId && <CheckCheck className="w-4 h-4 text-accent" />}
+                                </div>
                             </div>
                         </div>
                     ))}
+                    {/* Typing indicator example */}
+                     <div className="flex items-center gap-2 max-w-[75%] mr-auto">
+                         <Avatar className="h-8 w-8">
+                            <AvatarImage src={otherUser.avatarUrl} />
+                            <AvatarFallback>{otherUser.name.charAt(0)}</AvatarFallback>
+                        </Avatar>
+                        <div className="rounded-lg px-4 py-2 bg-muted text-muted-foreground text-sm">
+                            <span className="animate-pulse">●</span>
+                            <span className="animate-pulse delay-150">●</span>
+                            <span className="animate-pulse delay-300">●</span>
+                        </div>
+                    </div>
                 </div>
             </ScrollArea>
 
+            {/* Quick Replies */}
+            <div className="px-4 py-2 border-t flex gap-2 overflow-x-auto">
+                 <QuickReplyButton>Is this still available?</QuickReplyButton>
+                 <QuickReplyButton>I'll take it!</QuickReplyButton>
+                 <QuickReplyButton>
+                    <MapPin className="mr-1.5 h-3 w-3" />
+                    Share Location
+                </QuickReplyButton>
+            </div>
+
             {/* Message Input */}
-            <div className="p-4 border-t">
+            <div className="p-4 border-t bg-muted/40">
                 <form className="flex items-center gap-2">
-                    <Input placeholder="Type your message..." className="flex-grow" />
+                    <Input placeholder="Type your message..." className="flex-grow bg-background" />
                     <Button type="submit" size="icon">
                         <SendHorizonal className="h-4 w-4" />
                         <span className="sr-only">Send</span>
