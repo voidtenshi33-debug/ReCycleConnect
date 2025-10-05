@@ -16,7 +16,12 @@ export type User = {
   wishlist: string[];
 };
 
-export type Category = 'Laptops' | 'Phones' | 'Tablets' | 'Monitors' | 'Cameras' | 'Audio' | 'Accessories' | 'Other';
+export type Category = {
+    id: string;
+    name: string;
+    icon: LucideIcon;
+    slug: string;
+}
 
 export type AppCategory = {
     id: string;

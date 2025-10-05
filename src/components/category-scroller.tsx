@@ -4,6 +4,7 @@
 import { categories } from "@/lib/data";
 import { cn } from "@/lib/utils";
 import { Button } from "./ui/button";
+import { T } from "./t";
 
 interface CategoryScrollerProps {
     onCategorySelect: (slug: string) => void;
@@ -30,7 +31,7 @@ export function CategoryScroller({ onCategorySelect, activeCategory }: CategoryS
                         onClick={() => onCategorySelect(category.slug)}
                     >
                         <category.icon className={cn("h-8 w-8 text-muted-foreground transition-all", isActive ? "text-primary-foreground" : "group-hover:text-primary")} />
-                        <p className={cn("text-xs font-medium text-muted-foreground transition-all", isActive ? "text-primary-foreground" : "group-hover:text-primary")}>{category.name}</p>
+                        <p className={cn("text-xs font-medium text-muted-foreground transition-all", isActive ? "text-primary-foreground" : "group-hover:text-primary")}><T>{category.name}</T></p>
                     </Button>
                 )
             })}

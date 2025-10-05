@@ -13,6 +13,7 @@ import { useUser } from "@/firebase"
 import { users } from "@/lib/data"
 import { useState, useEffect } from "react"
 import { cn } from "@/lib/utils"
+import { T } from "./t"
 
 interface ItemCardProps {
   item: Item;
@@ -64,6 +65,8 @@ export function ItemCard({ item }: ItemCardProps) {
     // });
   }
 
+  const categoryName = typeof item.category === 'string' ? item.category : item.category.name;
+
   return (
     <Card className="w-full overflow-hidden flex flex-col transition-all hover:shadow-lg">
       <CardHeader className="p-0 relative">
@@ -91,25 +94,25 @@ export function ItemCard({ item }: ItemCardProps) {
          <div className="absolute top-2 left-2 flex gap-2">
             {item.isFeatured && (
                 <Badge variant="default" className="bg-yellow-400 text-yellow-900 gap-1 pr-3">
-                    <Zap className="w-3.5 h-3.5" /> Featured
+                    <Zap className="w-3.5 h-3.5" /> <T>Featured</T>
                 </Badge>
             )}
-            <Badge variant="secondary">{item.condition}</Badge>
+            <Badge variant="secondary"><T>{item.condition}</T></Badge>
         </div>
       </CardHeader>
       <CardContent className="p-4 flex-grow grid gap-2">
          <Link href={`/items/${item.id}`}>
-            <CardTitle className="font-headline text-lg hover:underline leading-tight">{item.title}</CardTitle>
+            <CardTitle className="font-headline text-lg hover:underline leading-tight"><T>{item.title}</T></CardTitle>
           </Link>
         <div className="text-2xl font-bold text-primary">
-          {item.listingType === 'Donate' ? 'DONATE' : `₹${item.price.toLocaleString('en-IN')}`}
+          {item.listingType === 'Donate' ? <T>DONATE</T> : `₹${item.price.toLocaleString('en-IN')}`}
         </div>
         <p className="text-sm text-muted-foreground">📍 {item.locality}</p>
       </CardContent>
       <CardFooter className="p-0">
         <Button asChild className="w-full rounded-t-none">
           <Link href={`/items/${item.id}`}>
-            View Now
+            <T>View Now</T>
           </Link>
         </Button>
       </CardFooter>

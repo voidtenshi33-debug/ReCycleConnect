@@ -91,7 +91,10 @@ export default function HomePage() {
     }
     
     if (activeCategory !== 'all') {
-      filtered = filtered.filter(item => item.category === activeCategory);
+      const categoryName = appCategories.find(c => c.slug === activeCategory)?.name;
+      if (categoryName) {
+        filtered = filtered.filter(item => item.category.toLowerCase() === categoryName.toLowerCase());
+      }
     }
 
     if (searchQuery) {
@@ -105,16 +108,16 @@ export default function HomePage() {
   }, [user, isUserLoading, activeCategory, searchQuery]);
 
   const { featuredItems, donationItems, recentItems } = useMemo(() => {
-    const featured = currentItems.filter(item => item.isFeatured);
-    const donations = currentItems.filter(item => item.listingType === 'Donate');
-    const recents = currentItems.filter(item => !item.isFeatured && item.listingType !== 'Donate');
+    const featured = allItems.filter(item => item.isFeatured);
+    const donations = allItems.filter(item => item.listingType === 'Donate');
+    const recents = allItems; // Show all for main grid before filtering
 
     return {
       featuredItems: featured,
       donationItems: donations,
       recentItems: recents
     };
-  }, [currentItems]);
+  }, []);
 
   const handleCategorySelect = (categorySlug: string) => {
     setActiveCategory(categorySlug);
