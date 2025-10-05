@@ -3,6 +3,7 @@
 
 import { suggestItemCategory } from "@/ai/flows/suggest-item-category";
 import { getLocalityFromCoordinates } from "@/ai/flows/get-locality-from-coords";
+import { translateText } from "@/ai/flows/translate-text";
 import { z } from "zod";
 
 const SuggestCategorySchema = z.object({
@@ -56,4 +57,27 @@ export async function handleGetLocality(latitude: number, longitude: number) {
     console.error(e);
     return { error: "Failed to get locality. Please try again." };
   }
+}
+
+
+const TranslateTextSchema = z.object({
+    text: z.string(),
+    targetLanguage: z.string(),
+});
+
+export async function handleTranslateText(text: string, targetLanguage: string) {
+    try {
+        const validatedFields = TranslateTextSchema.safeParse({ text, targetLanguage });
+
+        if (!validatedFields.success) {
+            return { error: "Invalid input for translation." };
+        }
+        
+        const result = await translateText(validatedFields.data);
+        return { translation: result.translation };
+    } catch (e) {
+        console.error(e);
+        // Don't return the original text on failure, let the UI handle it.
+        return { error: "Translation failed." };
+    }
 }

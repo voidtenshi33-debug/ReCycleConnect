@@ -13,6 +13,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar"
 import { getInitials } from "@/lib/utils"
 import { Separator } from "../ui/separator"
 import { users } from "@/lib/data"
+import { T } from "../t"
 
 const NavLink = ({ href, icon: Icon, children, badge, exact = false }: { href: string; icon: React.ElementType; children: React.ReactNode; badge?: string; exact?: boolean; }) => {
   const pathname = usePathname()
@@ -79,11 +80,11 @@ export default function Sidebar() {
         <Separator />
         <div className="flex-1 py-2">
           <nav className="grid items-start px-2 text-sm font-medium lg:px-4">
-            <NavLink href="/home" icon={Home} exact>Home</NavLink>
-            <NavLink href="/exchanges" icon={Repeat2} badge="3">Exchanges</NavLink>
-            <NavLink href="/messages" icon={MessageSquare}>Messages</NavLink>
-            <NavLink href="/wishlist" icon={Heart}>Wishlist</NavLink>
-            <NavLink href="/profile" icon={UserIcon}>Profile</NavLink>
+            <NavLink href="/home" icon={Home} exact><T>Home</T></NavLink>
+            <NavLink href="/exchanges" icon={Repeat2} badge="3"><T>Exchanges</T></NavLink>
+            <NavLink href="/messages" icon={MessageSquare}><T>Messages</T></NavLink>
+            <NavLink href="/wishlist" icon={Heart}><T>Wishlist</T></NavLink>
+            <NavLink href="/profile" icon={UserIcon}><T>Profile</T></NavLink>
           </nav>
         </div>
       </div>

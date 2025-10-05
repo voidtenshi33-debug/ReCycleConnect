@@ -1,9 +1,8 @@
 
-
 "use client"
 
 import Link from "next/link"
-import { Bell, CircleUser, Home, Leaf, Menu, Search, Heart, Repeat2, MessageSquare, User as UserIcon, Mic, MapPin, ChevronDown } from "lucide-react"
+import { Bell, CircleUser, Home, Leaf, Menu, Search, Heart, Repeat2, MessageSquare, User as UserIcon, Mic, MapPin, ChevronDown, Languages } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -11,6 +10,8 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
@@ -25,6 +26,8 @@ import { signOut } from "firebase/auth"
 import { useState } from "react"
 import { LocationModal } from "../location-modal"
 import { locations } from "@/lib/data"
+import { useLanguage } from "@/context/language-context"
+import { T } from "../t"
 
 
 const MobileNavLink = ({ href, icon: Icon, children }: { href: string, icon: React.ElementType, children: React.ReactNode }) => {
@@ -47,6 +50,7 @@ export default function Header() {
   const auth = useAuth();
   const router = useRouter();
   const [isLocationModalOpen, setLocationModalOpen] = useState(false);
+  const { locale, setLocale, availableLocales } = useLanguage();
   
   const handleLogout = async () => {
     await signOut(auth);
@@ -66,7 +70,7 @@ export default function Header() {
             className="shrink-0 md:hidden"
           >
             <Menu className="h-5 w-5" />
-            <span className="sr-only">Toggle navigation menu</span>
+            <span className="sr-only"><T>Toggle navigation menu</T></span>
           </Button>
         </SheetTrigger>
         <SheetContent side="left" className="flex flex-col">
@@ -78,11 +82,11 @@ export default function Header() {
               <Leaf className="h-6 w-6 text-primary" />
               <span className="sr-only">ReCycleConnect</span>
             </Link>
-            <MobileNavLink href="/home" icon={Home}>Home</MobileNavLink>
-            <MobileNavLink href="/exchanges" icon={Repeat2}>Exchanges</MobileNavLink>
-            <MobileNavLink href="/messages" icon={MessageSquare}>Messages</MobileNavLink>
-            <MobileNavLink href="/wishlist" icon={Heart}>Wishlist</MobileNavLink>
-            <MobileNavLink href="/profile" icon={UserIcon}>Profile</MobileNavLink>
+            <MobileNavLink href="/home" icon={Home}><T>Home</T></MobileNavLink>
+            <MobileNavLink href="/exchanges" icon={Repeat2}><T>Exchanges</T></MobileNavLink>
+            <MobileNavLink href="/messages" icon={MessageSquare}><T>Messages</T></MobileNavLink>
+            <MobileNavLink href="/wishlist" icon={Heart}><T>Wishlist</T></MobileNavLink>
+            <MobileNavLink href="/profile" icon={UserIcon}><T>Profile</T></MobileNavLink>
           </nav>
         </SheetContent>
       </Sheet>
@@ -101,11 +105,29 @@ export default function Header() {
             className="w-full appearance-none bg-background pl-8 shadow-none md:w-2/3 lg:w-1/3"
           />
         </div>
+        
+       <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="ghost" size="icon" className="rounded-full">
+            <Languages className="h-5 w-5" />
+            <span className="sr-only"><T>Change language</T></span>
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end">
+          <DropdownMenuLabel><T>Select Language</T></DropdownMenuLabel>
+          <DropdownMenuSeparator />
+          <DropdownMenuRadioGroup value={locale} onValueChange={setLocale}>
+            {availableLocales.map((loc) => (
+              <DropdownMenuRadioItem key={loc.code} value={loc.code}>{loc.name}</DropdownMenuRadioItem>
+            ))}
+          </DropdownMenuRadioGroup>
+        </DropdownMenuContent>
+      </DropdownMenu>
 
        <Button asChild variant="ghost" size="icon" className="rounded-full">
             <Link href="/notifications">
               <Bell className="h-5 w-5" />
-              <span className="sr-only">Toggle notifications</span>
+              <span className="sr-only"><T>Toggle notifications</T></span>
             </Link>
        </Button>
       <DropdownMenu>
@@ -119,7 +141,7 @@ export default function Header() {
             ) : (
               <CircleUser className="h-5 w-5" />
             )}
-            <span className="sr-only">Toggle user menu</span>
+            <span className="sr-only"><T>Toggle user menu</T></span>
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
@@ -127,15 +149,15 @@ export default function Header() {
             <>
               <DropdownMenuLabel>{user.displayName}</DropdownMenuLabel>
               <DropdownMenuSeparator />
-              <DropdownMenuItem asChild><Link href="/profile">Profile</Link></DropdownMenuItem>
-              <DropdownMenuItem>Settings</DropdownMenuItem>
+              <DropdownMenuItem asChild><Link href="/profile"><T>Profile</T></Link></DropdownMenuItem>
+              <DropdownMenuItem><T>Settings</T></DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={handleLogout}>Logout</DropdownMenuItem>
+              <DropdownMenuItem onClick={handleLogout}><T>Logout</T></DropdownMenuItem>
             </>
           ) : (
              <>
-              <DropdownMenuItem asChild><Link href="/login">Login</Link></DropdownMenuItem>
-              <DropdownMenuItem asChild><Link href="/signup">Sign Up</Link></DropdownMenuItem>
+              <DropdownMenuItem asChild><Link href="/login"><T>Login</T></Link></DropdownMenuItem>
+              <DropdownMenuItem asChild><Link href="/signup"><T>Sign Up</T></Link></DropdownMenuItem>
             </>
           )}
         </DropdownMenuContent>
