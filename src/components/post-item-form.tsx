@@ -1,5 +1,4 @@
 
-
 "use client"
 
 import { useState, useEffect } from 'react';
@@ -18,7 +17,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
 import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
 import { PriceSlider } from './price-slider';
-import { handleGenerateDescription } from '@/app/actions';
+import { handleGenerateDescription, handleGenerateTitle } from '@/app/actions';
 import { Card } from './ui/card';
 import { cn } from '@/lib/utils';
 
@@ -48,6 +47,7 @@ export function PostItemForm() {
     
     // Form state
     const [title, setTitle] = useState('');
+    const [brand, setBrand] = useState('');
     const [description, setDescription] = useState('');
     const [images, setImages] = useState<string[]>([]);
     const [selectedCategory, setSelectedCategory] = useState<string>("");
@@ -55,6 +55,7 @@ export function PostItemForm() {
     const [price, setPrice] = useState<number | ''>('');
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isGeneratingDescription, setIsGeneratingDescription] = useState(false);
+    const [isGeneratingTitle, setIsGeneratingTitle] = useState(false);
 
 
     useEffect(() => {
@@ -109,6 +110,35 @@ export function PostItemForm() {
         setIsGeneratingDescription(false);
     };
 
+     const handleGenerateTitleClick = async () => {
+        if (images.length === 0 || !selectedCategory) {
+            toast({
+                title: "Info Needed",
+                description: "Please upload an image and select a category first.",
+                variant: "destructive"
+            });
+            return;
+        }
+
+        setIsGeneratingTitle(true);
+        const result = await handleGenerateTitle(images, selectedCategory, brand);
+        if (result.title) {
+            setTitle(result.title);
+            toast({
+                title: "Title Generated!",
+                description: "The AI has suggested a title for your item.",
+            });
+        } else if (result.error) {
+            toast({
+                title: "Error",
+                description: result.error,
+                variant: "destructive"
+            });
+        }
+        setIsGeneratingTitle(false);
+    };
+
+
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         
@@ -131,7 +161,6 @@ export function PostItemForm() {
         }
 
         setIsSubmitting(true);
-        const formData = new FormData(event.currentTarget);
         
         const finalPrice = Number(price) || 0;
         
@@ -143,15 +172,15 @@ export function PostItemForm() {
             const imageUrls = images; 
 
             const newItem: Omit<Item, 'id'> = {
-                title: formData.get('title') as string,
+                title: title,
                 description: description,
                 imageUrls: imageUrls,
                 category: selectedCategory,
-                brand: formData.get('brand') as string,
+                brand: brand,
                 condition: condition,
                 listingType: finalPrice === 0 ? "Donate" : "Sell",
                 price: finalPrice,
-                locality: formData.get('locality') as string,
+                locality: 'kothrud', // Default locality for now
                 createdAt: serverTimestamp(),
                 ownerId: user.uid,
                 ownerName: ownerProfile.displayName ?? user.displayName ?? "Anonymous",
@@ -186,14 +215,32 @@ export function PostItemForm() {
 
     return (
         <form className="grid gap-6" onSubmit={handleSubmit}>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                <div className="grid gap-2">
+            <div className="grid gap-2">
+                <div className="flex justify-between items-center">
                     <Label htmlFor="title">Item Title</Label>
-                    <Input id="title" name="title" placeholder="e.g., MacBook Pro 14-inch" required defaultValue={title || initialTitle} onChange={e => setTitle(e.target.value)} />
+                     <Button type="button" variant="outline" size="sm" onClick={handleGenerateTitleClick} disabled={isGeneratingTitle || images.length === 0 || !selectedCategory}>
+                        {isGeneratingTitle ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Sparkles className="mr-2 h-4 w-4" />}
+                        AI Generate
+                    </Button>
+                </div>
+                <Input id="title" name="title" placeholder="e.g., MacBook Pro 14-inch" required value={title || initialTitle} onChange={e => setTitle(e.target.value)} />
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                 <div className="grid gap-2">
+                    <Label htmlFor="category">Category</Label>
+                    <Select name="category" value={selectedCategory} onValueChange={setSelectedCategory} required>
+                        <SelectTrigger id="category">
+                            <SelectValue placeholder="Select a category" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            {appCategories.map(cat => <SelectItem key={cat.slug} value={cat.slug}>{cat.name}</SelectItem>)}
+                        </SelectContent>
+                    </Select>
                 </div>
                  <div className="grid gap-2">
                     <Label htmlFor="brand">Brand</Label>
-                    <Input id="brand" name="brand" placeholder="e.g., Apple, Samsung" />
+                    <Input id="brand" name="brand" placeholder="e.g., Apple, Samsung" value={brand} onChange={e => setBrand(e.target.value)} />
                 </div>
             </div>
 
@@ -211,18 +258,6 @@ export function PostItemForm() {
                     </Button>
                 </div>
                 <Textarea id="description" name="description" placeholder="Describe your item's condition, features, and any issues." required value={description} onChange={e => setDescription(e.target.value)} />
-            </div>
-
-            <div className="grid gap-2">
-                <Label htmlFor="category">Category</Label>
-                <Select name="category" value={selectedCategory} onValueChange={setSelectedCategory} required>
-                    <SelectTrigger id="category">
-                        <SelectValue placeholder="Select a category" />
-                    </SelectTrigger>
-                    <SelectContent>
-                        {appCategories.map(cat => <SelectItem key={cat.slug} value={cat.slug}>{cat.name}</SelectItem>)}
-                    </SelectContent>
-                </Select>
             </div>
 
             <div className="grid gap-2">
