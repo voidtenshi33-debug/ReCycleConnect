@@ -1,4 +1,5 @@
 
+
 "use client"
 
 import { useState, useEffect } from 'react';
@@ -8,7 +9,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { MultiImageUpload } from '@/components/image-upload-with-ai';
+import { MultiImageUpload } from '@/components/multi-image-upload';
 import { categories as appCategories, locations, users as mockUsers } from '@/lib/data';
 import type { Item, ItemCondition } from '@/lib/types';
 import { Loader2, Sparkles } from 'lucide-react';
@@ -19,6 +20,7 @@ import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
 import { PriceSlider } from './price-slider';
 import { handleGenerateDescription } from '@/app/actions';
 import { Card } from './ui/card';
+import { cn } from '@/lib/utils';
 
 const conditionOptions: ItemCondition[] = [
     "Like New",
@@ -49,6 +51,7 @@ export function PostItemForm() {
     const [description, setDescription] = useState('');
     const [images, setImages] = useState<string[]>([]);
     const [selectedCategory, setSelectedCategory] = useState<string>("");
+    const [condition, setCondition] = useState<ItemCondition>("Working");
     const [price, setPrice] = useState(0);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isGeneratingDescription, setIsGeneratingDescription] = useState(false);
@@ -132,6 +135,7 @@ export function PostItemForm() {
         // Manually add values that aren't standard inputs
         formData.set('price', price.toString());
         formData.set('description', description);
+        formData.set('condition', condition);
 
 
         const formValues = Object.fromEntries(formData.entries());
@@ -229,12 +233,23 @@ export function PostItemForm() {
 
             <div className="grid gap-2">
                 <Label>Condition</Label>
-                <RadioGroup name="condition" defaultValue="Working" className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 pt-2">
+                <RadioGroup 
+                    value={condition} 
+                    onValueChange={(value: ItemCondition) => setCondition(value)}
+                    className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2"
+                >
                     {conditionOptions.map(cond => (
-                        <div key={cond} className="flex items-center space-x-2">
+                         <Label 
+                            key={cond}
+                            htmlFor={cond}
+                            className={cn(
+                                "flex items-center space-x-3 rounded-md border-2 p-4 cursor-pointer transition-all",
+                                condition === cond ? "border-primary bg-primary/5" : "border-border hover:bg-muted/50"
+                            )}
+                        >
                             <RadioGroupItem value={cond} id={cond} />
-                            <Label htmlFor={cond} className="font-normal">{cond}</Label>
-                        </div>
+                            <span className="font-medium">{cond}</span>
+                        </Label>
                     ))}
                 </RadioGroup>
             </div>
@@ -282,3 +297,4 @@ export function PostItemForm() {
         </form>
     );
 }
+
