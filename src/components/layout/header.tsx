@@ -23,11 +23,13 @@ import { useAuth, useUser } from "@/firebase"
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar"
 import { getInitials } from "@/lib/utils"
 import { signOut } from "firebase/auth"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { LocationModal } from "../location-modal"
 import { locations } from "@/lib/data"
 import { useLanguage } from "@/context/language-context"
 import { T } from "../t"
+import { useSpeechRecognition } from "@/hooks/use-speech-recognition"
+import { useToast } from "@/hooks/use-toast"
 
 
 const MobileNavLink = ({ href, icon: Icon, children }: { href: string, icon: React.ElementType, children: React.ReactNode }) => {
@@ -49,13 +51,59 @@ export default function Header() {
   const { user } = useUser();
   const auth = useAuth();
   const router = useRouter();
+  const pathname = usePathname();
   const [isLocationModalOpen, setLocationModalOpen] = useState(false);
   const { locale, setLocale, availableLocales } = useLanguage();
+  const [searchQuery, setSearchQuery] = useState('');
+  const { toast } = useToast();
+
+  const {
+    text: speechToText,
+    isListening,
+    startListening,
+    stopListening,
+    hasRecognitionSupport
+  } = useSpeechRecognition();
+  
+  useEffect(() => {
+    if (speechToText) {
+      setSearchQuery(speechToText);
+      // If we are not on the home page, navigate there to show search results.
+      if (pathname !== '/home') {
+        router.push(`/home?q=${encodeURIComponent(speechToText)}`);
+      }
+    }
+  }, [speechToText, pathname, router]);
+
+  const handleSearchSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (pathname !== '/home') {
+      router.push(`/home?q=${encodeURIComponent(searchQuery)}`);
+    }
+    // On the home page, the search is handled by the component's state
+  };
   
   const handleLogout = async () => {
     await signOut(auth);
     router.push('/login');
   };
+
+  const handleMicClick = () => {
+    if (!hasRecognitionSupport) {
+      toast({
+        variant: "destructive",
+        title: "Browser Not Supported",
+        description: "Your browser does not support voice recognition.",
+      });
+      return;
+    }
+    if (isListening) {
+      stopListening();
+    } else {
+      startListening();
+    }
+  };
+
 
   // @ts-ignore - user is not known to have lastKnownLocality
   const currentLocation = locations.find(l => l.slug === user?.lastKnownLocality)?.name || "Select Location";
@@ -98,12 +146,28 @@ export default function Header() {
       </Button>
 
        <div className="relative w-full flex-1">
-          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-          <Input
-            type="search"
-            placeholder="Search products..."
-            className="w-full appearance-none bg-background pl-8 shadow-none md:w-2/3 lg:w-1/3"
-          />
+        <form onSubmit={handleSearchSubmit}>
+            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+            <Input
+              type="search"
+              placeholder="Search products..."
+              className="w-full appearance-none bg-background pl-8 pr-10 shadow-none md:w-2/3 lg:w-1/3"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              className={cn(
+                "absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8 rounded-full",
+                isListening && "bg-destructive text-destructive-foreground animate-pulse"
+              )}
+              onClick={handleMicClick}
+            >
+              <Mic className="h-4 w-4" />
+            </Button>
+          </form>
         </div>
         
        <DropdownMenu>

@@ -20,6 +20,7 @@ import {
 import type { Item } from '@/lib/types';
 import { Input } from '@/components/ui/input';
 import { T } from '@/components/t';
+import { useSearchParams } from 'next/navigation';
 
 
 const ItemCarousel = ({ title, items, link = "#" }: { title: React.ReactNode, items: Item[], link?: string }) => (
@@ -75,11 +76,19 @@ const HeroSection = () => (
 )
 
 
-export default function HomePage() {
+function HomePageContent() {
   const { user, isUserLoading } = useUser();
+  const searchParams = useSearchParams();
   const [activeCategory, setActiveCategory] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [currentItems, setCurrentItems] = useState<Item[]>(allItems);
+
+  useEffect(() => {
+    const queryFromUrl = searchParams.get('q');
+    if (queryFromUrl) {
+      setSearchQuery(queryFromUrl);
+    }
+  }, [searchParams]);
 
   useEffect(() => {
     let filtered = allItems;
@@ -178,4 +187,15 @@ export default function HomePage() {
       </div>
     </>
   );
+}
+
+
+import { Suspense } from 'react';
+
+export default function HomePage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <HomePageContent />
+    </Suspense>
+  )
 }
