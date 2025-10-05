@@ -4,11 +4,21 @@ import Link from "next/link";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { items, users } from "@/lib/data";
 import { notFound } from "next/navigation";
-import { ArrowLeft, ChevronRight, Flag, MessageSquare, Share2, Star, ShieldCheck, CreditCard } from "lucide-react";
-import { formatDistanceToNow } from "date-fns";
+import { ArrowLeft, ChevronRight, Flag, MessageSquare, Share2, Star, ShieldCheck, CreditCard, Award, Zap, CheckCircle } from "lucide-react";
+import { format } from "date-fns";
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
+import { Separator } from "@/components/ui/separator";
+
+const TrustBadge = ({ icon: Icon, children }: { icon: React.ElementType, children: React.ReactNode }) => (
+    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+        <Icon className="w-5 h-5 text-primary" />
+        <span className="font-medium">{children}</span>
+    </div>
+);
+
 
 export default function ItemDetailPage({ params }: { params: { id: string } }) {
     const item = items.find(i => i.id === params.id);
@@ -18,135 +28,155 @@ export default function ItemDetailPage({ params }: { params: { id: string } }) {
     const seller = users.find(u => u.userId === item.ownerId);
 
     return (
-        <div className="grid md:grid-cols-3 gap-6 lg:gap-8">
-            <div className="md:col-span-2 space-y-6">
-                <Link href="/home" className="flex items-center gap-2 text-sm text-muted-foreground mb-4 hover:text-foreground">
-                    <ArrowLeft className="h-4 w-4" />
-                    Back to listings
-                </Link>
-                {/* Image Gallery */}
-                <Card className="overflow-hidden">
-                    <div className="relative aspect-video w-full">
-                        <Image src={item.imageUrls[0]} alt={item.title} fill className="object-cover" data-ai-hint="product photo" />
-                    </div>
-                    {item.imageUrls.length > 1 && (
-                        <div className="p-2 grid grid-cols-5 gap-2">
-                            {item.imageUrls.slice(0, 5).map((img, index) => (
-                                <div key={index} className={`relative aspect-square rounded-md overflow-hidden border-2 ${index === 0 ? 'border-primary' : 'border-transparent'}`}>
-                                    <Image src={img} alt={`${item.title} thumbnail ${index + 1}`} fill className="object-cover" />
-                                </div>
-                            ))}
-                        </div>
-                    )}
-                </Card>
+        <div className="max-w-7xl mx-auto">
+             <Link href="/home" className="flex items-center gap-2 text-sm text-muted-foreground mb-4 hover:text-foreground">
+                <ArrowLeft className="h-4 w-4" />
+                Back to listings
+            </Link>
 
-                {/* Item Details */}
-                <Card>
-                    <CardHeader>
-                        <h1 className="font-headline text-3xl font-bold">{item.title}</h1>
-                         <div className="text-4xl font-bold text-primary pt-2">
-                            {item.listingType === 'Donate' ? 'FREE for Donation' : `₹${item.price.toLocaleString()}`}
-                        </div>
-                        <div className="flex items-center gap-2 pt-2">
-                            {item.brand && <Badge variant="secondary" className="text-sm">{item.brand}</Badge>}
-                            <Badge variant="secondary" className="text-sm">{item.category}</Badge>
-                            <Badge variant="outline" className="text-sm">{item.condition}</Badge>
-                             {item.isFeatured && <Badge>⭐ Featured</Badge>}
-                        </div>
-                    </CardHeader>
-                    <CardContent>
-                        <h2 className="font-semibold text-lg mb-2">Description</h2>
-                        <p className="text-base leading-relaxed text-muted-foreground">{item.description}</p>
-                    </CardContent>
-                </Card>
+            <div className="grid md:grid-cols-3 gap-8 lg:gap-12">
+                
+                {/* Left Column: Media and Main Details */}
+                <div className="md:col-span-2 space-y-6">
+                    
+                    {/* Image Carousel */}
+                    <Card className="overflow-hidden">
+                         <Carousel className="w-full">
+                            <CarouselContent>
+                                {item.imageUrls.map((img, index) => (
+                                <CarouselItem key={index}>
+                                    <div className="relative aspect-video w-full">
+                                        <Image src={img} alt={`${item.title} image ${index + 1}`} fill className="object-cover" data-ai-hint="product photo" />
+                                    </div>
+                                </CarouselItem>
+                                ))}
+                            </CarouselContent>
+                             {item.imageUrls.length > 1 && (
+                                <>
+                                <CarouselPrevious className="absolute left-4 top-1/2 -translate-y-1/2 hidden md:flex" />
+                                <CarouselNext className="absolute right-4 top-1/2 -translate-y-1/2 hidden md:flex"/>
+                                </>
+                             )}
+                        </Carousel>
+                    </Card>
 
-                {/* Location */}
-                 <Card>
-                    <CardHeader>
-                         <h2 className="font-semibold text-lg">Location</h2>
-                    </CardHeader>
-                    <CardContent>
-                        <div className="aspect-video bg-muted rounded-md flex items-center justify-center">
-                            <p className="text-muted-foreground">Map snippet for {item.locality}</p>
-                        </div>
-                    </CardContent>
-                </Card>
+                    {/* Core Details */}
+                    <Card>
+                        <CardHeader>
+                            <CardTitle className="font-headline text-3xl font-bold">{item.title}</CardTitle>
+                             <div className="text-4xl font-bold text-primary pt-2">
+                                {item.listingType === 'Donate' ? 'FREE for Donation' : `₹${item.price.toLocaleString()}`}
+                            </div>
+                            <div className="flex flex-wrap items-center gap-2 pt-2">
+                                <Badge variant="secondary" className="text-sm">{item.category}</Badge>
+                                <Badge variant="outline" className="text-sm flex items-center gap-1">
+                                    {item.condition === 'Working' && <CheckCircle className="w-3.5 h-3.5 text-green-600" />}
+                                    {item.condition}
+                                </Badge>
+                                 {item.isFeatured && <Badge variant="default" className="bg-yellow-400 text-yellow-900 gap-1"><Zap className="w-3.5 h-3.5" /> Featured</Badge>}
+                                  {item.brand && <Badge variant="secondary" className="text-sm">{item.brand}</Badge>}
+                            </div>
+                        </CardHeader>
+                        <Separator />
+                        <CardContent>
+                            <h2 className="font-semibold text-xl mb-2 mt-4">Description</h2>
+                            <p className="text-base leading-relaxed text-muted-foreground">{item.description}</p>
+                        </CardContent>
+                    </Card>
 
-            </div>
-            
-            <div className="md:col-span-1 space-y-6">
-                {/* Action Card at the bottom for mobile, sticky for desktop */}
-                <div className="md:sticky md:top-6 space-y-6">
-                     {/* Seller Card */}
-                    {seller && (
-                        <Card>
-                            <CardHeader>
-                                <h2 className="font-semibold text-lg">Seller Information</h2>
-                            </CardHeader>
-                            <CardContent>
-                                <div className="flex items-center gap-4 mb-4">
-                                    <Avatar className="h-16 w-16">
-                                        <AvatarImage src={seller.photoURL ?? undefined} alt={seller.displayName} />
-                                        <AvatarFallback>{seller.displayName.charAt(0)}</AvatarFallback>
-                                    </Avatar>
-                                    <div className="grid gap-0.5">
-                                        <p className="font-semibold">{seller.displayName}</p>
-                                        <div className="flex items-center gap-1 text-sm text-muted-foreground">
-                                            <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                                            <span>{seller.averageRating.toFixed(1)} ({seller.ratingsCount} reviews)</span>
+                     {/* Location */}
+                    <Card>
+                        <CardHeader>
+                            <CardTitle className="font-headline text-xl">Location</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                             <p className="text-muted-foreground font-medium mb-2">{item.locality}</p>
+                            <div className="aspect-video bg-muted rounded-md flex items-center justify-center">
+                                <p className="text-muted-foreground">Map snippet for {item.locality}</p>
+                            </div>
+                        </CardContent>
+                    </Card>
+
+                </div>
+                
+                {/* Right Column: Seller and Actions */}
+                <div className="md:col-span-1 space-y-6">
+                    <div className="md:sticky md:top-6 space-y-6">
+                        
+                         {/* Trust Center (Seller Card) */}
+                        {seller && (
+                             <Card className="overflow-hidden">
+                                <CardHeader>
+                                    <CardTitle className="font-headline text-xl">The Trust Center</CardTitle>
+                                </CardHeader>
+                                <CardContent className="space-y-4">
+                                     <div className="flex items-center gap-4">
+                                        <Avatar className="h-16 w-16">
+                                            <AvatarImage src={seller.photoURL ?? undefined} alt={seller.displayName} />
+                                            <AvatarFallback>{seller.displayName.charAt(0)}</AvatarFallback>
+                                        </Avatar>
+                                        <div className="grid gap-0.5">
+                                            <p className="font-semibold text-lg">{seller.displayName}</p>
+                                            <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                                                <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+                                                <span>{seller.averageRating.toFixed(1)} ({seller.ratingsCount} reviews)</span>
+                                            </div>
+                                            <span className="text-sm text-muted-foreground">Joined {format(seller.createdAt, "MMMM yyyy")}</span>
                                         </div>
-                                         <span className="text-sm text-muted-foreground">Joined {new Date(seller.createdAt).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}</span>
                                     </div>
-                                </div>
-                                {seller.isTrusted && (
-                                     <div className="flex items-center gap-2 text-sm text-blue-800 font-medium p-2 bg-blue-50 border border-blue-200 rounded-md">
-                                         <ShieldCheck className="w-5 h-5 text-blue-600"/>
-                                        <span>Recycleconnect Trusted Seller</span>
+                                    <Separator />
+                                    <div className="grid grid-cols-2 gap-4">
+                                       <TrustBadge icon={ShieldCheck}>ID Verified</TrustBadge>
+                                       <TrustBadge icon={Award}>8+ Items Recycled</TrustBadge>
+                                       <TrustBadge icon={Zap}>Quick Responder</TrustBadge>
                                     </div>
-                                )}
-                                <Button variant="outline" className="w-full mt-4" asChild>
+                                </CardContent>
+                                <Button variant="ghost" className="w-full rounded-t-none border-t" asChild>
                                     <Link href={`/users/${seller.id}`}>
                                         View Full Profile <ChevronRight className="w-4 h-4 ml-auto" />
                                     </Link>
                                 </Button>
-                            </CardContent>
-                        </Card>
-                    )}
-
-                    {/* Action Buttons */}
-                    <Card>
-                        <CardContent className="p-4 space-y-3">
-                            {seller?.isTrusted ? (
-                                <>
+                            </Card>
+                        )}
+                        
+                        {/* Action Block */}
+                        <Card>
+                            <CardContent className="p-4 space-y-3">
+                                {seller?.isTrusted && item.listingType !== 'Donate' ? (
+                                    <>
+                                        <Button size="lg" className="w-full font-bold">
+                                            <CreditCard className="mr-2 h-5 w-5" />
+                                            Buy Now - ₹{item.price.toLocaleString()}
+                                        </Button>
+                                        <Button size="lg" variant="outline" className="w-full">
+                                            <MessageSquare className="mr-2 h-5 w-5"/> Chat with Seller
+                                        </Button>
+                                    </>
+                                ) : (
                                     <Button size="lg" className="w-full font-bold">
-                                        <CreditCard className="mr-2 h-5 w-5" />
-                                        Buy Now - ₹{item.price.toLocaleString()}
-                                    </Button>
-                                    <Button size="lg" variant="outline" className="w-full">
                                         <MessageSquare className="mr-2 h-5 w-5"/> Chat with Seller
                                     </Button>
-                                </>
-                            ) : (
-                                <Button size="lg" className="w-full font-bold">
-                                    <MessageSquare className="mr-2 h-5 w-5"/> Chat with Seller
-                                </Button>
-                            )}
-                        </CardContent>
-                    </Card>
+                                )}
+                            </CardContent>
+                        </Card>
 
-                    {/* Safety & Reporting */}
-                     <div className="space-y-2 text-sm text-muted-foreground text-center">
-                         <div className="p-3 bg-muted text-muted-foreground rounded-md text-xs">
-                            Safety Tip: Always meet in a public place and inspect the item before you pay.
-                         </div>
-                        <div className="flex justify-around pt-2">
-                             <Button variant="ghost" size="sm" className="gap-2 text-muted-foreground hover:text-foreground">
-                                <Share2 className="w-4 h-4"/> Share
-                            </Button>
-                             <Button variant="ghost" size="sm" className="gap-2 text-muted-foreground hover:text-destructive">
-                                 <Flag className="w-4 h-4"/> Report
-                            </Button>
+                        {/* Safety & Reporting */}
+                        <div className="space-y-3 text-sm">
+                            <Alert>
+                                <AlertDescription>
+                                    Safety Tip: Always meet in a public place and inspect the item before you pay. Never transfer money without verifying the product.
+                                </AlertDescription>
+                            </Alert>
+                            <div className="flex justify-around pt-2">
+                                <Button variant="ghost" size="sm" className="gap-2 text-muted-foreground hover:text-foreground">
+                                    <Share2 className="w-4 h-4"/> Share
+                                </Button>
+                                <Button variant="ghost" size="sm" className="gap-2 text-muted-foreground hover:text-destructive">
+                                    <Flag className="w-4 h-4"/> Report
+                                </Button>
+                            </div>
                         </div>
+
                     </div>
                 </div>
             </div>
