@@ -1,3 +1,4 @@
+
 "use client"
 
 import Image from "next/image"
@@ -12,7 +13,7 @@ const onboardingSteps = [
     image: "https://picsum.photos/seed/recycle1/800/1200",
     imageHint: "electronics recycling",
     title: "Give Your Electronics a Second Life",
-    description: "Easily list your old gadgets for sale, donation, or recycling. Turn clutter into cash or good karma.",
+    description: "Easily list your old gadgets for sale, donation, or recycling. Turn e-waste into cash or good karma.",
   },
   {
     image: "https://picsum.photos/seed/recycle2/800/1200",
@@ -24,7 +25,7 @@ const onboardingSteps = [
     image: "https://picsum.photos/seed/recycle3/800/1200",
     imageHint: "repaired phone",
     title: "Reduce, Reuse, ReCycleConnect",
-    description: "Join a movement to reduce e-waste. Every exchange makes a difference for our planet.",
+    description: "Join a movement to reduce e-waste. Every exchange of electronic goods makes a difference for our planet.",
   },
 ]
 

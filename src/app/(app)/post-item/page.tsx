@@ -57,7 +57,7 @@ export default function PostItemPage() {
         if (!imageDataUri) {
             toast({
                 title: "Image Required",
-                description: "Please upload an image for your item.",
+                description: "Please upload an image for your electronic item.",
                 variant: "destructive"
             });
             return;
@@ -94,12 +94,16 @@ export default function PostItemPage() {
                 isFeatured: false,
             };
 
+            if (!firestore) {
+                throw new Error("Firestore is not initialized.");
+            }
+
             const itemsCollectionRef = collection(firestore, 'items');
             await addDoc(itemsCollectionRef, newItem);
 
             toast({
                 title: "Listing Submitted!",
-                description: "Your item is now live on ReCycleConnect.",
+                description: "Your electronic item is now live on ReCycleConnect.",
             });
 
             router.push('/home');
@@ -123,8 +127,8 @@ export default function PostItemPage() {
             </Link>
             <Card>
                 <CardHeader>
-                    <CardTitle className="font-headline text-3xl">List an Item</CardTitle>
-                    <CardDescription>Fill out the details below to post your electronic item.</CardDescription>
+                    <CardTitle className="font-headline text-3xl">List an E-Waste Item</CardTitle>
+                    <CardDescription>Fill out the details below to post your electronic item for sale, donation, or recycling.</CardDescription>
                 </CardHeader>
                 <CardContent>
                     <form className="grid gap-6" onSubmit={handleSubmit}>
@@ -135,7 +139,7 @@ export default function PostItemPage() {
 
                         <div className="grid gap-2">
                             <Label>Item Image</Label>
-                            <p className="text-sm text-muted-foreground">Start by uploading a photo. Our AI will help suggest a category.</p>
+                            <p className="text-sm text-muted-foreground">Start by uploading a photo. Our AI will help suggest a category for your e-waste item.</p>
                             <ImageUploadWithAI 
                                 onCategoriesSuggested={handleCategoriesSuggested}
                                 onImageSelected={setImageDataUri}
@@ -201,7 +205,7 @@ export default function PostItemPage() {
                             </div>
                              <div className="grid gap-2">
                                 <Label htmlFor="price">Price (₹)</Label>
-                                <Input id="price" name="price" type="number" placeholder="Enter 0 for free items" />
+                                <Input id="price" name="price" type="number" placeholder="Enter 0 for a free donation" />
                             </div>
                         </div>
 
