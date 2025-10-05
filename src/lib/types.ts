@@ -11,6 +11,7 @@ export type User = {
   lastKnownLocality: string;
   averageRating: number;
   ratingsCount: number;
+  isTrusted: boolean;
 };
 
 export type Category = 'Laptops' | 'Phones' | 'Tablets' | 'Monitors' | 'Cameras' | 'Audio' | 'Accessories' | 'Other';

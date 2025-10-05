@@ -12,7 +12,8 @@ export const users: User[] = [
     createdAt: new Date("2025-10-04T13:10:00"),
     lastKnownLocality: "Kothrud",
     averageRating: 4.8,
-    ratingsCount: 12
+    ratingsCount: 12,
+    isTrusted: true,
   },
   {
     id: "user_02",
@@ -23,7 +24,8 @@ export const users: User[] = [
     createdAt: new Date("2025-10-03T09:30:00"),
     lastKnownLocality: "Viman Nagar",
     averageRating: 4.9,
-    ratingsCount: 8
+    ratingsCount: 8,
+    isTrusted: true,
   },
   {
     id: "user_03",
@@ -34,7 +36,8 @@ export const users: User[] = [
     createdAt: new Date("2025-10-01T17:00:00"),
     lastKnownLocality: "Hadapsar",
     averageRating: 4.5,
-    ratingsCount: 4
+    ratingsCount: 4,
+    isTrusted: false,
   }
 ];
 

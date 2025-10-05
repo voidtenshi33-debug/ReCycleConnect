@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { items, users } from "@/lib/data";
 import { notFound } from "next/navigation";
-import { ArrowLeft, ChevronRight, Flag, MessageSquare, Share2, Star } from "lucide-react";
+import { ArrowLeft, ChevronRight, Flag, MessageSquare, Share2, Star, ShieldCheck, CreditCard } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 
 export default function ItemDetailPage({ params }: { params: { id: string } }) {
@@ -67,10 +67,27 @@ export default function ItemDetailPage({ params }: { params: { id: string } }) {
                         <div className="text-4xl font-bold text-primary">
                             {item.listingType === 'Donate' ? 'DONATE' : `₹${item.price.toLocaleString()}`}
                         </div>
-                        <Button size="lg" className="w-full">Request Item</Button>
-                        <Button size="lg" variant="outline" className="w-full">
-                            <MessageSquare className="mr-2 h-4 w-4"/> Chat with Seller
-                        </Button>
+
+                        {seller?.isTrusted ? (
+                            <div className="space-y-3">
+                                <div className="p-3 bg-blue-50 border border-blue-200 rounded-md text-center text-sm text-blue-800 flex items-center justify-center gap-2">
+                                     <ShieldCheck className="w-5 h-5 text-blue-600"/>
+                                    <span className="font-medium">Recycleconnect Trusted Seller</span>
+                                </div>
+                                <Button size="lg" className="w-full">
+                                    <CreditCard className="mr-2 h-5 w-5" />
+                                    Buy Now - ₹{item.price.toLocaleString()}
+                                </Button>
+                                <Button size="lg" variant="outline" className="w-full">
+                                    <MessageSquare className="mr-2 h-4 w-4"/> Chat with Seller
+                                </Button>
+                            </div>
+                        ) : (
+                             <Button size="lg" className="w-full">
+                                <MessageSquare className="mr-2 h-4 w-4"/> Chat with Seller
+                            </Button>
+                        )}
+                        
                     </CardContent>
                 </Card>
 
