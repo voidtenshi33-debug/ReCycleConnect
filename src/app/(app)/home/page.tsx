@@ -2,7 +2,7 @@
 "use client"
 
 import { ItemCard } from '@/components/item-card';
-import { items, locations } from '@/lib/data';
+import { items, locations, users } from '@/lib/data';
 import {
   Select,
   SelectContent,
@@ -15,6 +15,9 @@ import { ListFilter } from 'lucide-react';
 import { CategoryScroller } from '@/components/category-scroller';
 import { useUser } from '@/firebase';
 import { useMemo } from 'react';
+
+// Helper function to get seller info
+const getSeller = (sellerId: string) => users.find(u => u.id === sellerId);
 
 export default function HomePage() {
   const { user, isUserLoading } = useUser();
@@ -35,10 +38,7 @@ export default function HomePage() {
     if (!locationData) return items;
 
     // A bit of a hack to make the mock data seem location-aware
-    return items.filter((item, index) => {
-        const locIndex = locations.findIndex(l => l.name === item.location);
-        return locIndex !== -1 && locIndex % locations.length === locations.indexOf(locationData);
-    });
+    return items.filter((item) => item.locality === locationData.slug);
   }, [user, isUserLoading]);
 
 
@@ -71,9 +71,11 @@ export default function HomePage() {
         </div>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 lg:gap-6">
-        {filteredItems.map(item => (
-          <ItemCard key={item.id} item={item} />
-        ))}
+        {filteredItems.map(item => {
+          const seller = getSeller(item.sellerId);
+          if (!seller) return null;
+          return <ItemCard key={item.id} item={item} seller={seller} />
+        })}
       </div>
     </>
   );
