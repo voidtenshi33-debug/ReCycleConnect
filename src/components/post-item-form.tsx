@@ -8,15 +8,17 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { ImageUploadWithAI } from '@/components/image-upload-with-ai';
+import { MultiImageUpload } from '@/components/multi-image-upload';
 import { categories as appCategories, locations, users as mockUsers } from '@/lib/data';
 import type { Item, ItemCondition } from '@/lib/types';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Sparkles } from 'lucide-react';
 import { useFirebase, useUser } from '@/firebase';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
 import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
 import { PriceSlider } from './price-slider';
+import { handleGenerateDescription } from '@/app/actions';
+import { Card } from './ui/card';
 
 export function PostItemForm() {
     const router = useRouter();
@@ -30,13 +32,16 @@ export function PostItemForm() {
     const [initialCategory, setInitialCategory] = useState('');
     const [minPrice, setMinPrice] = useState<number | null>(null);
     const [maxPrice, setMaxPrice] = useState<number | null>(null);
-
+    
     // Form state
-    const [suggestedCategories, setSuggestedCategories] = useState<string[]>([]);
+    const [title, setTitle] = useState('');
+    const [description, setDescription] = useState('');
+    const [images, setImages] = useState<string[]>([]);
     const [selectedCategory, setSelectedCategory] = useState<string>("");
-    const [imageDataUri, setImageDataUri] = useState<string>("");
     const [price, setPrice] = useState(0);
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [isGeneratingDescription, setIsGeneratingDescription] = useState(false);
+
 
     useEffect(() => {
         const urlTitle = searchParams.get('title');
@@ -44,7 +49,10 @@ export function PostItemForm() {
         const urlMinPrice = searchParams.get('minPrice');
         const urlMaxPrice = searchParams.get('maxPrice');
 
-        if (urlTitle) setInitialTitle(urlTitle);
+        if (urlTitle) {
+            setInitialTitle(urlTitle);
+            setTitle(urlTitle);
+        }
         if (urlCategory) {
             setInitialCategory(urlCategory);
             setSelectedCategory(urlCategory);
@@ -59,16 +67,32 @@ export function PostItemForm() {
         }
     }, [searchParams]);
 
-    const handleCategoriesSuggested = (categories: string[]) => {
-        setSuggestedCategories(categories);
-        // Auto-select the first suggested category if it exists in our app categories
-        if (categories.length > 0) {
-           const suggestedSlug = categories[0].toLowerCase().replace(/\s/g, '-');
-           const matchingCategory = appCategories.find(c => c.slug === suggestedSlug || c.name.toLowerCase() === categories[0].toLowerCase());
-           if(matchingCategory) {
-               setSelectedCategory(matchingCategory.slug);
-           }
+    const handleGenerateDescriptionClick = async () => {
+        if (images.length === 0) {
+            toast({
+                title: "Upload an Image First",
+                description: "Please upload at least one image of your item before generating a description.",
+                variant: "destructive"
+            });
+            return;
         }
+
+        setIsGeneratingDescription(true);
+        const result = await handleGenerateDescription(images);
+        if (result.description) {
+            setDescription(result.description);
+            toast({
+                title: "Description Generated!",
+                description: "The AI has written a description for your item.",
+            });
+        } else if (result.error) {
+            toast({
+                title: "Error",
+                description: result.error,
+                variant: "destructive"
+            });
+        }
+        setIsGeneratingDescription(false);
     };
 
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -83,10 +107,10 @@ export function PostItemForm() {
             return;
         }
 
-        if (!imageDataUri) {
+        if (images.length === 0) {
             toast({
                 title: "Image Required",
-                description: "Please upload an image for your electronic item.",
+                description: "Please upload at least one image for your electronic item.",
                 variant: "destructive"
             });
             return;
@@ -94,22 +118,25 @@ export function PostItemForm() {
 
         setIsSubmitting(true);
         const formData = new FormData(event.currentTarget);
-        // Manually add price to form data as it might come from the slider
+        // Manually add values that aren't standard inputs
         formData.set('price', price.toString());
+        formData.set('description', description);
+
 
         const formValues = Object.fromEntries(formData.entries());
         const finalPrice = Number(formValues.price) || 0;
         
         const ownerProfile = mockUsers.find(u => u.userId === user.uid) || { displayName: user.displayName, photoURL: user.photoURL, averageRating: 0 };
 
-
         try {
-            const imageUrl = imageDataUri; // In a real app, this would come from a file upload service
+            // In a real app, images would be uploaded to a storage service like Firebase Storage,
+            // and you would get back URLs. For this prototype, we'll store the data URIs directly.
+            const imageUrls = images; 
 
             const newItem: Omit<Item, 'id'> = {
                 title: formValues.title as string,
                 description: formValues.description as string,
-                imageUrls: [imageUrl],
+                imageUrls: imageUrls,
                 category: formValues.category as string,
                 brand: formValues.brand as string,
                 condition: formValues.condition as ItemCondition,
@@ -153,7 +180,7 @@ export function PostItemForm() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 <div className="grid gap-2">
                     <Label htmlFor="title">Item Title</Label>
-                    <Input id="title" name="title" placeholder="e.g., MacBook Pro 14-inch" required defaultValue={initialTitle} />
+                    <Input id="title" name="title" placeholder="e.g., MacBook Pro 14-inch" required defaultValue={title || initialTitle} onChange={e => setTitle(e.target.value)} />
                 </div>
                  <div className="grid gap-2">
                     <Label htmlFor="brand">Brand</Label>
@@ -162,32 +189,23 @@ export function PostItemForm() {
             </div>
 
             <div className="grid gap-2">
-                <Label>Item Image</Label>
-                <p className="text-sm text-muted-foreground">Start by uploading a photo. Our AI will help suggest a category for your e-waste item.</p>
-                <ImageUploadWithAI 
-                    onCategoriesSuggested={handleCategoriesSuggested}
-                    onImageSelected={setImageDataUri}
-                />
+                 <Label>Item Images (up to 3)</Label>
+                 <MultiImageUpload images={images} setImages={setImages} />
+            </div>
+
+            <div className="grid gap-2">
+                <div className="flex justify-between items-center">
+                    <Label htmlFor="description">Description</Label>
+                    <Button type="button" variant="outline" size="sm" onClick={handleGenerateDescriptionClick} disabled={isGeneratingDescription || images.length === 0}>
+                        {isGeneratingDescription ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Sparkles className="mr-2 h-4 w-4" />}
+                        AI Generate
+                    </Button>
+                </div>
+                <Textarea id="description" name="description" placeholder="Describe your item's condition, features, and any issues." required value={description} onChange={e => setDescription(e.target.value)} />
             </div>
 
             <div className="grid gap-2">
                 <Label htmlFor="category">Category</Label>
-                {suggestedCategories.length > 0 && (
-                    <div className="flex flex-wrap gap-2 mb-2">
-                        <p className="text-sm text-muted-foreground w-full">AI Suggestions:</p>
-                        {suggestedCategories.map(cat => {
-                            const catSlug = cat.toLowerCase().replace(/\s/g, '-');
-                            const matchingAppCat = appCategories.find(c => c.slug === catSlug || c.name.toLowerCase() === cat.toLowerCase());
-                            if (!matchingAppCat) return null;
-
-                            return (
-                                <Button key={cat} type="button" variant={selectedCategory === matchingAppCat.slug ? "default" : "secondary"} size="sm" onClick={() => setSelectedCategory(matchingAppCat.slug)}>
-                                    {cat}
-                                </Button>
-                            )
-                        })}
-                    </div>
-                )}
                 <Select name="category" value={selectedCategory} onValueChange={setSelectedCategory} required>
                     <SelectTrigger id="category">
                         <SelectValue placeholder="Select a category" />
@@ -208,11 +226,6 @@ export function PostItemForm() {
                         </div>
                     ))}
                 </RadioGroup>
-            </div>
-            
-            <div className="grid gap-2">
-                <Label htmlFor="description">Description</Label>
-                <Textarea id="description" name="description" placeholder="Describe your item's condition, features, and any issues." required />
             </div>
             
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">

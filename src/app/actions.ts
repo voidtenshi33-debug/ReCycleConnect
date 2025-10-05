@@ -5,6 +5,7 @@ import { suggestItemCategory } from "@/ai/flows/suggest-item-category";
 import { getLocalityFromCoordinates } from "@/ai/flows/get-locality-from-coords";
 import { translateText } from "@/ai/flows/translate-text";
 import { evaluateDevice } from "@/ai/flows/device-valuator-flow";
+import { generateDescriptionFromImages } from "@/ai/flows/generate-description-flow";
 import { z } from "zod";
 
 const SuggestCategorySchema = z.object({
@@ -102,5 +103,24 @@ export async function handleDeviceValuation(deviceName: string, images: string[]
   } catch (e) {
     console.error(e);
     return { error: "Failed to get valuation. Please try again." };
+  }
+}
+
+
+const GenerateDescriptionSchema = z.object({
+  images: z.array(z.string().startsWith("data:image/")).min(1, "At least one image is required."),
+});
+
+export async function handleGenerateDescription(images: string[]) {
+  try {
+    const validatedFields = GenerateDescriptionSchema.safeParse({ images });
+    if (!validatedFields.success) {
+      return { error: "Please upload at least one image to generate a description." };
+    }
+    const result = await generateDescriptionFromImages(validatedFields.data);
+    return { description: result.description };
+  } catch (e) {
+    console.error(e);
+    return { error: "Failed to generate description. Please try again." };
   }
 }

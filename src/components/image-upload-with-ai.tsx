@@ -1,94 +1,97 @@
+
 "use client";
 
-import { useState } from "react";
-import Image from "next/image";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Upload, Sparkles, Loader2 } from "lucide-react";
-import { handleSuggestCategory } from "@/app/actions";
+import { useState } from 'react';
+import Image from 'next/image';
+import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { CameraCapture } from '@/components/camera-capture';
+import { Upload, Camera, X, ImagePlus } from "lucide-react";
 
-interface ImageUploadWithAIProps {
-  onCategoriesSuggested: (categories: string[]) => void;
-  onImageSelected: (dataUri: string) => void;
+
+interface MultiImageUploadProps {
+  images: string[];
+  setImages: React.Dispatch<React.SetStateAction<string[]>>;
 }
 
-export function ImageUploadWithAI({ onCategoriesSuggested, onImageSelected }: ImageUploadWithAIProps) {
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+export function MultiImageUpload({ images, setImages }: MultiImageUploadProps) {
+  const [isCameraOpen, setIsCameraOpen] = useState(false);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
+    const files = event.target.files;
+    if (!files) return;
+
+    const filesToProcess = Array.from(files).slice(0, 3 - images.length);
+
+    filesToProcess.forEach(file => {
       const reader = new FileReader();
       reader.onloadend = () => {
-        const dataUri = reader.result as string;
-        setImagePreview(dataUri);
-        onImageSelected(dataUri);
+        setImages(prev => [...prev, reader.result as string]);
       };
       reader.readAsDataURL(file);
+    });
+  };
+  
+  const handleCapture = (imageDataUri: string) => {
+    if (images.length < 3) {
+      setImages(prev => [...prev, imageDataUri]);
     }
+    setIsCameraOpen(false);
   };
 
-  const onSuggest = async () => {
-    if (!imagePreview) return;
-    setIsLoading(true);
-    setError(null);
-    const formData = new FormData();
-    formData.append('photoDataUri', imagePreview);
-    const result = await handleSuggestCategory(formData);
-    setIsLoading(false);
-    if (result.error) {
-      setError(result.error);
-    } else if (result.suggestions) {
-      onCategoriesSuggested(result.suggestions);
-    }
+  const removeImage = (index: number) => {
+    setImages(prev => prev.filter((_, i) => i !== index));
   };
+
 
   return (
-    <Card>
-      <CardContent className="p-6 text-center">
-        <div className="relative mb-4 group aspect-video border-dashed border-2 rounded-lg flex items-center justify-center">
-          {imagePreview ? (
-            <Image
-              src={imagePreview}
-              alt="Item preview"
-              fill
-              className="object-contain rounded-lg"
-            />
-          ) : (
-            <div className="text-muted-foreground flex flex-col items-center">
-              <Upload className="h-10 w-10 mb-2" />
-              <span>Upload an image</span>
-            </div>
-          )}
-          <label
-            htmlFor="image-upload"
-            className="absolute inset-0 cursor-pointer"
-          />
-          <input
-            id="image-upload"
-            type="file"
-            accept="image/*"
-            className="sr-only"
-            onChange={handleFileChange}
-          />
+    <div className="grid grid-cols-3 gap-4">
+        {images.map((src, index) => (
+        <div key={index} className="relative aspect-square rounded-lg border">
+            <Image src={src} alt={`Preview ${index}`} fill className="object-cover rounded-lg" />
+            <Button
+            type="button"
+            size="icon"
+            variant="destructive"
+            className="absolute -top-2 -right-2 h-6 w-6 rounded-full"
+            onClick={() => removeImage(index)}
+            >
+            <X className="h-4 w-4" />
+            </Button>
         </div>
-        <Button
-          type="button"
-          onClick={onSuggest}
-          disabled={!imagePreview || isLoading}
-          className="w-full max-w-sm"
-        >
-          {isLoading ? (
-            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-          ) : (
-            <Sparkles className="mr-2 h-4 w-4" />
-          )}
-          Suggest Category with AI
-        </Button>
-        {error && <p className="text-destructive text-sm mt-2">{error}</p>}
-      </CardContent>
-    </Card>
+        ))}
+
+        {images.length < 3 && (
+            <div className="grid grid-cols-2 gap-2 aspect-square">
+                <label htmlFor="image-upload" className="cursor-pointer rounded-lg border-2 border-dashed flex flex-col items-center justify-center text-muted-foreground hover:border-primary hover:text-primary transition-colors p-2 text-center">
+                    <ImagePlus className="h-8 w-8" />
+                    <span className="text-xs mt-1">Add Image</span>
+                    <input
+                        id="image-upload"
+                        type="file"
+                        accept="image/*"
+                        multiple
+                        className="sr-only"
+                        onChange={handleFileChange}
+                        disabled={images.length >= 3}
+                    />
+                </label>
+                <Dialog open={isCameraOpen} onOpenChange={setIsCameraOpen}>
+                    <DialogTrigger asChild>
+                    <button type="button" className="cursor-pointer rounded-lg border-2 border-dashed flex flex-col items-center justify-center text-muted-foreground hover:border-primary hover:text-primary transition-colors p-2 text-center" disabled={images.length >= 3}>
+                        <Camera className="h-8 w-8" />
+                        <span className="text-xs mt-1">Use Camera</span>
+                    </button>
+                    </DialogTrigger>
+                    <DialogContent className="max-w-3xl">
+                        <DialogHeader>
+                            <DialogTitle>Capture Photo</DialogTitle>
+                        </DialogHeader>
+                        <CameraCapture onCapture={handleCapture} />
+                    </DialogContent>
+                </Dialog>
+            </div>
+        )}
+    </div>
   );
 }
