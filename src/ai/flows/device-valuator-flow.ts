@@ -11,13 +11,13 @@
 import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
 
-export const DeviceValuationInputSchema = z.object({
+const DeviceValuationInputSchema = z.object({
   deviceName: z.string().describe('The name of the device, e.g., "iPhone 13 Pro".'),
   images: z.array(z.string()).describe("An array of image data URIs showing the device's condition. Expected format: 'data:<mimetype>;base64,<encoded_data>'."),
 });
 export type DeviceValuationInput = z.infer<typeof DeviceValuationInputSchema>;
 
-export const DeviceValuationOutputSchema = z.object({
+const DeviceValuationOutputSchema = z.object({
   conditionAssessment: z.string().describe("A brief, one-sentence assessment of the device's condition based on the images."),
   estimatedLowPrice: z.number().describe("The low-end of the estimated resale value in Indian Rupees (₹)."),
   estimatedHighPrice: z.number().describe("The high-end of the estimated resale value in Indian Rupees (₹)."),

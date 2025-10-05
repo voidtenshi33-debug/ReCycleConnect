@@ -93,7 +93,8 @@ export async function handleDeviceValuation(deviceName: string, images: string[]
     const validatedFields = EvaluateDeviceSchema.safeParse({ deviceName, images });
 
     if (!validatedFields.success) {
-      return { error: "Invalid input for valuation." };
+      // For a more detailed error, you could format validatedFields.error.issues
+      return { error: "Invalid input: Please provide a device name and at least one image." };
     }
 
     const result = await evaluateDevice(validatedFields.data);
