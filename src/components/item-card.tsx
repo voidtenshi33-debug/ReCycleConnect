@@ -3,7 +3,7 @@
 
 import Image from "next/image"
 import Link from "next/link"
-import { Heart, Star, Zap } from "lucide-react"
+import { Heart, Star, Zap, MoreVertical, Trash2, Edit } from "lucide-react"
 
 import type { Item } from "@/lib/types"
 import { Badge } from "@/components/ui/badge"
@@ -14,12 +14,20 @@ import { users } from "@/lib/data"
 import { useState, useEffect } from "react"
 import { cn } from "@/lib/utils"
 import { T } from "./t"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 
 interface ItemCardProps {
   item: Item;
+  showControls?: boolean;
+  onRemove?: (itemId: string) => void;
 }
 
-export function ItemCard({ item }: ItemCardProps) {
+export function ItemCard({ item, showControls = false, onRemove }: ItemCardProps) {
   const { user, isUserLoading } = useUser();
   
   // In a real app, this would come from a Firestore hook or a context provider
@@ -81,16 +89,41 @@ export function ItemCard({ item }: ItemCardProps) {
             />
           </div>
         </Link>
-        <Button 
-          variant="ghost" 
-          size="icon" 
-          className="absolute top-2 right-2 bg-background/50 backdrop-blur-sm rounded-full hover:bg-background/70 group"
-          onClick={handleWishlistToggle}
-          disabled={isUserLoading}
-          aria-label="Toggle Wishlist"
-        >
-            <Heart className={cn("w-5 h-5 text-destructive transition-all group-hover:scale-110", isWishlisted && "fill-destructive")} />
-        </Button>
+        
+        <div className="absolute top-2 right-2 flex items-center gap-2">
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              className="bg-background/50 backdrop-blur-sm rounded-full hover:bg-background/70 group"
+              onClick={handleWishlistToggle}
+              disabled={isUserLoading}
+              aria-label="Toggle Wishlist"
+            >
+                <Heart className={cn("w-5 h-5 text-destructive transition-all group-hover:scale-110", isWishlisted && "fill-destructive")} />
+            </Button>
+            
+            {showControls && (
+                <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" size="icon" className="bg-background/50 backdrop-blur-sm rounded-full hover:bg-background/70">
+                            <MoreVertical className="w-5 h-5" />
+                        </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                        <DropdownMenuItem>
+                            <Edit className="mr-2 h-4 w-4" />
+                            <span>Edit</span>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => onRemove?.(item.id)} className="text-destructive focus:bg-destructive/10 focus:text-destructive">
+                             <Trash2 className="mr-2 h-4 w-4" />
+                            <span>Remove</span>
+                        </DropdownMenuItem>
+                    </DropdownMenuContent>
+                </DropdownMenu>
+            )}
+        </div>
+
+
          <div className="absolute top-2 left-2 flex gap-2">
             {item.isFeatured && (
                 <Badge variant="default" className="bg-yellow-400 text-yellow-900 gap-1 pr-3">

@@ -1,6 +1,7 @@
 
 'use client';
 
+import { useState } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -12,11 +13,23 @@ import { useCollection, useDoc, useFirebase, useUser } from "@/firebase";
 import type { User, Item } from "@/lib/types";
 import { Star, Loader2 } from "lucide-react";
 import { format } from "date-fns";
-import { collection, doc, query, where } from "firebase/firestore";
+import { collection, doc, query, where, deleteDoc } from "firebase/firestore";
 import Link from "next/link";
 import { useMemoFirebase } from "@/firebase/provider";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ItemCard } from "@/components/item-card";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { useToast } from '@/hooks/use-toast';
+import { deleteDocumentNonBlocking } from '@/firebase/non-blocking-updates';
 
 
 function ProfileSkeleton() {
@@ -62,6 +75,9 @@ function ProfileSkeleton() {
 export default function ProfilePage() {
     const { firestore } = useFirebase();
     const { user, isUserLoading } = useUser();
+    const { toast } = useToast();
+
+    const [itemToRemove, setItemToRemove] = useState<string | null>(null);
 
     const userProfileRef = useMemoFirebase(() => {
         if (!firestore || !user?.uid) return null;
@@ -76,6 +92,32 @@ export default function ProfilePage() {
     }, [firestore, user?.uid]);
 
     const { data: userItems, isLoading: areItemsLoading } = useCollection<Item>(userListingsQuery);
+
+    const handleConfirmRemove = async () => {
+        if (!itemToRemove || !firestore) return;
+
+        const itemRef = doc(firestore, 'items', itemToRemove);
+        
+        try {
+            // Using non-blocking delete for better UI responsiveness
+            deleteDocumentNonBlocking(itemRef);
+
+            toast({
+                title: "Item Removed",
+                description: "Your listing has been successfully removed.",
+            });
+        } catch (error: any) {
+            console.error("Error removing item:", error);
+            toast({
+                variant: "destructive",
+                title: "Error",
+                description: `Could not remove the item. ${error.message}`,
+            });
+        } finally {
+            setItemToRemove(null);
+        }
+    };
+
 
     if (isUserLoading || isProfileLoading || !userProfile) {
         return <ProfileSkeleton />;
@@ -128,7 +170,12 @@ export default function ProfilePage() {
                             ) : userItems && userItems.length > 0 ? (
                                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 pt-4">
                                     {userItems.map(item => (
-                                        <ItemCard key={item.id} item={item} />
+                                        <ItemCard 
+                                            key={item.id} 
+                                            item={item} 
+                                            showControls 
+                                            onRemove={() => setItemToRemove(item.id)}
+                                        />
                                     ))}
                                 </div>
                             ) : (
@@ -183,6 +230,24 @@ export default function ProfilePage() {
                     </Card>
                 </TabsContent>
             </Tabs>
+
+            <AlertDialog open={!!itemToRemove} onOpenChange={(open) => !open && setItemToRemove(null)}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                    <AlertDialogTitle>Are you sure you want to remove this listing?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                        This action cannot be undone. This will permanently delete the item
+                        listing from ReCycleConnect.
+                    </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogAction onClick={handleConfirmRemove} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+                        Yes, Remove Listing
+                    </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
         </div>
     );
 }
