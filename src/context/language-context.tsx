@@ -66,8 +66,8 @@ export const LanguageProvider = ({ children }: { children: ReactNode }) => {
       }));
       return result.translation;
     } else {
-      console.error('Translation failed:', result.error);
-      return defaultText; // Fallback to default text on failure
+      // Fallback to default text on failure, without logging an error.
+      return defaultText;
     }
   }, [locale, translations]);
 
