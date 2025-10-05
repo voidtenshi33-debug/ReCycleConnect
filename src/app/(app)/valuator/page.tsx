@@ -1,0 +1,180 @@
+
+'use client';
+
+import { useState } from 'react';
+import Image from 'next/image';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { handleDeviceValuation } from '@/app/actions';
+import type { DeviceValuationOutput } from '@/ai/flows/device-valuator-flow';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { ArrowLeft, భారతీయ రూపాయి, ImagePlus, Loader2, Sparkles, WandSparkles, X } from 'lucide-react';
+import Link from 'next/link';
+
+function ValuationResult({ result }: { result: DeviceValuationOutput }) {
+  return (
+    <Alert className="mt-6 border-primary">
+      <WandSparkles className="h-4 w-4" />
+      <AlertTitle className="font-bold">Valuation Complete!</AlertTitle>
+      <AlertDescription className="space-y-2">
+        <p className="font-semibold text-lg">
+          Estimated Value: ₹{result.estimatedLowPrice.toLocaleString('en-IN')} - ₹{result.estimatedHighPrice.toLocaleString('en-IN')}
+        </p>
+        <p><span className="font-semibold">Condition:</span> {result.conditionAssessment}</p>
+        <p><span className="font-semibold">Reasoning:</span> {result.reasoning}</p>
+      </AlertDescription>
+    </Alert>
+  );
+}
+
+export default function ValuatorPage() {
+  const [deviceName, setDeviceName] = useState('');
+  const [images, setImages] = useState<string[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [result, setResult] = useState<DeviceValuationOutput | null>(null);
+
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files;
+    if (!files) return;
+
+    // Allow up to 3 images
+    const filesToProcess = Array.from(files).slice(0, 3 - images.length);
+
+    filesToProcess.forEach(file => {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImages(prev => [...prev, reader.result as string]);
+      };
+      reader.readAsDataURL(file);
+    });
+  };
+
+  const removeImage = (index: number) => {
+    setImages(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const handleSubmit = async (event: React.FormEvent) => {
+    event.preventDefault();
+    if (images.length === 0 || !deviceName) {
+      setError("Please provide a device name and at least one image.");
+      return;
+    }
+    
+    setIsLoading(true);
+    setError(null);
+    setResult(null);
+
+    const valuationResult = await handleDeviceValuation(deviceName, images);
+
+    if (valuationResult.error) {
+      setError(valuationResult.error);
+    } else if (valuationResult.valuation) {
+      setResult(valuationResult.valuation);
+    }
+    
+    setIsLoading(false);
+  };
+  
+  const resetForm = () => {
+      setDeviceName('');
+      setImages([]);
+      setResult(null);
+      setError(null);
+      setIsLoading(false);
+  }
+
+  return (
+    <div className="max-w-2xl mx-auto">
+       <Link href="/home" className="flex items-center gap-2 text-sm text-muted-foreground mb-4 hover:text-foreground">
+          <ArrowLeft className="h-4 w-4" />
+          Back to home
+      </Link>
+      <Card>
+        <CardHeader>
+          <CardTitle className="font-headline text-3xl flex items-center gap-2">
+            <WandSparkles className="text-primary" /> AI Device Valuator
+          </CardTitle>
+          <CardDescription>
+            Upload photos of your device and our AI will estimate its resale value.
+            For best results, upload clear photos of the screen, back, and any visible damage.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          {result ? (
+            <ValuationResult result={result} />
+          ) : (
+            <form onSubmit={handleSubmit} className="space-y-6">
+              <div className="space-y-2">
+                <Label htmlFor="device-name">Device Name</Label>
+                <Input
+                  id="device-name"
+                  value={deviceName}
+                  onChange={(e) => setDeviceName(e.target.value)}
+                  placeholder="e.g., Apple iPhone 14 Pro"
+                  required
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label>Device Images (up to 3)</Label>
+                <div className="grid grid-cols-3 gap-4">
+                  {images.map((src, index) => (
+                    <div key={index} className="relative aspect-square rounded-lg border">
+                      <Image src={src} alt={`Preview ${index}`} fill className="object-cover rounded-lg" />
+                      <Button
+                        type="button"
+                        size="icon"
+                        variant="destructive"
+                        className="absolute -top-2 -right-2 h-6 w-6 rounded-full"
+                        onClick={() => removeImage(index)}
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  ))}
+
+                  {images.length < 3 && (
+                    <label htmlFor="image-upload" className="cursor-pointer aspect-square rounded-lg border-2 border-dashed flex flex-col items-center justify-center text-muted-foreground hover:border-primary hover:text-primary transition-colors">
+                      <ImagePlus className="h-8 w-8" />
+                      <span className="text-xs mt-1 text-center">Add Image</span>
+                      <input
+                        id="image-upload"
+                        type="file"
+                        accept="image/*"
+                        multiple
+                        className="sr-only"
+                        onChange={handleFileChange}
+                        disabled={images.length >= 3}
+                      />
+                    </label>
+                  )}
+                </div>
+              </div>
+              
+              {error && <p className="text-sm text-destructive">{error}</p>}
+              
+              <Button type="submit" size="lg" className="w-full" disabled={isLoading}>
+                {isLoading ? (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                ) : (
+                  <Sparkles className="mr-2 h-4 w-4" />
+                )}
+                {isLoading ? 'Analyzing...' : 'Estimate Value'}
+              </Button>
+            </form>
+          )}
+        </CardContent>
+        {result && (
+             <CardFooter>
+                <Button variant="outline" onClick={resetForm} className="w-full">
+                    Start New Valuation
+                </Button>
+            </CardFooter>
+        )}
+      </Card>
+    </div>
+  );
+}

@@ -3,7 +3,7 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { Heart, Home, Leaf, MessageSquare, PlusCircle, Repeat2, User as UserIcon, Star } from "lucide-react"
+import { Heart, Home, Leaf, MessageSquare, PlusCircle, Repeat2, User as UserIcon, Star, WandSparkles } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
@@ -83,6 +83,7 @@ export default function Sidebar() {
             <NavLink href="/home" icon={Home} exact><T>Home</T></NavLink>
             <NavLink href="/exchanges" icon={Repeat2} badge="3"><T>Exchanges</T></NavLink>
             <NavLink href="/messages" icon={MessageSquare}><T>Messages</T></NavLink>
+            <NavLink href="/valuator" icon={WandSparkles}><T>AI Valuator</T></NavLink>
             <NavLink href="/wishlist" icon={Heart}><T>Wishlist</T></NavLink>
             <NavLink href="/profile" icon={UserIcon}><T>Profile</T></NavLink>
           </nav>

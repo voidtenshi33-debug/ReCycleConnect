@@ -4,6 +4,7 @@
 import { suggestItemCategory } from "@/ai/flows/suggest-item-category";
 import { getLocalityFromCoordinates } from "@/ai/flows/get-locality-from-coords";
 import { translateText } from "@/ai/flows/translate-text";
+import { evaluateDevice } from "@/ai/flows/device-valuator-flow";
 import { z } from "zod";
 
 const SuggestCategorySchema = z.object({
@@ -80,4 +81,25 @@ export async function handleTranslateText(text: string, targetLanguage: string) 
         // Don't return the original text on failure, let the UI handle it.
         return { error: "Translation failed." };
     }
+}
+
+const EvaluateDeviceSchema = z.object({
+  deviceName: z.string().min(3, "Device name is required."),
+  images: z.array(z.string().startsWith("data:image/")).min(1, "At least one image is required."),
+});
+
+export async function handleDeviceValuation(deviceName: string, images: string[]) {
+  try {
+    const validatedFields = EvaluateDeviceSchema.safeParse({ deviceName, images });
+
+    if (!validatedFields.success) {
+      return { error: "Invalid input for valuation." };
+    }
+
+    const result = await evaluateDevice(validatedFields.data);
+    return { valuation: result };
+  } catch (e) {
+    console.error(e);
+    return { error: "Failed to get valuation. Please try again." };
+  }
 }
