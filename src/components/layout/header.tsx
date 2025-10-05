@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { Bell, CircleUser, Home, Leaf, Menu, Search, Heart, Repeat2, MessageSquare, User as UserIcon } from "lucide-react"
+import { Bell, CircleUser, Home, Leaf, Menu, Search, Heart, Repeat2, MessageSquare, User as UserIcon, Mic, X } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -20,6 +20,10 @@ import { useAuth, useUser } from "@/firebase"
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar"
 import { getInitials } from "@/lib/utils"
 import { signOut } from "firebase/auth"
+import { useState, useEffect } from "react"
+import { useSpeechRecognition } from "@/hooks/use-speech-recognition"
+import { Dialog, DialogContent } from "@/components/ui/dialog"
+
 
 const MobileNavLink = ({ href, icon: Icon, children }: { href: string, icon: React.ElementType, children: React.ReactNode }) => {
     const pathname = usePathname()
@@ -40,11 +44,36 @@ export default function Header() {
   const { user, isUserLoading } = useUser();
   const auth = useAuth();
   const router = useRouter();
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const {
+    text,
+    isListening,
+    startListening,
+    stopListening,
+    hasRecognitionSupport,
+  } = useSpeechRecognition();
+
+  useEffect(() => {
+    if (text) {
+      setSearchQuery(text);
+      // Optional: automatically submit search
+      // router.push(`/search?q=${encodeURIComponent(text)}`);
+    }
+  }, [text, router]);
   
   const handleLogout = async () => {
     await signOut(auth);
     router.push('/login');
   };
+
+  const handleSearchSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      router.push(`/search?q=${encodeURIComponent(searchQuery)}`);
+    }
+  };
+
 
   return (
     <header className="flex h-14 items-center gap-4 border-b bg-muted/40 px-4 lg:h-[60px] lg:px-6">
@@ -77,14 +106,28 @@ export default function Header() {
         </SheetContent>
       </Sheet>
       <div className="w-full flex-1">
-        <form>
+        <form onSubmit={handleSearchSubmit}>
           <div className="relative">
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
             <Input
               type="search"
               placeholder="Search for items..."
-              className="w-full appearance-none bg-background pl-8 shadow-none md:w-2/3 lg:w-1/3"
+              className="w-full appearance-none bg-background pl-8 shadow-none md:w-2/3 lg:w-1/3 pr-10"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
             />
+            {hasRecognitionSupport && (
+               <Button 
+                  type="button"
+                  variant="ghost" 
+                  size="icon" 
+                  className="absolute right-1.5 top-1/2 -translate-y-1/2 h-8 w-8 rounded-full"
+                  onClick={startListening}
+                >
+                  <Mic className="h-4 w-4" />
+                  <span className="sr-only">Search by voice</span>
+               </Button>
+            )}
           </div>
         </form>
       </div>
@@ -128,6 +171,20 @@ export default function Header() {
           )}
         </DropdownMenuContent>
       </DropdownMenu>
+
+       {isListening && (
+        <Dialog open onOpenChange={stopListening}>
+          <DialogContent className="sm:max-w-md">
+            <div className="flex flex-col items-center justify-center gap-4 py-12">
+              <div className="relative">
+                <Mic className="h-16 w-16 text-primary" />
+                <div className="absolute inset-0 -z-10 bg-primary/20 rounded-full animate-ping"></div>
+              </div>
+              <p className="text-lg font-medium text-muted-foreground">Listening...</p>
+            </div>
+          </DialogContent>
+        </Dialog>
+      )}
     </header>
   )
 }
