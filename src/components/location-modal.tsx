@@ -126,3 +126,4 @@ export function LocationModal({ isOpen, setIsOpen }: LocationModalProps) {
         </Dialog>
     );
 }
+
