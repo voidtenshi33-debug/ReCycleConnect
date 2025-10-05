@@ -101,8 +101,8 @@ function ItemDetailContent({ itemId }: { itemId: string }) {
                     {/* Core Details */}
                     <Card>
                         <CardHeader>
-                            <CardTitle className="font-headline text-3xl font-bold">{item.title}</CardTitle>
-                             <div className="text-4xl font-bold text-primary pt-2">
+                            <CardTitle className="font-headline text-2xl md:text-3xl font-bold">{item.title}</CardTitle>
+                             <div className="text-3xl md:text-4xl font-bold text-primary pt-2">
                                 {item.listingType === 'Donate' ? 'FREE for Donation' : `₹${item.price.toLocaleString()}`}
                             </div>
                             <div className="flex flex-wrap items-center gap-2 pt-2">

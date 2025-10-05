@@ -15,7 +15,7 @@ export default function MessagesLayout({
   const isRootMessages = pathname === '/messages';
 
   return (
-    <div className="grid h-[calc(100vh-theme(spacing.14))] grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-0 -m-4 lg:-m-6">
+    <div className="grid h-[calc(100vh-theme(spacing.14))] grid-cols-1 md:grid-cols-[320px_1fr] lg:grid-cols-[380px_1fr] gap-0 -m-4 lg:-m-6">
       <aside className={cn(
         "border-r bg-muted/40",
         // On mobile, hide the list when a conversation is selected
@@ -25,7 +25,7 @@ export default function MessagesLayout({
       </aside>
 
       <main className={cn(
-        "md:col-span-2 lg:col-span-3",
+        "md:col-span-1",
          // On mobile, hide the main content when on the root messages page
         isRootMessages && "hidden md:flex" 
       )}>

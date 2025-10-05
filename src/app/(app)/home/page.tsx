@@ -57,7 +57,7 @@ const ItemCarousel = ({ title, items, link = "#" }: { title: React.ReactNode, it
 )
 
 const HeroSection = () => (
-  <div className="relative w-full h-80 rounded-2xl overflow-hidden mb-8">
+  <div className="relative w-full h-64 md:h-80 rounded-2xl overflow-hidden mb-8">
     <Image 
       src="https://www.genoxtech.com/UserFiles/kindeditor/image/20240627/627-1.jpg"
       alt="A pile of discarded electronic devices representing e-waste"
@@ -67,8 +67,8 @@ const HeroSection = () => (
     />
     <div className="absolute inset-0 bg-black/50" />
     <div className="relative h-full flex flex-col items-center justify-center text-center text-white p-4 space-y-4">
-      <h1 className="text-4xl md:text-5xl font-headline font-bold"><T>Give Your Electronics a Second Life.</T></h1>
-      <p className="max-w-2xl text-lg text-white/90"><T>The dedicated marketplace for e-waste. Buy, sell, or donate used gadgets and reduce your carbon footprint.</T></p>
+      <h1 className="text-3xl md:text-5xl font-headline font-bold"><T>Give Your Electronics a Second Life.</T></h1>
+      <p className="max-w-2xl text-base md:text-lg text-white/90"><T>The dedicated marketplace for e-waste. Buy, sell, or donate used gadgets and reduce your carbon footprint.</T></p>
       <Button size="lg" asChild>
         <Link href="/post-item">
           <PlusCircle className="mr-2" /> <T>Post Your E-Waste Item</T>

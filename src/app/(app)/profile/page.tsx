@@ -133,7 +133,7 @@ export default function ProfilePage() {
                             <AvatarFallback>{(userProfile.displayName || 'U').charAt(0)}</AvatarFallback>
                         </Avatar>
                         <div className="flex-grow">
-                            <CardTitle className="font-headline text-3xl">{userProfile.displayName}</CardTitle>
+                            <CardTitle className="font-headline text-2xl md:text-3xl">{userProfile.displayName}</CardTitle>
                             <CardDescription className="mt-1">
                                 Member since {format(userProfile.createdAt?.toDate ? userProfile.createdAt.toDate() : new Date(), "MMMM yyyy")}
                             </CardDescription>
