@@ -25,6 +25,10 @@
           "description": "The user's email address.",
           "format": "email"
         },
+        "phoneNumber": {
+          "type": "string",
+          "description": "The user's phone number."
+        },
         "createdAt": {
           "type": "string",
           "description": "The date the user joined.",

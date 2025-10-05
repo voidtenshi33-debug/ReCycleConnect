@@ -8,6 +8,7 @@ export type User = {
   displayName: string;
   email: string;
   photoURL: string | null;
+  phoneNumber?: string;
   createdAt: any; // Firestore Timestamp
   lastKnownLocality: string;
   averageRating: number;

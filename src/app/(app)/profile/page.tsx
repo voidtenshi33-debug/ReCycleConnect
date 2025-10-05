@@ -146,10 +146,14 @@ export default function ProfilePage() {
                                 <Input id="location" defaultValue={userProfile.lastKnownLocality} />
                             </div>
                              <Separator />
-                            <div className="grid gap-2 max-w-md">
+                             <div className="grid gap-2 max-w-md">
                                 <Label htmlFor="email">Email Address</Label>
                                 <Input id="email" type="email" defaultValue={userProfile.email} disabled />
                                 <p className="text-xs text-muted-foreground">Email cannot be changed.</p>
+                            </div>
+                            <div className="grid gap-2 max-w-md">
+                                <Label htmlFor="phone">Phone Number</Label>
+                                <Input id="phone" type="tel" defaultValue={userProfile.phoneNumber || ''} placeholder="Add your phone number" />
                             </div>
                             <Button>Save Changes</Button>
                         </CardContent>
