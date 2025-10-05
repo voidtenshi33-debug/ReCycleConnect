@@ -11,6 +11,7 @@ import { ArrowLeft, ChevronRight, Flag, MessageSquare, Share2, Star, ShieldCheck
 import { format } from "date-fns";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import { Separator } from "@/components/ui/separator";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 const TrustBadge = ({ icon: Icon, children }: { icon: React.ElementType, children: React.ReactNode }) => (
     <div className="flex items-center gap-2 text-sm text-muted-foreground">
