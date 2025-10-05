@@ -12,13 +12,15 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { Button } from '@/components/ui/button';
-import { ListFilter } from 'lucide-react';
+import { ListFilter, Search } from 'lucide-react';
 import { CategoryScroller } from '@/components/category-scroller';
 import { useUser } from '@/firebase';
+import { Input } from '@/components/ui/input';
 
 export default function HomePage() {
   const { user, isUserLoading } = useUser();
   const [activeCategory, setActiveCategory] = useState<string>('all');
+  const [searchQuery, setSearchQuery] = useState('');
 
   const handleCategorySelect = (categorySlug: string) => {
     setActiveCategory(categorySlug);
@@ -33,13 +35,21 @@ export default function HomePage() {
       currentItems = items.filter((item) => item.locality === userLocation);
     }
     
-    if (activeCategory === 'all') {
-      return currentItems;
+    if (activeCategory !== 'all') {
+      currentItems = currentItems.filter(item => item.category === activeCategory);
     }
 
-    return currentItems.filter(item => item.category === activeCategory);
+    if (searchQuery.trim() !== '') {
+      const lowercasedQuery = searchQuery.toLowerCase();
+      currentItems = currentItems.filter(item => 
+        item.title.toLowerCase().includes(lowercasedQuery) ||
+        item.locality.toLowerCase().includes(lowercasedQuery)
+      );
+    }
 
-  }, [user, isUserLoading, activeCategory]);
+    return currentItems;
+
+  }, [user, isUserLoading, activeCategory, searchQuery]);
 
   const pageTitle = activeCategory === 'all' 
     ? 'Featured Items' 
@@ -55,6 +65,18 @@ export default function HomePage() {
         <h1 className="text-2xl font-headline font-semibold">Explore Categories</h1>
       </div>
       <CategoryScroller onCategorySelect={handleCategorySelect} activeCategory={activeCategory} />
+      
+      <div className="relative mt-6">
+          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+          <Input
+            type="search"
+            placeholder="Search by product name or location..."
+            className="w-full appearance-none bg-background pl-8 shadow-none"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+      </div>
+
       <div className="flex items-center justify-between mt-6">
         <h1 className="text-2xl font-headline font-semibold">
           {pageTitle}
@@ -81,9 +103,15 @@ export default function HomePage() {
         </div>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 lg:gap-6">
-        {filteredItems.map(item => (
-          <ItemCard key={item.id} item={item} />
-        ))}
+        {filteredItems.length > 0 ? (
+          filteredItems.map(item => (
+            <ItemCard key={item.id} item={item} />
+          ))
+        ) : (
+          <div className="col-span-full text-center py-12 text-muted-foreground">
+            <p>No items found for your search.</p>
+          </div>
+        )}
       </div>
     </>
   );

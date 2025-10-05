@@ -49,35 +49,11 @@ export default function Header() {
   const { user, isUserLoading } = useUser();
   const auth = useAuth();
   const router = useRouter();
-  const [searchQuery, setSearchQuery] = useState("");
   const [isLocationModalOpen, setLocationModalOpen] = useState(false);
-
-  const {
-    text,
-    isListening,
-    startListening,
-    stopListening,
-    hasRecognitionSupport,
-  } = useSpeechRecognition();
-
-  useEffect(() => {
-    if (text) {
-      setSearchQuery(text);
-      // Optional: automatically submit search
-      // router.push(`/search?q=${encodeURIComponent(text)}`);
-    }
-  }, [text, router]);
   
   const handleLogout = async () => {
     await signOut(auth);
     router.push('/login');
-  };
-
-  const handleSearchSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (searchQuery.trim()) {
-      router.push(`/search?q=${encodeURIComponent(searchQuery)}`);
-    }
   };
 
   // @ts-ignore - user is not known to have lastKnownLocality
@@ -120,33 +96,8 @@ export default function Header() {
         <ChevronDown className="h-4 w-4" />
       </Button>
 
-      <div className="w-full flex-1">
-        <form onSubmit={handleSearchSubmit}>
-          <div className="relative">
-            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-            <Input
-              type="search"
-              placeholder="Search for items..."
-              className="w-full appearance-none bg-background pl-8 shadow-none md:w-2/3 lg:w-2/3"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-             {!searchQuery && <TypewriterSearch />}
-             {hasRecognitionSupport && (
-               <Button 
-                  type="button"
-                  variant="ghost" 
-                  size="icon" 
-                  className="absolute right-1.5 top-1/2 -translate-y-1/2 h-8 w-8 rounded-full"
-                  onClick={startListening}
-                >
-                  <Mic className="h-4 w-4" />
-                  <span className="sr-only">Search by voice</span>
-               </Button>
-            )}
-          </div>
-        </form>
-      </div>
+      <div className="w-full flex-1" />
+
        <Button asChild variant="ghost" size="icon" className="rounded-full">
             <Link href="/notifications">
               <Bell className="h-5 w-5" />
@@ -188,19 +139,6 @@ export default function Header() {
         </DropdownMenuContent>
       </DropdownMenu>
 
-       {isListening && (
-        <Dialog open onOpenChange={stopListening}>
-          <DialogContent className="sm:max-w-md">
-            <div className="flex flex-col items-center justify-center gap-4 py-12">
-              <div className="relative">
-                <Mic className="h-16 w-16 text-primary" />
-                <div className="absolute inset-0 -z-10 bg-primary/20 rounded-full animate-ping"></div>
-              </div>
-              <p className="text-lg font-medium text-muted-foreground">Listening...</p>
-            </div>
-          </DialogContent>
-        </Dialog>
-      )}
        <LocationModal
         isOpen={isLocationModalOpen}
         setIsOpen={setLocationModalOpen}
