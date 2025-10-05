@@ -52,7 +52,7 @@ export function PostItemForm() {
     const [images, setImages] = useState<string[]>([]);
     const [selectedCategory, setSelectedCategory] = useState<string>("");
     const [condition, setCondition] = useState<ItemCondition>("Working");
-    const [price, setPrice] = useState(0);
+    const [price, setPrice] = useState<number | ''>('');
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isGeneratingDescription, setIsGeneratingDescription] = useState(false);
 
@@ -132,14 +132,8 @@ export function PostItemForm() {
 
         setIsSubmitting(true);
         const formData = new FormData(event.currentTarget);
-        // Manually add values that aren't standard inputs
-        formData.set('price', price.toString());
-        formData.set('description', description);
-        formData.set('condition', condition);
-
-
-        const formValues = Object.fromEntries(formData.entries());
-        const finalPrice = Number(formValues.price) || 0;
+        
+        const finalPrice = Number(price) || 0;
         
         const ownerProfile = mockUsers.find(u => u.userId === user.uid) || { displayName: user.displayName, photoURL: user.photoURL, averageRating: 0 };
 
@@ -149,15 +143,15 @@ export function PostItemForm() {
             const imageUrls = images; 
 
             const newItem: Omit<Item, 'id'> = {
-                title: formValues.title as string,
-                description: formValues.description as string,
+                title: formData.get('title') as string,
+                description: description,
                 imageUrls: imageUrls,
-                category: formValues.category as string,
-                brand: formValues.brand as string,
-                condition: formValues.condition as ItemCondition,
+                category: selectedCategory,
+                brand: formData.get('brand') as string,
+                condition: condition,
                 listingType: finalPrice === 0 ? "Donate" : "Sell",
                 price: finalPrice,
-                locality: formValues.locality as string,
+                locality: formData.get('locality') as string,
                 createdAt: serverTimestamp(),
                 ownerId: user.uid,
                 ownerName: ownerProfile.displayName ?? user.displayName ?? "Anonymous",
@@ -267,12 +261,12 @@ export function PostItemForm() {
                     </Select>
                 </div>
                 <div className="grid gap-2">
-                    {minPrice !== null && maxPrice !== null ? (
+                    {minPrice !== null && maxPrice !== null && typeof price === 'number' ? (
                         <PriceSlider
                             min={minPrice}
                             max={maxPrice}
                             value={price}
-                            onValueChange={setPrice}
+                            onValueChange={(newPrice) => setPrice(newPrice)}
                         />
                     ) : (
                         <div>
@@ -283,7 +277,10 @@ export function PostItemForm() {
                                 type="number" 
                                 placeholder="Enter 0 for a free donation"
                                 value={price}
-                                onChange={(e) => setPrice(Number(e.target.value))}
+                                onChange={(e) => {
+                                    const val = e.target.value;
+                                    setPrice(val === '' ? '' : parseInt(val, 10));
+                                }}
                             />
                         </div>
                     )}
@@ -297,4 +294,3 @@ export function PostItemForm() {
         </form>
     );
 }
-
