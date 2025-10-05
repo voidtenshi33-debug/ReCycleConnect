@@ -10,18 +10,21 @@ import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import { useCollection, useDoc, useFirebase, useMemoFirebase } from "@/firebase"
 import type { ExchangeRequest, Item, User } from "@/lib/types"
-import { collection, query, where } from "firebase/firestore"
+import { collection, query, where, doc } from "firebase/firestore"
 import { Repeat2, ShoppingBag } from "lucide-react"
 
 const RequestCard = ({ request }: { request: ExchangeRequest & { id: string } }) => {
-    const { user: currentUser } = useFirebase();
+    const { firestore, user: currentUser } = useFirebase();
     
     // Determine the other user's ID
     const otherUserId = request.sellerId === currentUser?.uid ? request.requesterId : request.sellerId;
 
-    // Fetch item, other user, and my profile
-    const { data: item } = useDoc<Item>(useMemoFirebase(() => doc(useFirebase().firestore, 'items', request.itemId), [request.itemId]));
-    const { data: otherUser } = useDoc<User>(useMemoFirebase(() => doc(useFirebase().firestore, 'users', otherUserId), [otherUserId]));
+    // Fetch item and other user profiles safely
+    const itemRef = useMemoFirebase(() => firestore ? doc(firestore, 'items', request.itemId) : null, [firestore, request.itemId]);
+    const otherUserRef = useMemoFirebase(() => firestore && otherUserId ? doc(firestore, 'users', otherUserId) : null, [firestore, otherUserId]);
+
+    const { data: item } = useDoc<Item>(itemRef);
+    const { data: otherUser } = useDoc<User>(otherUserRef);
     
     if (!item || !otherUser) {
         // You can return a loading skeleton here
