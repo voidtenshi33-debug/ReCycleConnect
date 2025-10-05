@@ -1,3 +1,4 @@
+
 "use client"
 
 import Link from "next/link"
@@ -11,6 +12,7 @@ import { useUser } from "@/firebase"
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar"
 import { getInitials } from "@/lib/utils"
 import { Separator } from "../ui/separator"
+import { users } from "@/lib/data"
 
 const NavLink = ({ href, icon: Icon, children, badge, exact = false }: { href: string; icon: React.ElementType; children: React.ReactNode; badge?: string; exact?: boolean; }) => {
   const pathname = usePathname()
@@ -33,14 +35,16 @@ const NavLink = ({ href, icon: Icon, children, badge, exact = false }: { href: s
 
 function UserProfileSnippet() {
   const { user } = useUser();
+  
+  // In a real app, you'd fetch the user's full profile from Firestore
+  // For now, we'll find the matching user from mock data.
+  const userProfile = users.find(u => u.id === user?.uid);
+  const mockRating = userProfile?.averageRating || 0;
+
 
   if (!user) {
     return null;
   }
-
-  // In a real app, you'd fetch the user's full profile from Firestore
-  // For now, we'll use a mock rating.
-  const mockRating = 4.8;
 
   return (
     <div className="px-4 lg:px-6 py-4">
