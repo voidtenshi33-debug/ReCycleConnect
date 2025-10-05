@@ -95,10 +95,14 @@ function HomePageContent() {
   const { data: allItems, isLoading: areItemsLoading } = useCollection<Item>(itemsQuery);
 
   const displayedItems = useMemo(() => {
-    if (areItemsLoading) return [];
-    if (allItems && allItems.length > 0) return allItems;
-    return mockItems; // Fallback to mock data if firestore is empty
-  }, [allItems, areItemsLoading]);
+    const liveItems = allItems || [];
+    // Create a Set of live item IDs for quick lookup
+    const liveItemIds = new Set(liveItems.map(item => item.id));
+    // Filter mockItems to exclude any that have a matching ID in liveItems
+    const filteredMockItems = mockItems.filter(item => !liveItemIds.has(item.id));
+    // Combine live items with the filtered mock items
+    return [...liveItems, ...filteredMockItems];
+  }, [allItems]);
 
 
   useEffect(() => {
