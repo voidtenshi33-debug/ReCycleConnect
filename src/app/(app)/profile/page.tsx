@@ -8,14 +8,15 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useDoc, useFirebase, useUser } from "@/firebase";
-import type { User } from "@/lib/types";
+import { useCollection, useDoc, useFirebase, useUser } from "@/firebase";
+import type { User, Item } from "@/lib/types";
 import { Star, Loader2 } from "lucide-react";
 import { format } from "date-fns";
-import { doc } from "firebase/firestore";
+import { collection, doc, query, where } from "firebase/firestore";
 import Link from "next/link";
 import { useMemoFirebase } from "@/firebase/provider";
 import { Skeleton } from "@/components/ui/skeleton";
+import { ItemCard } from "@/components/item-card";
 
 
 function ProfileSkeleton() {
@@ -69,6 +70,13 @@ export default function ProfilePage() {
 
     const { data: userProfile, isLoading: isProfileLoading } = useDoc<User>(userProfileRef);
 
+    const userListingsQuery = useMemoFirebase(() => {
+        if (!firestore || !user?.uid) return null;
+        return query(collection(firestore, 'items'), where('ownerId', '==', user.uid));
+    }, [firestore, user?.uid]);
+
+    const { data: userItems, isLoading: areItemsLoading } = useCollection<Item>(userListingsQuery);
+
     if (isUserLoading || isProfileLoading || !userProfile) {
         return <ProfileSkeleton />;
     }
@@ -111,11 +119,26 @@ export default function ProfilePage() {
                             <CardTitle>Your Listings</CardTitle>
                             <CardDescription>Manage your active item listings.</CardDescription>
                         </CardHeader>
-                        <CardContent className="text-center text-muted-foreground py-12">
-                            <p>You have no active listings.</p>
-                            <Button variant="link" className="mt-2" asChild>
-                                <Link href="/post-item">Post an item</Link>
-                            </Button>
+                        <CardContent>
+                             {areItemsLoading ? (
+                                <div className="text-center text-muted-foreground py-12">
+                                    <Loader2 className="h-8 w-8 animate-spin mx-auto text-primary" />
+                                    <p className="mt-2">Loading your listings...</p>
+                                </div>
+                            ) : userItems && userItems.length > 0 ? (
+                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 pt-4">
+                                    {userItems.map(item => (
+                                        <ItemCard key={item.id} item={item} />
+                                    ))}
+                                </div>
+                            ) : (
+                                <div className="text-center text-muted-foreground py-12">
+                                    <p>You have no active listings.</p>
+                                    <Button variant="link" className="mt-2" asChild>
+                                        <Link href="/post-item">Post an item</Link>
+                                    </Button>
+                                </div>
+                            )}
                         </CardContent>
                     </Card>
                 </TabsContent>
