@@ -14,8 +14,12 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Input } from "@/components/ui/input"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
-import { usePathname } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 import { cn } from "@/lib/utils"
+import { useAuth, useUser } from "@/firebase"
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar"
+import { getInitials } from "@/lib/utils"
+import { signOut } from "firebase/auth"
 
 const MobileNavLink = ({ href, icon: Icon, children }: { href: string, icon: React.ElementType, children: React.ReactNode }) => {
     const pathname = usePathname()
@@ -33,6 +37,15 @@ const MobileNavLink = ({ href, icon: Icon, children }: { href: string, icon: Rea
 }
 
 export default function Header() {
+  const { user, isUserLoading } = useUser();
+  const auth = useAuth();
+  const router = useRouter();
+  
+  const handleLogout = async () => {
+    await signOut(auth);
+    router.push('/login');
+  };
+
   return (
     <header className="flex h-14 items-center gap-4 border-b bg-muted/40 px-4 lg:h-[60px] lg:px-6">
       <Sheet>
@@ -84,17 +97,35 @@ export default function Header() {
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button variant="secondary" size="icon" className="rounded-full">
-            <CircleUser className="h-5 w-5" />
+            {isUserLoading ? (
+              <CircleUser className="h-5 w-5" />
+            ) : user ? (
+              <Avatar className="h-8 w-8">
+                <AvatarImage src={user.photoURL ?? undefined} alt={user.displayName ?? ""} />
+                <AvatarFallback>{getInitials(user.displayName)}</AvatarFallback>
+              </Avatar>
+            ) : (
+              <CircleUser className="h-5 w-5" />
+            )}
             <span className="sr-only">Toggle user menu</span>
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
-          <DropdownMenuLabel>My Account</DropdownMenuLabel>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem asChild><Link href="/profile">Profile</Link></DropdownMenuItem>
-          <DropdownMenuItem>Settings</DropdownMenuItem>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem>Logout</DropdownMenuItem>
+          { user ? (
+            <>
+              <DropdownMenuLabel>{user.displayName}</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem asChild><Link href="/profile">Profile</Link></DropdownMenuItem>
+              <DropdownMenuItem>Settings</DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={handleLogout}>Logout</DropdownMenuItem>
+            </>
+          ) : (
+             <>
+              <DropdownMenuItem asChild><Link href="/login">Login</Link></DropdownMenuItem>
+              <DropdownMenuItem asChild><Link href="/signup">Sign Up</Link></DropdownMenuItem>
+            </>
+          )}
         </DropdownMenuContent>
       </DropdownMenu>
     </header>

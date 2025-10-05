@@ -3,9 +3,15 @@
 import React, { useMemo, type ReactNode } from 'react';
 import { FirebaseProvider } from '@/firebase/provider';
 import { initializeFirebase } from '@/firebase';
+import { useAuthListener } from './auth/use-auth-listener';
 
 interface FirebaseClientProviderProps {
   children: ReactNode;
+}
+
+function AuthStateInitializer() {
+    useAuthListener();
+    return null;
 }
 
 export function FirebaseClientProvider({ children }: FirebaseClientProviderProps) {
@@ -20,6 +26,7 @@ export function FirebaseClientProvider({ children }: FirebaseClientProviderProps
       auth={firebaseServices.auth}
       firestore={firebaseServices.firestore}
     >
+      <AuthStateInitializer />
       {children}
     </FirebaseProvider>
   );
