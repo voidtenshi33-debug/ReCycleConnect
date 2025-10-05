@@ -48,7 +48,7 @@ export type Item = {
   ownerName: string;
   ownerAvatarUrl: string | null;
   ownerRating: number;
-  status: 'Available' | 'In Process' | 'Completed';
+  status: 'Available' | 'In Process' | 'Completed' | 'Reserved';
   isFeatured: boolean;
   createdAt: any; // Firestore Timestamp
 };
@@ -56,18 +56,23 @@ export type Item = {
 
 export type ChatMessage = {
   id: string;
-  senderId: string;
   text: string;
-  timestamp: string;
+  senderId: string;
+  timestamp: any; // Firestore Timestamp
   isRead: boolean;
 };
 
 export type Conversation = {
   id: string;
+  participants: string[]; // array of userIds
   itemId: string;
-  participants: [string, string]; // [userId, userId]
-  lastMessage: ChatMessage;
+  lastMessage: string;
+  lastMessageTimestamp: any; // Firestore Timestamp
+  unreadCount: {
+    [key: string]: number;
+  };
 };
+
 
 export type Rating = {
   id:string;

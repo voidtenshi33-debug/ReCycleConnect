@@ -4,17 +4,121 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { conversations, items, users } from "@/lib/data";
 import { cn } from "@/lib/utils";
-import { Search } from "lucide-react";
+import { MessageSquare, Search } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useCollection, useFirebase } from "@/firebase";
+import type { Conversation, Item, User } from "@/lib/types";
+import { collection, doc, query, where } from "firebase/firestore";
+import { useMemo } from 'react';
+import { formatDistanceToNow } from 'date-fns';
+import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
+import { useMemoFirebase } from "@/firebase/provider";
+
+
+function ChatListItemSkeleton() {
+    return (
+        <div className="p-4 flex gap-4">
+            <Skeleton className="h-12 w-12 rounded-full" />
+            <div className="flex-grow space-y-2">
+                <Skeleton className="h-4 w-3/4" />
+                <Skeleton className="h-3 w-1/2" />
+                <Skeleton className="h-3 w-full" />
+            </div>
+        </div>
+    )
+}
+
+function EmptyState() {
+    return (
+        <div className="h-full flex flex-col items-center justify-center text-center p-8">
+            <div className="p-6 bg-background rounded-full mb-4">
+                <MessageSquare className="w-16 h-16 text-muted-foreground/50" />
+            </div>
+            <h3 className="font-headline text-2xl font-semibold">No messages yet.</h3>
+            <p className="text-muted-foreground max-w-sm mt-2">
+                When a buyer contacts you, or you contact a seller, your conversations will appear here.
+            </p>
+            <Button asChild className="mt-6">
+                <Link href="/home">Browse Items Now</Link>
+            </Button>
+        </div>
+    );
+}
+
+function ChatListItem({ conversation, myUserId }: { conversation: Conversation, myUserId: string }) {
+    const { firestore } = useFirebase();
+    const pathname = usePathname();
+    const isActive = pathname === `/messages/${conversation.id}`;
+
+    const otherUserId = conversation.participants.find(p => p !== myUserId);
+
+    const otherUserRef = useMemoFirebase(() => otherUserId ? doc(firestore, 'users', otherUserId) : null, [firestore, otherUserId]);
+    // For now, we assume item details are denormalized on the convo.
+    // In a real app, you might fetch item details if needed.
+
+    const { data: otherUser } = useCollection<User>(otherUserRef ? [otherUserRef] : null);
+
+
+    if (!otherUser) {
+        return <ChatListItemSkeleton />;
+    }
+
+    const unreadCount = conversation.unreadCount?.[myUserId] || 0;
+
+    return (
+        <Link href={`/messages/${conversation.id}`} key={conversation.id}>
+            <div className={cn(
+                "p-4 border-b flex gap-4 hover:bg-muted/80",
+                isActive && "bg-muted"
+            )}>
+                <div className="relative">
+                    <Avatar className="h-12 w-12">
+                        <AvatarImage src={otherUser.photoURL ?? undefined} alt={otherUser.displayName} />
+                        <AvatarFallback>{otherUser.displayName.charAt(0)}</AvatarFallback>
+                    </Avatar>
+                    {/* In a real app, online status would come from a presence system */}
+                    <div className="absolute bottom-0 right-0 h-3 w-3 rounded-full bg-green-500 border-2 border-muted" />
+                </div>
+                <div className="flex-grow overflow-hidden">
+                    <div className="flex justify-between items-center">
+                        <p className="font-semibold truncate">{otherUser.displayName}</p>
+                        <p className="text-xs text-muted-foreground whitespace-nowrap">
+                            {formatDistanceToNow(conversation.lastMessageTimestamp.toDate(), { addSuffix: true })}
+                        </p>
+                    </div>
+                    <p className="text-xs text-muted-foreground truncate mt-0.5">Re: item-id:{conversation.itemId}</p>
+                    <div className="flex justify-between items-end mt-1">
+                        <p className="text-sm text-muted-foreground truncate">{conversation.lastMessage}</p>
+                        {unreadCount > 0 && (
+                            <div className="h-5 w-5 bg-primary text-primary-foreground text-xs rounded-full flex items-center justify-center font-bold">
+                                {unreadCount}
+                            </div>
+                        )}
+                    </div>
+                </div>
+            </div>
+        </Link>
+    )
+}
 
 
 export default function MessagesPage() {
-    const myUserId = "user_01";
-    const pathname = usePathname();
+    const { firestore, user, isUserLoading } = useFirebase();
+
+    const conversationsQuery = useMemoFirebase(() => {
+        if (!user || !firestore) return null;
+        return query(collection(firestore, 'conversations'), where('participants', 'array-contains', user.uid));
+    }, [firestore, user]);
+
+    const { data: conversations, isLoading: areConversationsLoading } = useCollection<Conversation>(conversationsQuery);
     
+    if (!isUserLoading && !areConversationsLoading && conversations?.length === 0) {
+        return <EmptyState />;
+    }
+
     return (
         <div className="flex flex-col h-full">
             <div className="p-4 border-b">
@@ -25,36 +129,19 @@ export default function MessagesPage() {
                 </div>
             </div>
             <ScrollArea className="flex-grow">
-                {conversations.map((convo) => {
-                     const otherUserId = convo.participants.find(p => p !== myUserId);
-                     const otherUser = users.find(u => u.id === otherUserId);
-                     const item = items.find(i => i.id === convo.itemId);
-                     if (!otherUser || !item) return null;
-
-                     const isActive = pathname === `/messages/${convo.id}`;
-
-                    return (
-                        <Link href={`/messages/${convo.id}`} key={convo.id}>
-                            <div className={cn(
-                                "p-4 border-b flex gap-4 hover:bg-muted/80",
-                                isActive && "bg-muted"
-                            )}>
-                                <Avatar className="h-12 w-12">
-                                    <AvatarImage src={otherUser.photoURL ?? undefined} alt={otherUser.displayName} />
-                                    <AvatarFallback>{otherUser.displayName.charAt(0)}</AvatarFallback>
-                                </Avatar>
-                                <div className="flex-grow overflow-hidden">
-                                    <div className="flex justify-between items-center">
-                                        <p className="font-semibold truncate">{otherUser.displayName}</p>
-                                        <p className="text-xs text-muted-foreground">{convo.lastMessage.timestamp}</p>
-                                    </div>
-                                    <p className="text-xs text-muted-foreground truncate mt-0.5">Re: {item.title}</p>
-                                    <p className="text-sm text-muted-foreground truncate mt-1">{convo.lastMessage.text}</p>
-                                </div>
-                            </div>
-                        </Link>
-                    )
-                })}
+                {areConversationsLoading || isUserLoading ? (
+                    <>
+                        <ChatListItemSkeleton />
+                        <ChatListItemSkeleton />
+                        <ChatListItemSkeleton />
+                    </>
+                ) : (
+                    conversations
+                        ?.sort((a, b) => b.lastMessageTimestamp.toDate() - a.lastMessageTimestamp.toDate())
+                        .map((convo) => (
+                            <ChatListItem key={convo.id} conversation={convo} myUserId={user!.uid} />
+                        ))
+                )}
             </ScrollArea>
         </div>
     );

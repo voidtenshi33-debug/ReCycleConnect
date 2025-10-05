@@ -16,25 +16,29 @@ export default function MessagesLayout({
 
   return (
     <div className="grid h-[calc(100vh-theme(spacing.14))] grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-0 -m-4 lg:-m-6">
-      <div className={cn(
+      <aside className={cn(
         "border-r bg-muted/40",
+        // On mobile, hide the list when a conversation is selected
         !isRootMessages && "hidden md:block" 
       )}>
         <MessagesPage />
-      </div>
+      </aside>
 
-      <div className={cn(
-        "col-span-1 md:col-span-2 lg:col-span-3",
+      <main className={cn(
+        "md:col-span-2 lg:col-span-3",
+         // On mobile, hide the main content when on the root messages page
         isRootMessages && "hidden md:flex" 
       )}>
         {isRootMessages ? (
             <div className="flex-col items-center justify-center text-center bg-background w-full hidden md:flex">
-                <MessageSquare className="w-16 h-16 text-muted-foreground/50" />
-                <h3 className="font-headline text-xl mt-4">Select a conversation</h3>
-                <p className="text-muted-foreground">Choose one of your existing conversations to read messages.</p>
+                <div className="p-6 bg-muted rounded-full mb-4">
+                    <MessageSquare className="w-16 h-16 text-muted-foreground/50" />
+                </div>
+                <h3 className="font-headline text-2xl font-semibold">Select a conversation</h3>
+                <p className="text-muted-foreground max-w-sm">Choose one of your existing conversations to read messages, or start a new one by contacting a seller.</p>
             </div>
         ) : children}
-      </div>
+      </main>
     </div>
   );
 }

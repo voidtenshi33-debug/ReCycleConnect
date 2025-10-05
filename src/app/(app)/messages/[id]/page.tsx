@@ -1,34 +1,109 @@
 
+'use client';
+
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { conversations, items, users } from "@/lib/data";
 import { cn } from "@/lib/utils";
-import { ArrowLeft, SendHorizonal, CheckCheck, MapPin } from "lucide-react";
-import { notFound } from "next/navigation";
+import { ArrowLeft, SendHorizonal, CheckCheck, MapPin, Loader2 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { Card, CardContent } from "@/components/ui/card";
+import { useCollection, useDoc, useFirebase } from "@/firebase";
+import { collection, doc, orderBy, query, serverTimestamp, addDoc, updateDoc } from "firebase/firestore";
+import type { Conversation, Item, User, ChatMessage } from "@/lib/types";
+import { format } from 'date-fns';
+import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
+import { useMemoFirebase } from "@/firebase/provider";
+import { Skeleton } from "@/components/ui/skeleton";
 
-const QuickReplyButton = ({ children }: { children: React.ReactNode }) => (
-    <Button variant="outline" size="sm" className="rounded-full h-auto py-1.5 px-4 text-xs">
+const QuickReplyButton = ({ children, onClick }: { children: React.ReactNode, onClick: () => void }) => (
+    <Button variant="outline" size="sm" className="rounded-full h-auto py-1.5 px-4 text-xs" onClick={onClick}>
         {children}
     </Button>
 )
 
+function MessageSkeleton() {
+    return (
+        <div className="flex items-end gap-2 max-w-[75%]">
+            <Skeleton className="h-8 w-8 rounded-full" />
+            <div className="flex-grow space-y-2">
+                <Skeleton className="h-8 w-48 rounded-lg" />
+            </div>
+        </div>
+    );
+}
 
 export default function MessageDetailPage({ params }: { params: { id: string } }) {
-    const convo = conversations.find(c => c.id === params.id);
-    if (!convo) notFound();
+    const { firestore, user } = useFirebase();
+    const [messageText, setMessageText] = useState("");
+    const scrollAreaRef = useRef<HTMLDivElement>(null);
 
-    const myUserId = "user_01";
-    const otherUserId = convo.participants.find(p => p !== myUserId);
-    const otherUser = users.find(u => u.id === otherUserId);
-    const me = users.find(u => u.id === myUserId);
-    const item = items.find(i => i.id === convo.itemId);
+    const convoRef = useMemoFirebase(() => firestore ? doc(firestore, 'conversations', params.id) : null, [firestore, params.id]);
+    const { data: convo, isLoading: isConvoLoading } = useDoc<Conversation>(convoRef);
+
+    const otherUserId = useMemo(() => convo?.participants.find(p => p !== user?.uid), [convo, user]);
+
+    const otherUserRef = useMemoFirebase(() => (firestore && otherUserId) ? doc(firestore, 'users', otherUserId) : null, [firestore, otherUserId]);
+    const { data: otherUser, isLoading: isOtherUserLoading } = useDoc<User>(otherUserRef);
+
+    const itemRef = useMemoFirebase(() => (firestore && convo) ? doc(firestore, 'items', convo.itemId) : null, [firestore, convo]);
+    const { data: item, isLoading: isItemLoading } = useDoc<Item>(itemRef);
+
+    const messagesQuery = useMemoFirebase(() => (firestore && convo) ? query(collection(firestore, 'conversations', convo.id, 'messages'), orderBy('timestamp', 'asc')) : null, [firestore, convo]);
+    const { data: messages, isLoading: areMessagesLoading } = useCollection<ChatMessage>(messagesQuery);
     
-    if (!otherUser || !item || !me) notFound();
+     useEffect(() => {
+        if (scrollAreaRef.current) {
+            scrollAreaRef.current.scrollTo({ top: scrollAreaRef.current.scrollHeight });
+        }
+    }, [messages]);
+
+    const handleSendMessage = async (e: FormEvent) => {
+        e.preventDefault();
+        if (!messageText.trim() || !user || !firestore || !convo) return;
+        
+        const textToSend = messageText;
+        setMessageText(""); // Optimistic UI update
+
+        const messagesCol = collection(firestore, 'conversations', convo.id, 'messages');
+        const convoRef = doc(firestore, 'conversations', convo.id);
+
+        try {
+            await addDoc(messagesCol, {
+                text: textToSend,
+                senderId: user.uid,
+                timestamp: serverTimestamp(),
+                isRead: false
+            });
+
+            await updateDoc(convoRef, {
+                lastMessage: textToSend,
+                lastMessageTimestamp: serverTimestamp(),
+                [`unreadCount.${otherUserId}`]: (convo.unreadCount[otherUserId!] || 0) + 1
+            });
+        } catch (error) {
+            console.error("Error sending message:", error);
+            setMessageText(textToSend); // Revert on error
+        }
+    };
+
+    const handleQuickReply = (text: string) => {
+        setMessageText(text);
+        // Optionally, you could auto-send it
+        // handleSendMessage(new Event('submit') as any);
+    }
+    
+    const isLoading = isConvoLoading || isOtherUserLoading || isItemLoading || areMessagesLoading;
+
+    if (isLoading) {
+       return <div className="p-4 h-full flex items-center justify-center"><Loader2 className="h-8 w-8 animate-spin" /></div>
+    }
+
+    if (!convo || !otherUser || !item || !user) {
+        return <div className="p-4">Conversation not found.</div>;
+    }
 
     return (
         <div className="flex flex-col h-full bg-background">
@@ -67,49 +142,42 @@ export default function MessageDetailPage({ params }: { params: { id: string } }
             </Card>
 
             {/* Messages */}
-            <ScrollArea className="flex-grow p-4">
+            <ScrollArea className="flex-grow p-4" ref={scrollAreaRef}>
                 <div className="space-y-4">
-                    {convo.messages.map((message, index) => (
+                    {messages ? messages.map((message) => (
                         <div key={message.id} className={cn(
                             "flex items-end gap-2 max-w-[75%]",
-                            message.senderId === myUserId ? "ml-auto flex-row-reverse" : "mr-auto"
+                            message.senderId === user.uid ? "ml-auto flex-row-reverse" : "mr-auto"
                         )}>
                             <Avatar className="h-8 w-8">
-                                <AvatarImage src={message.senderId === myUserId ? me.photoURL ?? undefined : otherUser.photoURL ?? undefined} />
-                                <AvatarFallback>{(message.senderId === myUserId ? me.displayName : otherUser.displayName).charAt(0)}</AvatarFallback>
+                                <AvatarImage src={message.senderId === user.uid ? user.photoURL ?? undefined : otherUser.photoURL ?? undefined} />
+                                <AvatarFallback>{(message.senderId === user.uid ? user.displayName : otherUser.displayName)?.charAt(0)}</AvatarFallback>
                             </Avatar>
                             <div className={cn(
                                 "rounded-lg px-3 py-2 text-sm relative group",
-                                message.senderId === myUserId ? "bg-primary text-primary-foreground" : "bg-muted"
+                                message.senderId === user.uid ? "bg-primary text-primary-foreground" : "bg-muted"
                             )}>
                                 <p>{message.text}</p>
                                 <div className="flex items-center gap-1.5 text-xs text-right mt-1.5 opacity-70">
-                                    <span>{message.timestamp}</span>
-                                    {message.senderId === myUserId && <CheckCheck className="w-4 h-4 text-accent" />}
+                                    <span>{message.timestamp ? format(message.timestamp.toDate(), 'p') : '...'}</span>
+                                    {message.senderId === user.uid && <CheckCheck className="w-4 h-4 text-accent" />}
                                 </div>
                             </div>
                         </div>
-                    ))}
-                    {/* Typing indicator example */}
-                     <div className="flex items-center gap-2 max-w-[75%] mr-auto">
-                         <Avatar className="h-8 w-8">
-                            <AvatarImage src={otherUser.photoURL ?? undefined} />
-                            <AvatarFallback>{otherUser.displayName.charAt(0)}</AvatarFallback>
-                        </Avatar>
-                        <div className="rounded-lg px-4 py-2 bg-muted text-muted-foreground text-sm">
-                            <span className="animate-pulse">●</span>
-                            <span className="animate-pulse delay-150">●</span>
-                            <span className="animate-pulse delay-300">●</span>
-                        </div>
-                    </div>
+                    )) : (
+                        <>
+                            <MessageSkeleton />
+                            <div className="ml-auto"><MessageSkeleton /></div>
+                        </>
+                    )}
                 </div>
             </ScrollArea>
 
             {/* Quick Replies */}
             <div className="px-4 py-2 border-t flex gap-2 overflow-x-auto">
-                 <QuickReplyButton>Is this still available?</QuickReplyButton>
-                 <QuickReplyButton>I'll take it!</QuickReplyButton>
-                 <QuickReplyButton>
+                 <QuickReplyButton onClick={() => handleQuickReply("Is this still available?")}>Is this still available?</QuickReplyButton>
+                 <QuickReplyButton onClick={() => handleQuickReply("I'll take it!")}>I'll take it!</QuickReplyButton>
+                 <QuickReplyButton onClick={() => handleQuickReply("Can we meet at your location?")}>
                     <MapPin className="mr-1.5 h-3 w-3" />
                     Share Location
                 </QuickReplyButton>
@@ -117,9 +185,9 @@ export default function MessageDetailPage({ params }: { params: { id: string } }
 
             {/* Message Input */}
             <div className="p-4 border-t bg-muted/40">
-                <form className="flex items-center gap-2">
-                    <Input placeholder="Type your message..." className="flex-grow bg-background" />
-                    <Button type="submit" size="icon">
+                <form className="flex items-center gap-2" onSubmit={handleSendMessage}>
+                    <Input placeholder="Type your message..." className="flex-grow bg-background" value={messageText} onChange={(e) => setMessageText(e.target.value)} />
+                    <Button type="submit" size="icon" disabled={!messageText.trim()}>
                         <SendHorizonal className="h-4 w-4" />
                         <span className="sr-only">Send</span>
                     </Button>

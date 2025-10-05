@@ -85,10 +85,66 @@
         "ownerName": { "type": "string" },
         "ownerAvatarUrl": { "type": "string", "format": "uri" },
         "ownerRating": { "type": "number" },
-        "status": { "type": "string", "enum": ["Available", "In Process", "Completed"] },
+        "status": { "type": "string", "enum": ["Available", "In Process", "Completed", "Reserved"] },
         "isFeatured": { "type": "boolean" }
       },
       "required": ["title", "description", "category", "condition", "listingType", "price", "locality", "createdAt", "ownerId", "ownerName", "status"]
+    },
+     "Conversation": {
+      "title": "Conversation",
+      "type": "object",
+      "description": "Represents a chat session between two users about a specific item.",
+      "properties": {
+        "participants": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "An array containing the user IDs of the two participants."
+        },
+        "itemId": {
+          "type": "string",
+          "description": "The ID of the item this conversation is about."
+        },
+        "lastMessage": {
+          "type": "string",
+          "description": "A snippet of the last message sent in the chat."
+        },
+        "lastMessageTimestamp": {
+          "type": "string",
+          "format": "date-time",
+          "description": "The timestamp of the last message."
+        },
+        "unreadCount": {
+          "type": "object",
+          "description": "An object tracking unread message counts for each user.",
+          "additionalProperties": { "type": "number" }
+        }
+      },
+      "required": ["participants", "itemId", "lastMessageTimestamp"]
+    },
+    "ChatMessage": {
+      "title": "ChatMessage",
+      "type": "object",
+      "description": "Represents a single message within a conversation.",
+      "properties": {
+        "text": {
+          "type": "string",
+          "description": "The content of the message."
+        },
+        "senderId": {
+          "type": "string",
+          "description": "The user ID of the person who sent the message."
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time",
+          "description": "The server timestamp when the message was sent."
+        },
+        "isRead": {
+          "type": "boolean",
+          "description": "Whether the message has been read by the recipient."
+        }
+      },
+      "required": ["text", "senderId", "timestamp"]
     }
   },
   "auth": {
@@ -104,35 +160,35 @@
         "path": "/users/{userId}",
         "definition": {
           "entityName": "UserProfile",
-          "schema": {
-            "$ref": "#/backend/entities/UserProfile"
-          },
-          "description": "Stores user profile information. The document ID is the Firebase Authentication UID (`userId`).",
-          "params": [
-            {
-              "name": "userId",
-              "description": "The unique ID from Firebase Authentication, used as the document ID."
-            }
-          ]
+          "schema": { "$ref": "#/backend/entities/UserProfile" },
+          "description": "Stores user profile information. The document ID is the Firebase Authentication UID (`userId`)."
         }
       },
       {
         "path": "/items/{itemId}",
         "definition": {
           "entityName": "Item",
-          "schema": {
-            "$ref": "#/backend/entities/Item"
-          },
-          "description": "Stores all items listed on the platform.",
-          "params": [
-             {
-              "name": "itemId",
-              "description": "The unique ID for the item."
-            }
-          ]
+          "schema": { "$ref": "#/backend/entities/Item" },
+          "description": "Stores all items listed on the platform."
         }
+      },
+      {
+          "path": "/conversations/{conversationId}",
+          "definition": {
+              "entityName": "Conversation",
+              "schema": { "$ref": "#/backend/entities/Conversation" },
+              "description": "Top-level collection for chat sessions."
+          }
+      },
+      {
+          "path": "/conversations/{conversationId}/messages/{messageId}",
+          "definition": {
+              "entityName": "ChatMessage",
+              "schema": { "$ref": "#/backend/entities/ChatMessage" },
+              "description": "Sub-collection for messages within a specific chat."
+          }
       }
     ],
-    "reasoning": "The Firestore data structure is designed to support the ReCycleConnect application's user profiles and related data, focusing on secure access and efficient queries. The primary collection, `users`, stores user profile information. To ensure authorization independence, the `users` collection uses path-based ownership, which simplifies security rules. This structure supports the required QAPs (Queries and Permissions) by segregating user data into a dedicated collection, and access control can be easily managed through Firebase Authentication and security rules. The `userId` is used as document ID. Additionally, the structure denormalizes the relationship between users and ratings, reported items, and wishlist items by storing references (IDs) within the user document itself, avoiding the need for complex joins or subcollection queries when fetching basic user profile information. The `items` collection stores all listed items, with a `locality` field to enable efficient location-based filtering."
+    "reasoning": "The Firestore data structure is designed to support the ReCycleConnect application's core features. The `users` collection stores public profiles. The `items` collection holds all listings. The `conversations` collection is introduced to manage chat sessions between users, with a `messages` sub-collection for individual messages. This nested approach is efficient for loading a specific chat's history. Denormalizing fields like `lastMessage` and `unreadCount` in the parent `conversations` document allows for efficient loading of the chat list view without needing to query sub-collections."
   }
 }
