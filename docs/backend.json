@@ -145,6 +145,42 @@
         }
       },
       "required": ["text", "senderId", "timestamp"]
+    },
+    "ExchangeRequest": {
+      "title": "ExchangeRequest",
+      "type": "object",
+      "description": "Tracks the state of a transaction between a buyer and a seller for a specific item.",
+      "properties": {
+        "itemId": {
+          "type": "string"
+        },
+        "requesterId": {
+          "type": "string"
+        },
+        "sellerId": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "Pending",
+            "Accepted",
+            "Rejected",
+            "Completed"
+          ]
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "itemId",
+        "requesterId",
+        "sellerId",
+        "status",
+        "createdAt"
+      ]
     }
   },
   "auth": {
@@ -187,8 +223,18 @@
               "schema": { "$ref": "#/backend/entities/ChatMessage" },
               "description": "Sub-collection for messages within a specific chat."
           }
+      },
+      {
+        "path": "/exchanges/{exchangeId}",
+        "definition": {
+            "entityName": "ExchangeRequest",
+            "schema": { "$ref": "#/backend/entities/ExchangeRequest" },
+            "description": "Stores transaction requests between users."
+        }
       }
     ],
-    "reasoning": "The Firestore data structure is designed to support the ReCycleConnect application's core features. The `users` collection stores public profiles. The `items` collection holds all listings. The `conversations` collection is introduced to manage chat sessions between users, with a `messages` sub-collection for individual messages. This nested approach is efficient for loading a specific chat's history. Denormalizing fields like `lastMessage` and `unreadCount` in the parent `conversations` document allows for efficient loading of the chat list view without needing to query sub-collections."
+    "reasoning": "The Firestore data structure is designed to support the ReCycleConnect application's core features. The `users` collection stores public profiles. The `items` collection holds all listings. The `conversations` collection is introduced to manage chat sessions between users, with a `messages` sub-collection for individual messages. This nested approach is efficient for loading a specific chat's history. Denormalizing fields like `lastMessage` and `unreadCount` in the parent `conversations` document allows for efficient loading of the chat list view without needing to query sub-collections. The `exchanges` collection tracks the state of transactions."
   }
 }
+
+    

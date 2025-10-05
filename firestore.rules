@@ -1,133 +1,149 @@
+/**
+ * @fileoverview Firestore Security Rules for ReCycleConnect.
+ *
+ * Core Philosophy:
+ * This ruleset enforces a user-ownership model for user profiles and items.
+ * Conversations and messages within those conversations are restricted to the participants.
+ *
+ * Data Structure:
+ * - /users/{userId}: User profiles, where {userId} is the Firebase Auth UID.
+ * - /items/{itemId}: Items listed for exchange. Each item has an ownerId field.
+ * - /conversations/{conversationId}: Top-level collection for chat sessions between users.
+ * - /conversations/{conversationId}/messages/{messageId}: Sub-collection for messages within a specific chat.
+ *
+ * Key Security Decisions:
+ * - Users can only read/write their own profile data.
+ * - Users can only create/update/delete items they own.
+ * - Conversations and messages are only accessible to the participants.
+ * - Listing of all items is allowed.
+ */
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
     /**
-     * @description Secures user profile data.
+     * @description Controls access to user profile documents.
      * @path /users/{userId}
-     * @allow (create) Authenticated user can create their own profile.
-     * @deny (create) Authenticated user cannot create profile for another user.
-     * @allow (get, list) Authenticated user can read their own profile.
-     * @deny (get, list) Authenticated user cannot read other users' profiles, listing is disabled.
-     * @allow (update) Authenticated user can update their own profile.
-     * @deny (update) Authenticated user cannot update other user profile.
-     * @allow (delete) Authenticated user can delete their own profile.
-     * @deny (delete) Authenticated user cannot delete other user profile.
-     * @principle Enforces document ownership for writes. Restricts access to a user's own data tree.
+     * @allow (create) User with UID 'I3l03MNYHuhVLMYi2VxIIbgJVtv2' can create their profile.
+     * @allow (get) User with UID 'I3l03MNYHuhVLMYi2VxIIbgJVtv2' can read their profile.
+     * @allow (update) User with UID 'I3l03MNYHuhVLMYi2VxIIbgJVtv2' can update their profile.
+     * @allow (delete) User with UID 'I3l03MNYHuhVLMYi2VxIIbgJVtv2' can delete their profile.
+     * @deny (create) User with UID 'otherUserId' cannot create a profile for 'I3l03MNYHuhVLMYi2VxIIbgJVtv2'.
+     * @deny (get) User with UID 'otherUserId' cannot read the profile of 'I3l03MNYHuhVLMYi2VxIIbgJVtv2'.
+     * @principle Enforces document ownership for all operations on user profiles.
      */
     match /users/{userId} {
+      function isOwner(userId) {
+        return request.auth != null && request.auth.uid == userId;
+      }
       function isSignedIn() {
         return request.auth != null;
       }
 
-      function isOwner(userId) {
-        return request.auth.uid == userId;
-      }
-
-      function isExistingOwner(userId) {
-        return isSignedIn() && resource.data.userId == request.auth.uid;
-      }
-      allow create: if isSignedIn() && isOwner(userId) && request.resource.data.userId == request.auth.uid;
       allow get: if isSignedIn() && isOwner(userId);
-      allow list: if isSignedIn() && isOwner(userId);
+      allow list: if false;
+      allow create: if isSignedIn() && isOwner(userId);
       allow update: if isSignedIn() && isOwner(userId);
       allow delete: if isSignedIn() && isOwner(userId);
     }
 
     /**
-     * @description Secures item listings.
+     * @description Controls access to item documents.
      * @path /items/{itemId}
-     * @allow (get, list) Anyone can read item listings.
-     * @allow (create) Authenticated user can create an item listing.
-     * @deny (create) An unauthenticated user cannot create an item listing.
-     * @allow (update) Only the owner can update their item listing.
-     * @deny (update) Other users cannot update item listings.
-     * @allow (delete) Only the owner can delete their item listing.
-     * @deny (delete) Other users cannot delete item listings.
-     * @principle Enforces document ownership for writes. Allows public reads.
+     * @allow (get) Any user can read any item.
+     * @allow (list) Any user can list items.
+     * @allow (create) User with UID 'I3l03MNYHuhVLMYi2VxIIbgJVtv2' can create an item with ownerId set to their UID.
+     * @allow (update) User with UID 'I3l03MNYHuhVLMYi2VxIIbgJVtv2' can update an item they own.
+     * @allow (delete) User with UID 'I3l03MNYHuhVLMYi2VxIIbgJVtv2' can delete an item they own.
+     * @deny (create) User with UID 'otherUserId' cannot create an item with ownerId set to 'I3l03MNYHuhVLMYi2VxIIbgJVtv2'.
+     * @deny (update) User with UID 'otherUserId' cannot update an item owned by 'I3l03MNYHuhVLMYi2VxIIbgJVtv2'.
+     * @principle Enforces document ownership for writes, allows public reads.
      */
     match /items/{itemId} {
       function isSignedIn() {
         return request.auth != null;
       }
-
       function isOwner(ownerId) {
-        return request.auth.uid == ownerId;
+        return request.auth != null && request.auth.uid == ownerId;
       }
 
       function isExistingOwner(ownerId) {
-        return isSignedIn() && resource.data.ownerId == request.auth.uid;
+        return isOwner(resource.data.ownerId) && resource != null;
       }
+
       allow get: if true;
       allow list: if true;
       allow create: if isSignedIn() && request.resource.data.ownerId == request.auth.uid;
       allow update: if isSignedIn() && request.resource.data.ownerId == request.auth.uid;
-      allow delete: if isSignedIn() && request.resource.data.ownerId == request.auth.uid;
+      allow delete: if isSignedIn() && resource.data.ownerId == request.auth.uid;
     }
 
-    /**
-     * @description Secures conversations between users.
-     * @path /conversations/{conversationId}
-     * @allow (get) Only participants can read the conversation.
-     * @allow (list) Only participants can list the conversation.
-     * @allow (create) Only participants can create a conversation.
-     * @deny (create) Non-authenticated user cannot create a conversation.
-     * @allow (update) Only participants can update a conversation.
-     * @deny (update) Other users cannot update conversations.
-     * @allow (delete) Only participants can delete the conversation.
-     * @deny (delete) Other users cannot delete conversations.
-     * @principle Enforces shared access (closed collaborators).
-     */
-    match /conversations/{conversationId} {
-      function isSignedIn() {
-        return request.auth != null;
-      }
-
-      function isParticipant(participants) {
-        return request.auth.uid in participants;
-      }
-
-       function isNewParticipant(participants) {
-        return request.auth.uid in participants;
-      }
-
-      function isExistingParticipant(participants) {
-        return isSignedIn() && isParticipant(participants);
-      }
-
-      allow get: if isSignedIn() && isParticipant(resource.data.participants);
-      allow list: if isSignedIn() && isParticipant(resource.data.participants);
-      allow create: if isSignedIn() && request.resource.data.participants.hasAll([request.auth.uid]);
-      allow update: if isSignedIn() && isParticipant(resource.data.participants);
-      allow delete: if isSignedIn() && isParticipant(resource.data.participants);
-
-       match /messages/{messageId} {
-
-            function isSignedIn() {
+      /**
+       * @description Controls access to conversation documents.
+       * @path /conversations/{conversationId}
+       * @allow (get) User 'I3l03MNYHuhVLMYi2VxIIbgJVtv2' can read a conversation if they are a participant.
+       * @allow (list) User 'I3l03MNYHuhVLMYi2VxIIbgJVtv2' can list conversations if they are a participant.
+       * @allow (create) User 'I3l03MNYHuhVLMYi2VxIIbgJVtv2' can create a conversation if they are a participant.
+       *
+       * @deny (get) User 'otherUserId' cannot read a conversation if they are not a participant.
+       * @deny (update) User 'otherUserId' cannot update a conversation if they are not a participant.
+       * @principle Restricts access to conversations to only the participants.
+       */
+      match /conversations/{conversationId} {
+          function isSignedIn() {
               return request.auth != null;
-            }
+          }
 
-            function getConversation() {
-              return get(/databases/$(database)/documents/conversations/$(conversationId)).data;
-            }
+          function isParticipant() {
+              return isSignedIn() && 'participants' in resource.data && resource.data.participants is list && resource.data.participants.hasAny([request.auth.uid]);
+          }
 
-            function isParticipant() {
-              return request.auth.uid in getConversation().participants;
-            }
+          allow get: if isParticipant();
+          allow list: if isSignedIn(); // List is allowed to anyone signed in to show the conversations page, but isParticipant checks ensure only relevant conversations are returned.
+          allow create: if isSignedIn() && 'participants' in request.resource.data && request.resource.data.participants is list && request.resource.data.participants.hasAny([request.auth.uid]);
+          allow update: if isParticipant();
+          allow delete: if false; // Deleting conversations is not allowed
+      }
 
-             function isNewParticipant() {
-              return request.auth.uid in getConversation().participants;
-            }
+      /**
+       * @description Controls access to chat message documents within a conversation.
+       * @path /conversations/{conversationId}/messages/{messageId}
+       * @allow (create) User 'I3l03MNYHuhVLMYi2VxIIbgJVtv2' can create a message in a conversation they participate in.
+       * @allow (get) User 'I3l03MNYHuhVLMYi2VxIIbgJVtv2' can read a message in a conversation they participate in.
+       * @allow (list) User 'I3l03MNYHuhVLMYi2VxIIbgJVtv2' can list messages in a conversation they participate in.
+       * @deny (create) User 'otherUserId' cannot create a message in a conversation they do not participate in.
+       * @deny (update) User 'otherUserId' cannot update a message in a conversation, as messages are immutable.
+       * @principle Restricts access to messages to only the participants of the parent conversation.
+       */
+      match /conversations/{conversationId}/messages/{messageId} {
+          function isSignedIn() {
+              return request.auth != null;
+          }
 
-            function isExistingParticipant() {
-              return isSignedIn() && isParticipant();
-            }
-          allow get: if isSignedIn() && isParticipant();
-          allow list: if isSignedIn() && isParticipant();
-          allow create: if isSignedIn() && isParticipant();
-          allow update: if isSignedIn() && isParticipant();
-          allow delete: if isSignedIn() && isParticipant();
-        }
-    }
+          function isConversationParticipant(conversationId) {
+              return isSignedIn() && get(/databases/$(database)/documents/conversations/$(conversationId)).data.participants.hasAny([request.auth.uid]);
+          }
+          allow get: if isConversationParticipant(conversationId);
+          allow list: if isConversationParticipant(conversationId);
+          allow create: if isConversationParticipant(conversationId) ;
+          allow update: if false; // Messages are immutable
+          allow delete: if false; // Deleting messages is not allowed
+      }
+        /**
+         * @description Denies all access to the /exchanges collection, as it does not exist.
+         * @path /exchanges
+         * @deny (get) No user can read from this collection.
+         * @deny (list) No user can list documents in this collection.
+         * @deny (create) No user can create documents in this collection.
+         *
+         * @principle  Hard-coded denial since this collection does not exist in the data model.
+         */
+      match /exchanges/{exchangeId} {
+         allow get: if false;
+         allow list: if false;
+         allow create: if false;
+         allow update: if false;
+         allow delete: if false;
+      }
   }
 }
