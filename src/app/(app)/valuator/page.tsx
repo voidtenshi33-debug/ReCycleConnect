@@ -10,10 +10,12 @@ import { Label } from '@/components/ui/label';
 import { handleDeviceValuation } from '@/app/actions';
 import type { DeviceValuationOutput } from '@/ai/flows/device-valuator-flow';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { ArrowLeft, ImagePlus, Loader2, Sparkles, WandSparkles, X, List } from 'lucide-react';
+import { ArrowLeft, ImagePlus, Loader2, Sparkles, WandSparkles, X, List, Camera } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { categories as appCategories } from '@/lib/data';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { CameraCapture } from '@/components/camera-capture';
 
 
 function ValuationResult({ result }: { result: DeviceValuationOutput }) {
@@ -61,6 +63,7 @@ export default function ValuatorPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<DeviceValuationOutput | null>(null);
+  const [isCameraOpen, setIsCameraOpen] = useState(false);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
@@ -76,6 +79,13 @@ export default function ValuatorPage() {
       };
       reader.readAsDataURL(file);
     });
+  };
+
+  const handleCapture = (imageDataUri: string) => {
+    if (images.length < 3) {
+      setImages(prev => [...prev, imageDataUri]);
+    }
+    setIsCameraOpen(false);
   };
 
   const removeImage = (index: number) => {
@@ -163,19 +173,35 @@ export default function ValuatorPage() {
                   ))}
 
                   {images.length < 3 && (
-                    <label htmlFor="image-upload" className="cursor-pointer aspect-square rounded-lg border-2 border-dashed flex flex-col items-center justify-center text-muted-foreground hover:border-primary hover:text-primary transition-colors">
-                      <ImagePlus className="h-8 w-8" />
-                      <span className="text-xs mt-1 text-center">Add Image</span>
-                      <input
-                        id="image-upload"
-                        type="file"
-                        accept="image/*"
-                        multiple
-                        className="sr-only"
-                        onChange={handleFileChange}
-                        disabled={images.length >= 3}
-                      />
-                    </label>
+                    <div className="grid grid-cols-2 gap-2 aspect-square">
+                        <label htmlFor="image-upload" className="cursor-pointer rounded-lg border-2 border-dashed flex flex-col items-center justify-center text-muted-foreground hover:border-primary hover:text-primary transition-colors p-2">
+                            <ImagePlus className="h-8 w-8" />
+                            <span className="text-xs mt-1 text-center">Add Image</span>
+                            <input
+                                id="image-upload"
+                                type="file"
+                                accept="image/*"
+                                multiple
+                                className="sr-only"
+                                onChange={handleFileChange}
+                                disabled={images.length >= 3}
+                            />
+                        </label>
+                        <Dialog open={isCameraOpen} onOpenChange={setIsCameraOpen}>
+                          <DialogTrigger asChild>
+                            <button type="button" className="cursor-pointer rounded-lg border-2 border-dashed flex flex-col items-center justify-center text-muted-foreground hover:border-primary hover:text-primary transition-colors p-2" disabled={images.length >= 3}>
+                              <Camera className="h-8 w-8" />
+                              <span className="text-xs mt-1 text-center">Use Camera</span>
+                            </button>
+                          </DialogTrigger>
+                          <DialogContent className="max-w-3xl">
+                              <DialogHeader>
+                                  <DialogTitle>Capture Photo</DialogTitle>
+                              </DialogHeader>
+                              <CameraCapture onCapture={handleCapture} />
+                          </DialogContent>
+                        </Dialog>
+                    </div>
                   )}
                 </div>
               </div>
