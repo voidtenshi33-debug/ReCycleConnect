@@ -1,4 +1,5 @@
 
+
 "use client"
 
 import Link from "next/link"
@@ -26,6 +27,7 @@ import { useSpeechRecognition } from "@/hooks/use-speech-recognition"
 import { Dialog, DialogContent } from "@/components/ui/dialog"
 import { LocationModal } from "../location-modal"
 import { locations } from "@/lib/data"
+import { TypewriterSearch } from "../typewriter-search"
 
 
 const MobileNavLink = ({ href, icon: Icon, children }: { href: string, icon: React.ElementType, children: React.ReactNode }) => {
@@ -129,6 +131,7 @@ export default function Header() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
+             {!searchQuery && <TypewriterSearch />}
              {hasRecognitionSupport && (
                <Button 
                   type="button"
