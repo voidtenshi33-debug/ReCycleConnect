@@ -1,16 +1,18 @@
 
 "use client"
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { ScrollArea } from './ui/scroll-area';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from './ui/command';
 import { Loader2, MapPin } from 'lucide-react';
 import { locations } from '@/lib/data';
 import { useFirebase } from '@/firebase';
 import { doc, setDoc } from 'firebase/firestore';
+import { errorEmitter } from '@/firebase/error-emitter';
+import { FirestorePermissionError } from '@/firebase/errors';
+import { handleGetLocality } from '@/app/actions';
 
 interface LocationModalProps {
     isOpen: boolean;
@@ -35,6 +37,11 @@ export function LocationModal({ isOpen, setIsOpen }: LocationModalProps) {
             .catch(err => {
                 console.error("Failed to save location", err);
                 setError("Could not save your location preference.");
+                 errorEmitter.emit('permission-error', new FirestorePermissionError({
+                    path: userRef.path,
+                    operation: 'update',
+                    requestResourceData: { lastKnownLocality: localitySlug },
+                }));
             });
     }
 
@@ -42,14 +49,29 @@ export function LocationModal({ isOpen, setIsOpen }: LocationModalProps) {
         setIsDetecting(true);
         setError(null);
         navigator.geolocation.getCurrentPosition(
-            (position) => {
-                // In a real app, you would use a reverse geocoding service here.
-                // For this demo, we'll just pick a random popular location.
-                console.log(position.coords.latitude, position.coords.longitude);
-                setTimeout(() => {
-                    handleLocationSelect('hinjawadi'); // Mocking detection to Hinjawadi
+            async (position) => {
+                const { latitude, longitude } = position.coords;
+                const result = await handleGetLocality(latitude, longitude);
+
+                if (result.error) {
+                    setError(result.error);
                     setIsDetecting(false);
-                }, 1000);
+                    return;
+                }
+                
+                if (result.locality) {
+                    // Check if the returned locality slug exists in our predefined list
+                    const matchedLocation = locations.find(l => l.slug === result.locality);
+                    if (matchedLocation) {
+                        handleLocationSelect(matchedLocation.slug);
+                    } else {
+                        setError(`Could not find a matching locality for "${result.locality}". Please select one manually.`);
+                    }
+                } else {
+                    setError("Could not determine your locality. Please select one manually.");
+                }
+
+                setIsDetecting(false);
             },
             (err) => {
                 if (err.code === 1) { // PERMISSION_DENIED
@@ -104,8 +126,3 @@ export function LocationModal({ isOpen, setIsOpen }: LocationModalProps) {
         </Dialog>
     );
 }
-
-// You might need to add these to your components/ui folder if they don't exist
-// components/ui/command.tsx
-// This is a complex component. For this example, let's assume you've added it
-// via `npx shadcn-ui@latest add command`
