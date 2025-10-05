@@ -1,0 +1,96 @@
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Separator } from "@/components/ui/separator";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { users } from "@/lib/data";
+import { Star } from "lucide-react";
+
+export default function ProfilePage() {
+    // Assuming we're viewing the profile of the first user in our mock data
+    const user = users[0];
+
+    return (
+        <div className="space-y-6">
+            <Card>
+                <CardHeader>
+                    <div className="flex flex-col md:flex-row items-start md:items-center gap-4">
+                        <Avatar className="h-24 w-24">
+                            <AvatarImage src={user.avatarUrl} alt={user.name} />
+                            <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
+                        </Avatar>
+                        <div className="flex-grow">
+                            <CardTitle className="font-headline text-3xl">{user.name}</CardTitle>
+                            <CardDescription className="mt-1">Member since {user.memberSince}</CardDescription>
+                            <div className="flex items-center gap-2 mt-2">
+                                <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                                    <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+                                    <span>{user.rating.toFixed(1)} ({user.reviews} reviews)</span>
+                                </div>
+                            </div>
+                        </div>
+                        <Button>Edit Profile</Button>
+                    </div>
+                </CardHeader>
+            </Card>
+
+            <Tabs defaultValue="listings">
+                <TabsList className="grid w-full grid-cols-3">
+                    <TabsTrigger value="listings">Active Listings</TabsTrigger>
+                    <TabsTrigger value="ratings">Ratings</TabsTrigger>
+                    <TabsTrigger value="settings">Settings</TabsTrigger>
+                </TabsList>
+                <TabsContent value="listings">
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Your Listings</CardTitle>
+                            <CardDescription>Manage your active item listings.</CardDescription>
+                        </CardHeader>
+                        <CardContent className="text-center text-muted-foreground py-12">
+                            <p>You have no active listings.</p>
+                            <Button variant="link" className="mt-2">Post an item</Button>
+                        </CardContent>
+                    </Card>
+                </TabsContent>
+                <TabsContent value="ratings">
+                     <Card>
+                        <CardHeader>
+                            <CardTitle>Ratings Received</CardTitle>
+                            <CardDescription>Feedback from other users.</CardDescription>
+                        </CardHeader>
+                        <CardContent className="text-center text-muted-foreground py-12">
+                            <p>You have not received any ratings yet.</p>
+                        </CardContent>
+                    </Card>
+                </TabsContent>
+                <TabsContent value="settings">
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Account Settings</CardTitle>
+                            <CardDescription>Manage your account settings and preferences.</CardDescription>
+                        </CardHeader>
+                        <CardContent className="space-y-8">
+                            <div className="grid gap-2 max-w-md">
+                                <Label htmlFor="name">Full Name</Label>
+                                <Input id="name" defaultValue={user.name} />
+                            </div>
+                             <div className="grid gap-2 max-w-md">
+                                <Label htmlFor="location">Location</Label>
+                                <Input id="location" defaultValue={user.location} />
+                            </div>
+                             <Separator />
+                            <div className="grid gap-2 max-w-md">
+                                <Label htmlFor="email">Email Address</Label>
+                                <Input id="email" type="email" defaultValue="jane.doe@example.com" disabled />
+                                <p className="text-xs text-muted-foreground">Email cannot be changed.</p>
+                            </div>
+                            <Button>Save Changes</Button>
+                        </CardContent>
+                    </Card>
+                </TabsContent>
+            </Tabs>
+        </div>
+    );
+}

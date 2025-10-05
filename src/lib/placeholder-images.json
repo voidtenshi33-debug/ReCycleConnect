@@ -1,3 +1,88 @@
 {
-  "placeholderImages": []
+  "placeholderImages": [
+    {
+      "id": "onboarding-1",
+      "description": "Illustration showing people exchanging electronics",
+      "imageUrl": "https://images.unsplash.com/photo-1646451403277-ac39408146eb?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw2fHxlbGVjdHJvbmljcyUyMHJlY3ljbGluZ3xlbnwwfHx8fDE3NTk2NDEzMDJ8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "electronics recycling"
+    },
+    {
+      "id": "onboarding-2",
+      "description": "Illustration showing a map with pins for local exchanges",
+      "imageUrl": "https://images.unsplash.com/photo-1591197172062-c718f82aba20?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHxsb2NhbCUyMGNvbW11bml0eXxlbnwwfHx8fDE3NTk1NDk5MDZ8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "local community"
+    },
+    {
+      "id": "onboarding-3",
+      "description": "Illustration of a shiny, repaired smartphone",
+      "imageUrl": "https://images.unsplash.com/photo-1754277294998-085f4f3daacc?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw4fHxyZXBhaXJlZCUyMHBob25lfGVufDB8fHx8MTc1OTY0MTMwMnww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "repaired phone"
+    },
+    {
+      "id": "user-avatar-1",
+      "description": "Avatar for user Jane Doe",
+      "imageUrl": "https://images.unsplash.com/photo-1614283233556-f35b0c801ef1?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHx3b21hbiUyMHBvcnRyYWl0fGVufDB8fHx8MTc1OTYyOTkwN3ww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "woman portrait"
+    },
+    {
+      "id": "user-avatar-2",
+      "description": "Avatar for user John Smith",
+      "imageUrl": "https://images.unsplash.com/photo-1624395213043-fa2e123b2656?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw3fHxtYW4lMjBwb3J0cmFpdHxlbnwwfHx8fDE3NTk1ODAxMjN8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "man portrait"
+    },
+    {
+      "id": "user-avatar-3",
+      "description": "Avatar for user Alex Ray",
+      "imageUrl": "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHxwZXJzb24lMjBwb3J0cmFpdHxlbnwwfHx8fDE3NTk2MjQ1ODZ8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "person portrait"
+    },
+    {
+      "id": "item-laptop-1",
+      "description": "A modern silver laptop",
+      "imageUrl": "https://images.unsplash.com/photo-1505330622279-bf7d7fc918f4?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw4fHxsYXB0b3AlMjBkZXNrfGVufDB8fHx8MTc1OTU5MzkxN3ww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "laptop desk"
+    },
+    {
+      "id": "item-laptop-2",
+      "description": "A modern silver laptop from another angle",
+      "imageUrl": "https://images.unsplash.com/photo-1740721455292-e5cd29544381?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxMHx8bGFwdG9wJTIwc2lkZXxlbnwwfHx8fDE3NTk1ODU1NTh8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "laptop side"
+    },
+    {
+      "id": "item-phone-1",
+      "description": "A black smartphone",
+      "imageUrl": "https://images.unsplash.com/photo-1662468353771-b177773cc281?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHxzbWFydHBob25lJTIwc2NyZWVufGVufDB8fHx8MTc1OTYxMDYwNHww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "smartphone screen"
+    },
+    {
+      "id": "item-monitor-1",
+      "description": "A wide computer monitor",
+      "imageUrl": "https://images.unsplash.com/photo-1426024120108-99cc76989c71?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHxjb21wdXRlciUyMG1vbml0b3J8ZW58MHx8fHwxNzU5NTU1ODEyfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "computer monitor"
+    },
+    {
+      "id": "item-camera-1",
+      "description": "A DSLR camera",
+      "imageUrl": "https://images.unsplash.com/photo-1606986601547-a4d886b671b2?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw3fHxkc2xyJTIwY2FtZXJhfGVufDB8fHx8MTc1OTYxOTM2NXww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "dslr camera"
+    },
+    {
+      "id": "item-headphones-1",
+      "description": "Wireless over-ear headphones",
+      "imageUrl": "https://images.unsplash.com/photo-1633346703386-bf6f1e59ec6f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxMHx8aGVhZHBob25lcyUyMHByb2R1Y3R8ZW58MHx8fHwxNzU5NjAzMTcyfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "headphones product"
+    },
+    {
+      "id": "item-tablet-1",
+      "description": "A tablet computer",
+      "imageUrl": "https://images.unsplash.com/photo-1672239069328-dd1535c0d78a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHx0YWJsZXQlMjBkZXZpY2V8ZW58MHx8fHwxNzU5NjM1MjI3fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "tablet device"
+    },
+    {
+      "id": "empty-state-box",
+      "description": "An empty box illustration",
+      "imageUrl": "https://images.unsplash.com/photo-1591097356871-b5b118bd3b34?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw5fHxlbXB0eSUyMGJveHxlbnwwfHx8fDE3NTk1OTM5NjV8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "empty box"
+    }
+  ]
 }
