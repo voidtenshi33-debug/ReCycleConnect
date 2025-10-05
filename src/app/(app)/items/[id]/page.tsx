@@ -48,6 +48,7 @@ export default function ItemDetailPage({ params }: { params: { id: string } }) {
                             {item.listingType === 'Donate' ? 'FREE for Donation' : `₹${item.price.toLocaleString()}`}
                         </div>
                         <div className="flex items-center gap-2 pt-2">
+                            {item.brand && <Badge variant="secondary" className="text-sm">{item.brand}</Badge>}
                             <Badge variant="secondary" className="text-sm">{item.category}</Badge>
                             <Badge variant="outline" className="text-sm">{item.condition}</Badge>
                              {item.isFeatured && <Badge>⭐ Featured</Badge>}
@@ -152,6 +153,3 @@ export default function ItemDetailPage({ params }: { params: { id: string } }) {
         </div>
     );
 }
-
-
-    

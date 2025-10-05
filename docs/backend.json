@@ -71,6 +71,7 @@
         "description": { "type": "string" },
         "imageUrls": { "type": "array", "items": { "type": "string", "format": "uri" } },
         "category": { "type": "string" },
+        "brand": { "type": "string" },
         "condition": { "type": "string", "enum": ["Working", "Needs Minor Repair", "For Spare Parts Only"] },
         "listingType": { "type": "string", "enum": ["Sell", "Donate"] },
         "price": { "type": "number" },

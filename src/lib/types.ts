@@ -32,6 +32,7 @@ export type Item = {
   title: string;
   description: string;
   category: string;
+  brand?: string;
   condition: ItemCondition;
   listingType: "Sell" | "Donate";
   price: number;

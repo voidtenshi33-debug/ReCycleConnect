@@ -81,6 +81,7 @@ export default function PostItemPage() {
                 description: formValues.description as string,
                 imageUrls: [imageUrl],
                 category: formValues.category as string,
+                brand: formValues.brand as string,
                 condition: formValues.condition as ItemCondition,
                 listingType: price === 0 ? "Donate" : "Sell",
                 price: price,
@@ -132,9 +133,15 @@ export default function PostItemPage() {
                 </CardHeader>
                 <CardContent>
                     <form className="grid gap-6" onSubmit={handleSubmit}>
-                        <div className="grid gap-2">
-                            <Label htmlFor="title">Item Title</Label>
-                            <Input id="title" name="title" placeholder="e.g., MacBook Pro 14-inch" required />
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                            <div className="grid gap-2">
+                                <Label htmlFor="title">Item Title</Label>
+                                <Input id="title" name="title" placeholder="e.g., MacBook Pro 14-inch" required />
+                            </div>
+                             <div className="grid gap-2">
+                                <Label htmlFor="brand">Brand</Label>
+                                <Input id="brand" name="brand" placeholder="e.g., Apple, Samsung" />
+                            </div>
                         </div>
 
                         <div className="grid gap-2">
