@@ -56,11 +56,11 @@ const ItemCarousel = ({ title, items, link = "#" }: { title: React.ReactNode, it
 const HeroSection = () => (
   <div className="relative w-full h-80 rounded-2xl overflow-hidden mb-8">
     <Image 
-      src="https://images.unsplash.com/photo-1528328154642-f1c521f7c32d?q=80&w=2070&auto=format&fit=crop"
-      alt="Electronics recycling background"
+      src="https://www.genoxtech.com/UserFiles/kindeditor/image/20240627/627-1.jpg"
+      alt="A pile of discarded electronic devices representing e-waste"
       fill
       className="object-cover"
-      data-ai-hint="electronics recycling"
+      data-ai-hint="e-waste pile"
     />
     <div className="absolute inset-0 bg-black/50" />
     <div className="relative h-full flex flex-col items-center justify-center text-center text-white p-4 space-y-4">
