@@ -13,19 +13,19 @@ const onboardingSteps = [
     image: "https://picsum.photos/seed/recycle1/800/1200",
     imageHint: "electronics recycling",
     title: "Give Your Electronics a Second Life",
-    description: "Easily list your old gadgets for sale, donation, or recycling. Turn e-waste into cash or good karma.",
+    description: "Easily list your used gadgets for sale or donation. Turn e-waste into cash or good karma.",
   },
   {
     image: "https://picsum.photos/seed/recycle2/800/1200",
-    imageHint: "local community",
-    title: "Connect with Your Community",
-    description: "Discover great deals on pre-owned electronics near you, or find someone who needs the spare parts you have.",
+    imageHint: "local community electronics",
+    title: "Connect with Your E-Waste Community",
+    description: "Discover great deals on pre-owned electronics near you, or find someone who needs your spare parts.",
   },
   {
     image: "https://picsum.photos/seed/recycle3/800/1200",
-    imageHint: "repaired phone",
+    imageHint: "repaired phone circuit",
     title: "Reduce, Reuse, ReCycleConnect",
-    description: "Join a movement to reduce e-waste. Every exchange of electronic goods makes a difference for our planet.",
+    description: "Join a movement to reduce electronic waste. Every gadget you exchange makes a difference for our planet.",
   },
 ]
 
@@ -64,7 +64,7 @@ export default function WelcomePage() {
         <div className="mt-6 flex flex-col items-center gap-4">
             <Button asChild className="w-full max-w-xs">
                 <Link href="/home">
-                    Get Started <ArrowRight className="ml-2 h-4 w-4" />
+                    Start Recycling <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>
             </Button>
             <Link href="/login" className="text-sm text-muted-foreground hover:underline">

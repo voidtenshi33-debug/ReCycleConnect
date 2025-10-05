@@ -1,6 +1,6 @@
 
 import type { User, Item, Category, Conversation, ChatMessage, ExchangeRequest, Notification, AppCategory, Location } from './types';
-import { Smartphone, Laptop, Keyboard, Monitor, Cable, Headphones, MemoryStick, SquarePlus } from 'lucide-react';
+import { Smartphone, Laptop, Keyboard, Monitor, Cable, Headphones, MemoryStick, SquarePlus, Gamepad2, ToyBrick } from 'lucide-react';
 
 export const users: User[] = [
   {
@@ -87,7 +87,7 @@ export const items: Item[] = [
     id: 'item-3',
     title: "Logitech Mechanical Gaming Keyboard",
     description: "RGB backlit mechanical keyboard. All keys and lights working perfectly. Great for gaming and typing.",
-    category: "keyboards-mice",
+    category: "keyboards",
     brand: "Logitech",
     condition: "Working",
     listingType: "Sell",
@@ -125,7 +125,7 @@ export const items: Item[] = [
     id: 'item-5',
     title: "Box of Assorted Cables and Chargers",
     description: "Includes various USB-A, Micro USB, and Aux cables. A few old phone chargers also included. All free for anyone who needs them.",
-    category: "chargers-cables",
+    category: "cables",
     brand: "Assorted",
     condition: "Working",
     listingType: "Donate",
@@ -144,7 +144,7 @@ export const items: Item[] = [
     id: 'item-6',
     title: "Sony Noise-Cancelling Headphones",
     description: "WH-1000XM4 model. Excellent condition, comes with the original case. The sound quality is amazing.",
-    category: "audio-devices",
+    category: "audio",
     brand: "Sony",
     condition: "Working",
     listingType: "Sell",
@@ -202,12 +202,14 @@ export const itemCategories: string[] = ['Laptops', 'Phones', 'Tablets', 'Monito
 export const categories: AppCategory[] = [
   { id: 'mobiles', name: 'Mobiles', icon: Smartphone, slug: 'mobiles' },
   { id: 'laptops', name: 'Laptops', icon: Laptop, slug: 'laptops' },
-  { id: 'keyboards', name: 'Keyboards', icon: Keyboard, slug: 'keyboards-mice' },
+  { id: 'keyboards', name: 'Keyboards', icon: Keyboard, slug: 'keyboards' },
   { id: 'monitors', name: 'Monitors', icon: Monitor, slug: 'monitors' },
-  { id: 'cables', name: 'Cables', icon: Cable, slug: 'chargers-cables' },
-  { id: 'audio', name: 'Audio', icon: Headphones, slug: 'audio-devices' },
+  { id: 'cables', name: 'Cables', icon: Cable, slug: 'cables' },
+  { id: 'audio', name: 'Audio', icon: Headphones, slug: 'audio' },
   { id: 'components', name: 'Components', icon: MemoryStick, slug: 'components' },
-  { id: 'other', name: 'Other', icon: SquarePlus, slug: 'other-accessories' },
+  { id: 'gaming', name: 'Gaming', icon: Gamepad2, slug: 'gaming' },
+  { id: 'drones', name: 'Drones', icon: ToyBrick, slug: 'drones' },
+  { id: 'other', name: 'Other', icon: SquarePlus, slug: 'other' },
 ];
 
 export const locations: Location[] = [

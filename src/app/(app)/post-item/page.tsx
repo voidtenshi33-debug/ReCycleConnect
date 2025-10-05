@@ -129,7 +129,7 @@ export default function PostItemPage() {
             <Card>
                 <CardHeader>
                     <CardTitle className="font-headline text-3xl">List an E-Waste Item</CardTitle>
-                    <CardDescription>Fill out the details below to post your electronic item for sale, donation, or recycling.</CardDescription>
+                    <CardDescription>Fill out the details below to list your electronic item for sale or donation.</CardDescription>
                 </CardHeader>
                 <CardContent>
                     <form className="grid gap-6" onSubmit={handleSubmit}>

@@ -64,10 +64,10 @@ const HeroSection = () => (
     <div className="absolute inset-0 bg-black/50" />
     <div className="relative h-full flex flex-col items-center justify-center text-center text-white p-4 space-y-4">
       <h1 className="text-4xl md:text-5xl font-headline font-bold"><T>Give Your Electronics a Second Life.</T></h1>
-      <p className="max-w-2xl text-lg text-white/90"><T>Join the community in reducing e-waste. Buy, sell, or donate your used gadgets today.</T></p>
+      <p className="max-w-2xl text-lg text-white/90"><T>The dedicated marketplace for e-waste. Buy, sell, or donate used gadgets and reduce your carbon footprint.</T></p>
       <Button size="lg" asChild>
         <Link href="/post-item">
-          <PlusCircle className="mr-2" /> <T>Post Your Item Now</T>
+          <PlusCircle className="mr-2" /> <T>Post Your E-Waste Item</T>
         </Link>
       </Button>
     </div>
@@ -134,14 +134,14 @@ export default function HomePage() {
       
       <div className="space-y-12">
         <div>
-          <h2 className="text-2xl font-headline font-semibold mb-4"><T>Browse by Category</T></h2>
+          <h2 className="text-2xl font-headline font-semibold mb-4"><T>Browse by E-Waste Category</T></h2>
           <CategoryScroller onCategorySelect={handleCategorySelect} activeCategory={activeCategory} />
         </div>
 
         <div className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
           <Input 
-            placeholder="Search by product or location..."
+            placeholder="Search for electronics or locations..."
             className="pl-10 w-full md:w-1/2 lg:w-1/3"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
@@ -149,11 +149,11 @@ export default function HomePage() {
         </div>
 
         {activeCategory === 'all' && searchQuery.length === 0 && featuredItems.length > 0 && (
-          <ItemCarousel title={<T>⭐ Featured Items</T>} items={featuredItems} />
+          <ItemCarousel title={<T>⭐ Featured Electronics</T>} items={featuredItems} />
         )}
         
         {activeCategory === 'all' && searchQuery.length === 0 && donationItems.length > 0 && (
-           <ItemCarousel title={<T>♻️ Donations Corner</T>} items={donationItems} />
+           <ItemCarousel title={<T>♻️ E-Waste Donations Corner</T>} items={donationItems} />
         )}
 
         <div>
@@ -167,7 +167,7 @@ export default function HomePage() {
               ))
             ) : (
               <div className="col-span-full text-center py-12 text-muted-foreground">
-                <p><T>No items found.</T></p>
+                <p><T>No electronic items found.</T></p>
               </div>
             )}
           </div>
@@ -176,4 +176,3 @@ export default function HomePage() {
     </>
   );
 }
-

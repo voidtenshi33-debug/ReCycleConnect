@@ -2,7 +2,7 @@
 'use server';
 
 /**
- * @fileOverview Suggests item categories based on an image.
+ * @fileOverview Suggests item categories based on an image for an electronics recycling app.
  *
  * - suggestItemCategory - A function that suggests item categories based on an image.
  * - SuggestItemCategoryInput - The input type for the suggestItemCategory function.
@@ -27,7 +27,7 @@ const validCategories = categories.map(c => c.name);
 const SuggestItemCategoryOutputSchema = z.object({
   suggestedCategories: z
     .array(z.string())
-    .describe(`An array of up to 3 suggested item categories from the following list: ${validCategories.join(', ')}`),
+    .describe(`An array of up to 3 suggested e-waste categories from the following list: ${validCategories.join(', ')}`),
 });
 export type SuggestItemCategoryOutput = z.infer<typeof SuggestItemCategoryOutputSchema>;
 
@@ -41,11 +41,11 @@ const prompt = ai.definePrompt({
   name: 'suggestItemCategoryPrompt',
   input: {schema: SuggestItemCategoryInputSchema},
   output: {schema: SuggestItemCategoryOutputSchema},
-  prompt: `You are an AI assistant for an electronics recycling app called ReCycleConnect. Your task is to suggest relevant categories for a user's item based on an image they upload.
+  prompt: `You are an AI assistant for an electronics recycling app called ReCycleConnect. Your task is to suggest relevant categories for a user's e-waste item based on an image they upload.
 
   Analyze the image provided and suggest up to 3 of the most relevant categories from the following official list. The suggestions should be ordered from most to least relevant.
 
-  Official Category List:
+  Official E-Waste Category List:
   - Mobiles
   - Laptops
   - Keyboards
@@ -53,6 +53,8 @@ const prompt = ai.definePrompt({
   - Cables
   - Audio
   - Components
+  - Gaming
+  - Drones
   - Other
 
   Image: {{media url=photoDataUri}}
