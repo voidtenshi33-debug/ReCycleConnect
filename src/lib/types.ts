@@ -1,5 +1,6 @@
 
 import type { LucideIcon } from "lucide-react";
+import type { Timestamp } from "firebase/firestore";
 
 export type User = {
   id: string; // Corresponds to document ID user_01, user_02 etc.
