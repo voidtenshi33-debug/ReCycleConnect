@@ -7,7 +7,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { notFound } from "next/navigation";
+import { notFound, useParams } from "next/navigation";
 import { ArrowLeft, ChevronRight, Flag, MessageSquare, Share2, Star, ShieldCheck, Award, Zap, CheckCircle, Wrench, XCircle, Loader2, CreditCard } from "lucide-react";
 import { format } from "date-fns";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
@@ -17,6 +17,7 @@ import { useDoc, useFirebase } from "@/firebase";
 import { doc } from "firebase/firestore";
 import type { Item, User } from "@/lib/types";
 import { useMemoFirebase } from "@/firebase/provider";
+
 
 const TrustBadge = ({ icon: Icon, children }: { icon: React.ElementType, children: React.ReactNode }) => (
     <div className="flex items-center gap-2 text-sm text-muted-foreground">
@@ -72,10 +73,10 @@ function ItemDetailContent({ itemId }: { itemId: string }) {
                 Back to listings
             </Link>
 
-            <div className="grid md:grid-cols-3 gap-8 lg:gap-12">
+            <div className="grid md:grid-cols-5 gap-8 lg:gap-12">
                 
                 {/* Left Column: Media and Main Details */}
-                <div className="md:col-span-2 space-y-6">
+                <div className="md:col-span-3 space-y-6">
                     
                     {/* Image Carousel */}
                     <Card className="overflow-hidden">
@@ -138,7 +139,7 @@ function ItemDetailContent({ itemId }: { itemId: string }) {
                 </div>
                 
                 {/* Right Column: Seller and Actions */}
-                <div className="md:col-span-1 space-y-6">
+                <div className="md:col-span-2 space-y-6">
                     <div className="md:sticky md:top-6 space-y-6">
                         
                          {/* Trust Center (Seller Card) */}
@@ -222,7 +223,8 @@ function ItemDetailContent({ itemId }: { itemId: string }) {
     );
 }
 
-
+// This is now a Server Component by default
 export default function ItemDetailPage({ params }: { params: { id: string } }) {
+    // It can safely access params without triggering the warning
     return <ItemDetailContent itemId={params.id} />;
 }

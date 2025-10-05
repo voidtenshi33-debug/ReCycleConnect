@@ -1,3 +1,4 @@
+
 'use client';
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -125,7 +126,7 @@ function MessageDetailContent({ conversationId }: { conversationId: string }) {
             {/* Contextual Item Header */}
              <Card className="m-2 md:m-4 rounded-lg shadow-sm">
                 <CardContent className="p-3">
-                    <div className="flex items-center gap-4">
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
                         <div className="relative h-16 w-16 rounded-md overflow-hidden flex-shrink-0">
                             <Image src={item.imageUrls[0]} alt={item.title} fill className="object-cover" />
                         </div>
@@ -133,7 +134,7 @@ function MessageDetailContent({ conversationId }: { conversationId: string }) {
                             <p className="font-semibold truncate">{item.title}</p>
                             <p className="text-xl font-bold text-primary mt-1">{item.listingType === 'Donate' ? 'DONATE' : `₹${item.price}`}</p>
                         </div>
-                        <Button asChild variant="secondary" size="sm">
+                        <Button asChild variant="secondary" size="sm" className="w-full sm:w-auto">
                             <Link href={`/items/${item.id}`}>View Item</Link>
                         </Button>
                     </div>

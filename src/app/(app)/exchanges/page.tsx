@@ -45,7 +45,7 @@ const RequestCard = ({ request }: { request: ExchangeRequest & { id: string } })
     const isMyRequest = request.requesterId === currentUser?.uid;
 
     return (
-        <div className="flex items-center justify-between p-4 border-b">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 border-b gap-4">
             <div className="flex items-center gap-4">
                 <Image src={item.imageUrls[0]} alt={item.title} width={64} height={64} className="rounded-md object-cover aspect-square" />
                 <div>
@@ -59,7 +59,7 @@ const RequestCard = ({ request }: { request: ExchangeRequest & { id: string } })
                     </div>
                 </div>
             </div>
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-4 self-end sm:self-center">
                 <Badge variant={request.status === 'Accepted' ? 'default' : request.status === 'Completed' ? 'secondary' : 'outline'}>{request.status}</Badge>
                 {request.status === 'Pending' && !isMyRequest && <Button size="sm">Respond</Button>}
                 {request.status === 'Completed' && <Button size="sm" variant="outline">Leave Rating</Button>}
@@ -100,7 +100,7 @@ export default function ExchangesPage() {
     
     return (
         <div className="space-y-6">
-             <h1 className="text-2xl font-headline font-semibold">Exchanges</h1>
+             <h1 className="text-2xl md:text-3xl font-headline font-semibold">Exchanges</h1>
             <Tabs defaultValue="incoming" className="w-full">
                 <TabsList className="grid w-full grid-cols-2">
                     <TabsTrigger value="incoming">Incoming Requests</TabsTrigger>
