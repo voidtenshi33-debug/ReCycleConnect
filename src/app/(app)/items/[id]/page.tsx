@@ -1,18 +1,23 @@
 
+'use client'
+
 import Image from "next/image";
 import Link from "next/link";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { items, users } from "@/lib/data";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { notFound } from "next/navigation";
-import { ArrowLeft, ChevronRight, Flag, MessageSquare, Share2, Star, ShieldCheck, CreditCard, Award, Zap, CheckCircle, Wrench, XCircle } from "lucide-react";
+import { ArrowLeft, ChevronRight, Flag, MessageSquare, Share2, Star, ShieldCheck, Award, Zap, CheckCircle, Wrench, XCircle, Loader2 } from "lucide-react";
 import { format } from "date-fns";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import { Separator } from "@/components/ui/separator";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { cn } from "@/lib/utils";
+import { useDoc, useFirebase } from "@/firebase";
+import { doc } from "firebase/firestore";
+import type { Item, User } from "@/lib/types";
+import { useMemoFirebase } from "@/firebase/provider";
 
 const TrustBadge = ({ icon: Icon, children }: { icon: React.ElementType, children: React.ReactNode }) => (
     <div className="flex items-center gap-2 text-sm text-muted-foreground">
@@ -40,11 +45,27 @@ const getConditionIcon = (condition: string) => {
 
 
 export default function ItemDetailPage({ params }: { params: { id: string } }) {
-    const item = items.find(i => i.id === params.id);
+    const { firestore } = useFirebase();
+
+    const itemRef = useMemoFirebase(() => firestore ? doc(firestore, 'items', params.id) : null, [firestore, params.id]);
+    const { data: item, isLoading: isItemLoading } = useDoc<Item>(itemRef);
+    
+    const sellerId = item?.ownerId;
+    const sellerRef = useMemoFirebase(() => (firestore && sellerId) ? doc(firestore, 'users', sellerId) : null, [firestore, sellerId]);
+    const { data: seller, isLoading: isSellerLoading } = useDoc<User>(sellerRef);
+
+
+    if (isItemLoading || isSellerLoading) {
+        return (
+            <div className="flex justify-center items-center h-96">
+                <Loader2 className="w-8 h-8 animate-spin text-primary" />
+            </div>
+        )
+    }
+
     if (!item) {
         notFound();
     }
-    const seller = users.find(u => u.userId === item.ownerId);
 
     return (
         <div className="max-w-7xl mx-auto">
@@ -138,9 +159,9 @@ export default function ItemDetailPage({ params }: { params: { id: string } }) {
                                             <p className="font-semibold text-lg">{seller.displayName}</p>
                                             <div className="flex items-center gap-1 text-sm text-muted-foreground">
                                                 <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                                                <span>{seller.averageRating.toFixed(1)} ({seller.ratingsCount} reviews)</span>
+                                                <span>{seller.averageRating?.toFixed(1) ?? 0} ({seller.ratingsCount ?? 0} reviews)</span>
                                             </div>
-                                            <span className="text-sm text-muted-foreground">Joined {format(seller.createdAt, "MMMM yyyy")}</span>
+                                            <span className="text-sm text-muted-foreground">Joined {format(seller.createdAt?.toDate ? seller.createdAt.toDate() : new Date(), "MMMM yyyy")}</span>
                                         </div>
                                     </div>
                                     <Separator />

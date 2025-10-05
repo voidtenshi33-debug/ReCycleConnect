@@ -8,12 +8,15 @@ import { Heart, Home, Leaf, MessageSquare, PlusCircle, Repeat2, User as UserIcon
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { useUser } from "@/firebase"
+import { useDoc, useUser } from "@/firebase"
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar"
 import { getInitials } from "@/lib/utils"
 import { Separator } from "../ui/separator"
-import { users } from "@/lib/data"
 import { T } from "../t"
+import { useMemoFirebase } from "@/firebase/provider"
+import { doc } from "firebase/firestore"
+import { useFirebase } from "@/firebase/provider"
+import type { User } from "@/lib/types"
 
 const NavLink = ({ href, icon: Icon, children, badge, exact = false }: { href: string; icon: React.ElementType; children: React.ReactNode; badge?: string; exact?: boolean; }) => {
   const pathname = usePathname()
@@ -36,14 +39,17 @@ const NavLink = ({ href, icon: Icon, children, badge, exact = false }: { href: s
 
 function UserProfileSnippet() {
   const { user } = useUser();
+  const { firestore } = useFirebase();
   
-  // In a real app, you'd fetch the user's full profile from Firestore
-  // For now, we'll find the matching user from mock data.
-  const userProfile = users.find(u => u.id === user?.uid);
-  const mockRating = userProfile?.averageRating || 0;
+  const userProfileRef = useMemoFirebase(() => {
+    if (!firestore || !user?.uid) return null;
+    return doc(firestore, 'users', user.uid);
+  }, [firestore, user?.uid]);
 
+  const { data: userProfile } = useDoc<User>(userProfileRef);
+  const rating = userProfile?.averageRating || 0;
 
-  if (!user) {
+  if (!user || !userProfile) {
     return null;
   }
 
@@ -58,7 +64,7 @@ function UserProfileSnippet() {
           <span className="font-semibold text-sm">{user.displayName}</span>
            <div className="flex items-center gap-1 text-xs text-muted-foreground">
               <Star className="w-3.5 h-3.5 fill-yellow-400 text-yellow-400" />
-              <span>{mockRating.toFixed(1)}</span>
+              <span>{rating.toFixed(1)}</span>
           </div>
         </div>
       </div>
@@ -100,5 +106,3 @@ export default function Sidebar() {
     </div>
   )
 }
-
-    

@@ -5,11 +5,13 @@ import { useState, useMemo, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { ItemCard } from '@/components/item-card';
-import { items as allItems, locations, users, categories as appCategories } from '@/lib/data';
+import { useCollection } from '@/firebase/firestore/use-collection';
+import { collection, query, where } from 'firebase/firestore';
+import { categories as appCategories } from '@/lib/data';
 import { Button } from '@/components/ui/button';
 import { PlusCircle, ChevronRight, Search } from 'lucide-react';
 import { CategoryScroller } from '@/components/category-scroller';
-import { useUser } from '@/firebase';
+import { useFirebase, useUser } from '@/firebase';
 import {
   Carousel,
   CarouselContent,
@@ -21,6 +23,7 @@ import type { Item } from '@/lib/types';
 import { Input } from '@/components/ui/input';
 import { T } from '@/components/t';
 import { useSearchParams } from 'next/navigation';
+import { useMemoFirebase } from '@/firebase/provider';
 
 
 const ItemCarousel = ({ title, items, link = "#" }: { title: React.ReactNode, items: Item[], link?: string }) => (
@@ -78,10 +81,18 @@ const HeroSection = () => (
 
 function HomePageContent() {
   const { user, isUserLoading } = useUser();
+  const { firestore } = useFirebase();
   const searchParams = useSearchParams();
   const [activeCategory, setActiveCategory] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState('');
-  const [currentItems, setCurrentItems] = useState<Item[]>(allItems);
+  const [currentItems, setCurrentItems] = useState<Item[]>([]);
+
+  const itemsQuery = useMemoFirebase(() => {
+    if (!firestore) return null;
+    return collection(firestore, 'items');
+  }, [firestore]);
+
+  const { data: allItems, isLoading: areItemsLoading } = useCollection<Item>(itemsQuery);
 
   useEffect(() => {
     const queryFromUrl = searchParams.get('q');
@@ -91,12 +102,15 @@ function HomePageContent() {
   }, [searchParams]);
 
   useEffect(() => {
+    if (!allItems) return;
+
     let filtered = allItems;
     // @ts-ignore - user has no lastKnownLocality
     const userLocation = user?.lastKnownLocality;
 
     if (userLocation && !isUserLoading) {
-        filtered = filtered.filter((item) => item.locality === userLocation);
+        // This is a mock implementation. For a real app, you would query based on location.
+        // filtered = filtered.filter((item) => item.locality === userLocation);
     }
     
     if (activeCategory !== 'all') {
@@ -114,19 +128,18 @@ function HomePageContent() {
     }
 
     setCurrentItems(filtered);
-  }, [user, isUserLoading, activeCategory, searchQuery]);
+  }, [user, isUserLoading, activeCategory, searchQuery, allItems]);
 
-  const { featuredItems, donationItems, recentItems } = useMemo(() => {
+  const { featuredItems, donationItems } = useMemo(() => {
+    if (!allItems) return { featuredItems: [], donationItems: [] };
     const featured = allItems.filter(item => item.isFeatured);
     const donations = allItems.filter(item => item.listingType === 'Donate');
-    const recents = allItems; // Show all for main grid before filtering
 
     return {
       featuredItems: featured,
       donationItems: donations,
-      recentItems: recents
     };
-  }, []);
+  }, [allItems]);
 
   const handleCategorySelect = (categorySlug: string) => {
     setActiveCategory(categorySlug);
@@ -172,17 +185,23 @@ function HomePageContent() {
            <h2 className="text-2xl font-headline font-semibold mb-4">
              {searchQuery ? <T>Search Results</T> : getHeading()}
           </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 lg:gap-6">
-            {currentItems.length > 0 ? (
-              currentItems.map(item => (
-                <ItemCard key={item.id} item={item} />
-              ))
-            ) : (
-              <div className="col-span-full text-center py-12 text-muted-foreground">
-                <p><T>No electronic items found.</T></p>
-              </div>
-            )}
-          </div>
+          {areItemsLoading ? (
+            <div className="col-span-full text-center py-12 text-muted-foreground">
+                <p><T>Loading items...</T></p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 lg:gap-6">
+                {currentItems.length > 0 ? (
+                currentItems.map(item => (
+                    <ItemCard key={item.id} item={item} />
+                ))
+                ) : (
+                <div className="col-span-full text-center py-12 text-muted-foreground">
+                    <p><T>No electronic items found.</T></p>
+                </div>
+                )}
+            </div>
+          )}
         </div>
       </div>
     </>
