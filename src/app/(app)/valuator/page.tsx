@@ -10,22 +10,48 @@ import { Label } from '@/components/ui/label';
 import { handleDeviceValuation } from '@/app/actions';
 import type { DeviceValuationOutput } from '@/ai/flows/device-valuator-flow';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { ArrowLeft, భారతీయ రూపాయి, ImagePlus, Loader2, Sparkles, WandSparkles, X } from 'lucide-react';
+import { ArrowLeft, ImagePlus, Loader2, Sparkles, WandSparkles, X, List } from 'lucide-react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { categories as appCategories } from '@/lib/data';
+
 
 function ValuationResult({ result }: { result: DeviceValuationOutput }) {
+  const router = useRouter();
+
+  const handleListNow = () => {
+    const categorySlug = appCategories.find(c => c.name.toLowerCase() === result.suggestedCategory.toLowerCase())?.slug || 'other';
+
+    const queryParams = new URLSearchParams({
+      title: result.suggestedTitle,
+      category: categorySlug,
+      minPrice: result.estimatedLowPrice.toString(),
+      maxPrice: result.estimatedHighPrice.toString(),
+    });
+    router.push(`/post-item?${queryParams.toString()}`);
+  }
+
+  const midPrice = Math.round((result.estimatedLowPrice + result.estimatedHighPrice) / 200) * 100;
+
   return (
-    <Alert className="mt-6 border-primary">
-      <WandSparkles className="h-4 w-4" />
-      <AlertTitle className="font-bold">Valuation Complete!</AlertTitle>
-      <AlertDescription className="space-y-2">
-        <p className="font-semibold text-lg">
-          Estimated Value: ₹{result.estimatedLowPrice.toLocaleString('en-IN')} - ₹{result.estimatedHighPrice.toLocaleString('en-IN')}
-        </p>
-        <p><span className="font-semibold">Condition:</span> {result.conditionAssessment}</p>
-        <p><span className="font-semibold">Reasoning:</span> {result.reasoning}</p>
-      </AlertDescription>
-    </Alert>
+    <div className="space-y-4">
+      <Alert className="border-primary text-center">
+        <WandSparkles className="h-4 w-4" />
+        <AlertTitle className="font-bold">Valuation Complete!</AlertTitle>
+        <AlertDescription className="space-y-2">
+          <p className="font-semibold text-2xl">
+            ₹{result.estimatedLowPrice.toLocaleString('en-IN')} - ₹{result.estimatedHighPrice.toLocaleString('en-IN')}
+          </p>
+          <p><span className="font-semibold">Suggested Title:</span> {result.suggestedTitle}</p>
+          <p><span className="font-semibold">Condition:</span> {result.conditionAssessment}</p>
+          <p><span className="font-semibold">Reasoning:</span> {result.reasoning}</p>
+        </AlertDescription>
+      </Alert>
+       <Button size="lg" className="w-full" onClick={handleListNow}>
+        <List className="mr-2 h-4 w-4" />
+        List this {result.suggestedTitle} for ~₹{midPrice.toLocaleString('en-IN')}
+      </Button>
+    </div>
   );
 }
 
