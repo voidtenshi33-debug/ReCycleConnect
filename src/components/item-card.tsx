@@ -46,11 +46,15 @@ export function ItemCard({ item, showControls = false, onRemove }: ItemCardProps
   useEffect(() => {
     if (userProfile?.wishlist) {
       setIsWishlisted(userProfile.wishlist.includes(item.id));
+    } else {
+      setIsWishlisted(false);
     }
   }, [userProfile, item.id]);
 
   const handleWishlistToggle = async () => {
+    // --- Step 1: Check if a user is logged in ---
     if (isUserLoading || !user || !userProfileRef) {
+        console.error("Wishlist Error: User is not logged in.");
         toast({
             variant: "destructive",
             title: "Please log in",
@@ -58,25 +62,54 @@ export function ItemCard({ item, showControls = false, onRemove }: ItemCardProps
         });
         return;
     }
-    
-    const newWishlistedState = !isWishlisted;
-    setIsWishlisted(newWishlistedState); // Optimistic UI update
 
+    const newWishlistedState = !isWishlisted;
+    const itemId = item.id;
+    const userId = user.uid;
+
+    // --- Step 2: Log the action for debugging ---
+    console.log(
+        `Attempting to ${newWishlistedState ? 'ADD' : 'REMOVE'} item:`,
+        itemId,
+        `for user:`,
+        userId
+    );
+    
+    // Optimistic UI update
+    setIsWishlisted(newWishlistedState);
+
+    // --- Step 3: Use a try...catch block to find hidden errors ---
     try {
-      await updateDoc(userProfileRef, {
-        wishlist: newWishlistedState ? arrayUnion(item.id) : arrayRemove(item.id)
-      });
-       toast({
-            title: newWishlistedState ? "Added to Wishlist" : "Removed from Wishlist",
-        });
+        if (newWishlistedState) {
+            // --- ADD TO WISHLIST ---
+            await updateDoc(userProfileRef, {
+                wishlist: arrayUnion(itemId)
+            });
+            console.log("Successfully ADDED item to wishlist.");
+            toast({
+                title: "Added to Wishlist",
+            });
+        } else {
+            // --- REMOVE FROM WISHLIST ---
+            await updateDoc(userProfileRef, {
+                wishlist: arrayRemove(itemId)
+            });
+            console.log("Successfully REMOVED item from wishlist.");
+            toast({
+                title: "Removed from Wishlist",
+            });
+        }
     } catch (error) {
-      console.error("Error updating wishlist:", error);
-      setIsWishlisted(!newWishlistedState); // Revert on error
-      toast({
+        // --- THIS IS THE CRUCIAL PART ---
+        // If the update fails for any reason, this will catch the error.
+        console.error("WISHLIST UPDATE FAILED:", error);
+        toast({
             variant: "destructive",
-            title: "Something went wrong",
-            description: "Could not update your wishlist. Please try again.",
-      });
+            title: "Could not update your wishlist",
+            description: "Please check your connection and try again.",
+        });
+        // Revert the optimistic UI update
+        setIsWishlisted(!newWishlistedState);
     }
   }
 
