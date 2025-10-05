@@ -78,7 +78,7 @@ export default function Sidebar() {
         </div>
         <UserProfileSnippet />
         <Separator />
-        <div className="flex-1 py-2">
+        <div className="flex-1 py-2 overflow-y-auto">
           <nav className="grid items-start px-2 text-sm font-medium lg:px-4">
             <NavLink href="/home" icon={Home} exact><T>Home</T></NavLink>
             <NavLink href="/exchanges" icon={Repeat2}><T>Exchanges</T></NavLink>
@@ -87,6 +87,14 @@ export default function Sidebar() {
             <NavLink href="/wishlist" icon={Heart}><T>Wishlist</T></NavLink>
             <NavLink href="/profile" icon={UserIcon}><T>Profile</T></NavLink>
           </nav>
+        </div>
+         <div className="mt-auto p-4">
+            <Button asChild size="sm" className="w-full">
+                <Link href="/post-item">
+                    <PlusCircle className="mr-2 h-4 w-4" />
+                    Post Your E-Waste
+                </Link>
+            </Button>
         </div>
       </div>
     </div>
