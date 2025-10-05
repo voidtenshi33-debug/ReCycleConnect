@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils";
 import { MessageSquare, Search } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useCollection, useFirebase } from "@/firebase";
+import { useCollection, useDoc, useFirebase } from "@/firebase";
 import type { Conversation, Item, User } from "@/lib/types";
 import { collection, doc, query, where } from "firebase/firestore";
 import { useMemo } from 'react';
@@ -56,10 +56,7 @@ function ChatListItem({ conversation, myUserId }: { conversation: Conversation, 
     const otherUserId = conversation.participants.find(p => p !== myUserId);
 
     const otherUserRef = useMemoFirebase(() => otherUserId ? doc(firestore, 'users', otherUserId) : null, [firestore, otherUserId]);
-    // For now, we assume item details are denormalized on the convo.
-    // In a real app, you might fetch item details if needed.
-
-    const { data: otherUser } = useCollection<User>(otherUserRef ? [otherUserRef] : null);
+    const { data: otherUser } = useDoc<User>(otherUserRef);
 
 
     if (!otherUser) {
@@ -71,7 +68,7 @@ function ChatListItem({ conversation, myUserId }: { conversation: Conversation, 
     return (
         <Link href={`/messages/${conversation.id}`} key={conversation.id}>
             <div className={cn(
-                "p-4 border-b flex gap-4 hover:bg-muted/80",
+                "p-4 border-b flex gap-4 hover:bg-muted/80 transition-colors",
                 isActive && "bg-muted"
             )}>
                 <div className="relative">
@@ -85,15 +82,17 @@ function ChatListItem({ conversation, myUserId }: { conversation: Conversation, 
                 <div className="flex-grow overflow-hidden">
                     <div className="flex justify-between items-center">
                         <p className="font-semibold truncate">{otherUser.displayName}</p>
-                        <p className="text-xs text-muted-foreground whitespace-nowrap">
-                            {formatDistanceToNow(conversation.lastMessageTimestamp.toDate(), { addSuffix: true })}
-                        </p>
+                        {conversation.lastMessageTimestamp && (
+                            <p className="text-xs text-muted-foreground whitespace-nowrap">
+                                {formatDistanceToNow(conversation.lastMessageTimestamp.toDate(), { addSuffix: true })}
+                            </p>
+                        )}
                     </div>
                     <p className="text-xs text-muted-foreground truncate mt-0.5">Re: item-id:{conversation.itemId}</p>
                     <div className="flex justify-between items-end mt-1">
                         <p className="text-sm text-muted-foreground truncate">{conversation.lastMessage}</p>
                         {unreadCount > 0 && (
-                            <div className="h-5 w-5 bg-primary text-primary-foreground text-xs rounded-full flex items-center justify-center font-bold">
+                            <div className="h-5 min-w-[1.25rem] bg-primary text-primary-foreground text-xs rounded-full flex items-center justify-center font-bold px-1.5">
                                 {unreadCount}
                             </div>
                         )}
@@ -115,7 +114,9 @@ export default function MessagesPage() {
 
     const { data: conversations, isLoading: areConversationsLoading } = useCollection<Conversation>(conversationsQuery);
     
-    if (!isUserLoading && !areConversationsLoading && conversations?.length === 0) {
+    const isLoading = areConversationsLoading || isUserLoading;
+
+    if (!isLoading && conversations?.length === 0) {
         return <EmptyState />;
     }
 
@@ -125,12 +126,13 @@ export default function MessagesPage() {
                  <h2 className="text-xl font-headline font-semibold">Messages</h2>
                 <div className="relative mt-2">
                      <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                    <Input placeholder="Search conversations..." className="pl-8" />
+                    <Input placeholder="Search conversations..." className="pl-8 bg-background" />
                 </div>
             </div>
             <ScrollArea className="flex-grow">
-                {areConversationsLoading || isUserLoading ? (
+                {isLoading ? (
                     <>
+                        <ChatListItemSkeleton />
                         <ChatListItemSkeleton />
                         <ChatListItemSkeleton />
                         <ChatListItemSkeleton />

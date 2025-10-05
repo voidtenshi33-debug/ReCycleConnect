@@ -30,12 +30,12 @@ export default function MessagesLayout({
         isRootMessages && "hidden md:flex" 
       )}>
         {isRootMessages ? (
-            <div className="flex-col items-center justify-center text-center bg-background w-full hidden md:flex">
+            <div className="flex-col items-center justify-center text-center bg-background w-full hidden md:flex p-8">
                 <div className="p-6 bg-muted rounded-full mb-4">
                     <MessageSquare className="w-16 h-16 text-muted-foreground/50" />
                 </div>
                 <h3 className="font-headline text-2xl font-semibold">Select a conversation</h3>
-                <p className="text-muted-foreground max-w-sm">Choose one of your existing conversations to read messages, or start a new one by contacting a seller.</p>
+                <p className="text-muted-foreground max-w-sm mt-2">Choose one of your existing conversations to read messages, or start a new one by contacting a seller.</p>
             </div>
         ) : children}
       </main>
