@@ -1,0 +1,94 @@
+{
+  "entities": {
+    "UserProfile": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "UserProfile",
+      "type": "object",
+      "description": "Represents a user profile in the ReCycleConnect application.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the user profile."
+        },
+        "userId": {
+          "type": "string",
+          "description": "The unique ID from Firebase Authentication."
+        },
+        "displayName": {
+          "type": "string",
+          "description": "The user's full name."
+        },
+        "photoURL": {
+          "type": "string",
+          "description": "The URL to the user's profile picture. This can be null or empty if they don't have one.",
+          "format": "uri"
+        },
+        "email": {
+          "type": "string",
+          "description": "The user's email address.",
+          "format": "email"
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "The date the user joined.",
+          "format": "date-time"
+        },
+        "ratingIds": {
+          "type": "array",
+          "description": "References to Ratings given or received by this user. (Relationship: User 1:N Rating)",
+          "items": {
+            "type": "string"
+          }
+        },
+        "reportedItemIds": {
+          "type": "array",
+          "description": "References to Items reported by this user. (Relationship: User 1:N Item)",
+          "items": {
+            "type": "string"
+          }
+        },
+        "wishlistItemIds": {
+          "type": "array",
+          "description": "References to Items saved in user's wishlist. (Relationship: User 1:N Item)",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "id",
+        "userId",
+        "displayName",
+        "email",
+        "createdAt"
+      ]
+    }
+  },
+  "auth": {
+    "providers": [
+      "password",
+      "anonymous"
+    ]
+  },
+  "firestore": {
+    "structure": [
+      {
+        "path": "/users/{userId}",
+        "definition": {
+          "entityName": "UserProfile",
+          "schema": {
+            "$ref": "#/backend/entities/UserProfile"
+          },
+          "description": "Stores user profile information. The document ID is the Firebase Authentication UID (`userId`).",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique ID from Firebase Authentication, used as the document ID."
+            }
+          ]
+        }
+      }
+    ],
+    "reasoning": "The Firestore data structure is designed to support the ReCycleConnect application's user profiles and related data, focusing on secure access and efficient queries. The primary collection, `users`, stores user profile information. To ensure authorization independence, the `users` collection uses path-based ownership, which simplifies security rules. This structure supports the required QAPs (Queries and Permissions) by segregating user data into a dedicated collection, and access control can be easily managed through Firebase Authentication and security rules. The `userId` is used as document ID. Additionally, the structure denormalizes the relationship between users and ratings, reported items, and wishlist items by storing references (IDs) within the user document itself, avoiding the need for complex joins or subcollection queries when fetching basic user profile information."
+  }
+}
