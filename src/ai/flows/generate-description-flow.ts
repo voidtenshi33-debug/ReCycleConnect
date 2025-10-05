@@ -36,8 +36,8 @@ const prompt = ai.definePrompt({
 
 Analyze the following images to assess the item's physical condition. Look for scratches, cracks, screen damage, dents, and overall wear and tear. Also, note any positive attributes like a clean screen or minimal wear.
 
-{{#each images}}
-Image {{@index}}: {{media url=this}}
+{{#each images as |image|}}
+Image {{@index}}: {{media url=image}}
 {{/each}}
 
 Based on your analysis, write a 2-3 sentence description.
