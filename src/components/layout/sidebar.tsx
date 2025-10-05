@@ -2,11 +2,15 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { Heart, Home, Leaf, MessageSquare, PlusCircle, Repeat2, User } from "lucide-react"
+import { Heart, Home, Leaf, MessageSquare, PlusCircle, Repeat2, User as UserIcon, Star } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
+import { useUser } from "@/firebase"
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar"
+import { getInitials } from "@/lib/utils"
+import { Separator } from "../ui/separator"
 
 const NavLink = ({ href, icon: Icon, children, badge, exact = false }: { href: string; icon: React.ElementType; children: React.ReactNode; badge?: string; exact?: boolean; }) => {
   const pathname = usePathname()
@@ -27,6 +31,36 @@ const NavLink = ({ href, icon: Icon, children, badge, exact = false }: { href: s
   )
 }
 
+function UserProfileSnippet() {
+  const { user } = useUser();
+
+  if (!user) {
+    return null;
+  }
+
+  // In a real app, you'd fetch the user's full profile from Firestore
+  // For now, we'll use a mock rating.
+  const mockRating = 4.8;
+
+  return (
+    <div className="px-4 lg:px-6 py-4">
+      <div className="flex items-center gap-3">
+        <Avatar className="h-10 w-10">
+          <AvatarImage src={user.photoURL ?? undefined} alt={user.displayName ?? ""} />
+          <AvatarFallback>{getInitials(user.displayName)}</AvatarFallback>
+        </Avatar>
+        <div className="flex flex-col">
+          <span className="font-semibold text-sm">{user.displayName}</span>
+           <div className="flex items-center gap-1 text-xs text-muted-foreground">
+              <Star className="w-3.5 h-3.5 fill-yellow-400 text-yellow-400" />
+              <span>{mockRating.toFixed(1)}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 export default function Sidebar() {
   return (
     <div className="hidden border-r bg-muted/40 md:block">
@@ -37,21 +71,16 @@ export default function Sidebar() {
             <span className="font-headline text-lg">ReCycleConnect</span>
           </Link>
         </div>
-        <div className="flex-1">
+        <UserProfileSnippet />
+        <Separator />
+        <div className="flex-1 py-2">
           <nav className="grid items-start px-2 text-sm font-medium lg:px-4">
             <NavLink href="/home" icon={Home} exact>Home</NavLink>
             <NavLink href="/exchanges" icon={Repeat2} badge="3">Exchanges</NavLink>
             <NavLink href="/messages" icon={MessageSquare}>Messages</NavLink>
             <NavLink href="/wishlist" icon={Heart}>Wishlist</NavLink>
-            <NavLink href="/profile" icon={User}>Profile</NavLink>
+            <NavLink href="/profile" icon={UserIcon}>Profile</NavLink>
           </nav>
-        </div>
-        <div className="mt-auto p-4">
-          <Button size="lg" className="w-full" asChild>
-            <Link href="/post-item">
-              <PlusCircle className="mr-2 h-5 w-5" /> Post an Item
-            </Link>
-          </Button>
         </div>
       </div>
     </div>

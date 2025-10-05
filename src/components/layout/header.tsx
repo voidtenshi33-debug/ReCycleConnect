@@ -22,12 +22,9 @@ import { useAuth, useUser } from "@/firebase"
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar"
 import { getInitials } from "@/lib/utils"
 import { signOut } from "firebase/auth"
-import { useState, useEffect } from "react"
-import { useSpeechRecognition } from "@/hooks/use-speech-recognition"
-import { Dialog, DialogContent } from "@/components/ui/dialog"
+import { useState } from "react"
 import { LocationModal } from "../location-modal"
 import { locations } from "@/lib/data"
-import { TypewriterSearch } from "../typewriter-search"
 
 
 const MobileNavLink = ({ href, icon: Icon, children }: { href: string, icon: React.ElementType, children: React.ReactNode }) => {
@@ -46,7 +43,7 @@ const MobileNavLink = ({ href, icon: Icon, children }: { href: string, icon: Rea
 }
 
 export default function Header() {
-  const { user, isUserLoading } = useUser();
+  const { user } = useUser();
   const auth = useAuth();
   const router = useRouter();
   const [isLocationModalOpen, setLocationModalOpen] = useState(false);
@@ -96,7 +93,14 @@ export default function Header() {
         <ChevronDown className="h-4 w-4" />
       </Button>
 
-      <div className="w-full flex-1" />
+       <div className="relative w-full flex-1">
+          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+          <Input
+            type="search"
+            placeholder="Search products..."
+            className="w-full appearance-none bg-background pl-8 shadow-none md:w-2/3 lg:w-1/3"
+          />
+        </div>
 
        <Button asChild variant="ghost" size="icon" className="rounded-full">
             <Link href="/notifications">
@@ -107,9 +111,7 @@ export default function Header() {
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button variant="secondary" size="icon" className="rounded-full">
-            {isUserLoading ? (
-              <CircleUser className="h-5 w-5" />
-            ) : user ? (
+            {user ? (
               <Avatar className="h-8 w-8">
                 <AvatarImage src={user.photoURL ?? undefined} alt={user.displayName ?? ""} />
                 <AvatarFallback>{getInitials(user.displayName)}</AvatarFallback>
