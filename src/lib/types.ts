@@ -9,7 +9,7 @@ export type User = {
   email: string;
   photoURL: string | null;
   phoneNumber?: string;
-  createdAt: any; // Firestore Timestamp
+  createdAt: Timestamp | Date;
   lastKnownLocality: string;
   averageRating: number;
   ratingsCount: number;
@@ -50,7 +50,7 @@ export type Item = {
   ownerRating: number;
   status: 'Available' | 'In Process' | 'Completed' | 'Reserved';
   isFeatured: boolean;
-  createdAt: any; // Firestore Timestamp
+  createdAt: Timestamp | Date;
 };
 
 
@@ -58,7 +58,7 @@ export type ChatMessage = {
   id: string;
   text: string;
   senderId: string;
-  timestamp: any; // Firestore Timestamp
+  timestamp: Timestamp | Date;
   isRead: boolean;
 };
 
@@ -67,7 +67,7 @@ export type Conversation = {
   participants: string[]; // array of userIds
   itemId: string;
   lastMessage: string;
-  lastMessageTimestamp: any; // Firestore Timestamp
+  lastMessageTimestamp: Timestamp | Date;
   unreadCount: {
     [key: string]: number;
   };
@@ -81,7 +81,7 @@ export type Rating = {
   ratedUserId: string;
   rating: number; // 1-5 stars
   comment: string;
-  createdAt: any; // Firestore Timestamp
+  createdAt: Timestamp | Date;
 };
 
 export type ExchangeRequest = {
@@ -90,7 +90,7 @@ export type ExchangeRequest = {
   requesterId: string;
   sellerId: string;
   status: 'Pending' | 'Accepted' | 'Rejected' | 'Completed';
-  createdAt: any; // Firestore Timestamp
+  createdAt: Timestamp | Date;
 };
 
 export type Notification = {

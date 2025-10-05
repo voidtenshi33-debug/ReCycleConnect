@@ -7,7 +7,7 @@ import Link from 'next/link';
 import { ItemCard } from '@/components/item-card';
 import { useCollection } from '@/firebase/firestore/use-collection';
 import { collection, query, where } from 'firebase/firestore';
-import { categories as appCategories } from '@/lib/data';
+import { categories as appCategories, items as mockItems } from '@/lib/data';
 import { Button } from '@/components/ui/button';
 import { PlusCircle, ChevronRight, Search } from 'lucide-react';
 import { CategoryScroller } from '@/components/category-scroller';
@@ -94,6 +94,13 @@ function HomePageContent() {
 
   const { data: allItems, isLoading: areItemsLoading } = useCollection<Item>(itemsQuery);
 
+  const displayedItems = useMemo(() => {
+    if (areItemsLoading) return [];
+    if (allItems && allItems.length > 0) return allItems;
+    return mockItems; // Fallback to mock data if firestore is empty
+  }, [allItems, areItemsLoading]);
+
+
   useEffect(() => {
     const queryFromUrl = searchParams.get('q');
     if (queryFromUrl) {
@@ -102,9 +109,7 @@ function HomePageContent() {
   }, [searchParams]);
 
   useEffect(() => {
-    if (!allItems) return;
-
-    let filtered = allItems;
+    let filtered = displayedItems;
     // @ts-ignore - user has no lastKnownLocality
     const userLocation = user?.lastKnownLocality;
 
@@ -128,18 +133,18 @@ function HomePageContent() {
     }
 
     setCurrentItems(filtered);
-  }, [user, isUserLoading, activeCategory, searchQuery, allItems]);
+  }, [user, isUserLoading, activeCategory, searchQuery, displayedItems]);
 
   const { featuredItems, donationItems } = useMemo(() => {
-    if (!allItems) return { featuredItems: [], donationItems: [] };
-    const featured = allItems.filter(item => item.isFeatured);
-    const donations = allItems.filter(item => item.listingType === 'Donate');
+    if (!displayedItems) return { featuredItems: [], donationItems: [] };
+    const featured = displayedItems.filter(item => item.isFeatured);
+    const donations = displayedItems.filter(item => item.listingType === 'Donate');
 
     return {
       featuredItems: featured,
       donationItems: donations,
     };
-  }, [allItems]);
+  }, [displayedItems]);
 
   const handleCategorySelect = (categorySlug: string) => {
     setActiveCategory(categorySlug);
