@@ -2,67 +2,92 @@
  * @fileoverview Firestore Security Rules for ReCycleConnect.
  *
  * Core Philosophy:
- * This ruleset enforces a strict user-ownership model for user profiles. Each user can only
- * create, read, update, and delete their own profile data.
+ * This ruleset enforces a strict user-ownership model for user profiles.
+ * Items listed are readable by everyone, but can only be created, updated, and deleted by their owner.
  *
  * Data Structure:
- * All user profile data is stored under the `/users/{userId}` path, where `{userId}` is the
- * Firebase Authentication UID.
+ * - /users/{userId}: Stores user profile information, where {userId} is the Firebase Authentication UID.
+ * - /items/{itemId}: Stores items listed for exchange.
  *
  * Key Security Decisions:
- * - User listing is disallowed to prevent enumeration of user accounts.
- * - All writes are validated against the authenticated user's UID to prevent unauthorized
- *   data modification.
- * - The rules do not enforce any schema validation beyond the critical `userId` field.
+ * - Users can only read and write their own profile data.
+ * - Listing items is public, but only the owner can modify or delete them.
  *
  * Denormalization for Authorization:
- * The `userId` is used as the document ID in the `/users/{userId}` collection, enabling simple
- * path-based ownership checks. The `userId` field within the document must match the
- * document ID to ensure consistency.
- *
- * Structural Segregation:
- * There are no public or private data concerns in the provided data model. All data under
- * `/users/{userId}` is considered private to the user.
+ * The Item documents denormalize `ownerId` to allow direct ownership checks without additional reads.
  */
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
     /**
-     * @description Enforces user-ownership for user profiles. Each user can only
-     *              create, read, update, and delete their own profile data.
+     * @description Controls access to user profile documents.
      * @path /users/{userId}
-     * @allow (create) - Authenticated user with UID 'user_abc' can create a profile
-     *        if the document ID is 'user_abc' and the userId field is 'user_abc'.
-     * @allow (get, list) - Authenticated user with UID 'user_abc' can read their own profile.
-     * @allow (update, delete) - Authenticated user with UID 'user_abc' can update or delete
-     *        their own profile.
-     * @deny (create) - Authenticated user with UID 'user_xyz' cannot create a profile for
-     *       'user_abc'.
-     * @deny (get, list) - Authenticated user with UID 'user_xyz' cannot read the profile of
-     *       'user_abc'.
-     * @deny (update, delete) - Authenticated user with UID 'user_xyz' cannot update or delete
-     *       the profile of 'user_abc'.
-     * @principle Enforces document ownership for all operations.
+     * @allow (create) User with UID 'user123' can create their profile if request.auth.uid == 'user123'.
+     * @allow (get, update, delete) User with UID 'user123' can read and modify their profile.
+     * @deny (create) User with UID 'user456' cannot create a profile for user 'user123'.
+     * @deny (update, delete) User with UID 'user456' cannot modify user 'user123' profile.
+     * @principle Enforces document ownership for writes.
      */
     match /users/{userId} {
+      //function isTrustedUser() {
+      //  return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isTrusted == true;
+      //}
       function isSignedIn() {
         return request.auth != null;
       }
-
       function isOwner(userId) {
         return request.auth.uid == userId;
       }
-
       function isExistingOwner(userId) {
-        return isOwner(userId) && resource != null;
+          return isOwner(userId) && resource != null;
       }
 
-      allow get: if isSignedIn() && isOwner(userId);
-      allow list: if isSignedIn() && isOwner(userId);
+      allow get: if isOwner(userId);
+      allow list: if false; // Prevent listing all users.
+
+      // Self-creation: A user can create their own document.
       allow create: if isSignedIn() && isOwner(userId) && request.resource.data.userId == userId;
+
+      // Update: Only the owner can update, and the userId must not change.
       allow update: if isExistingOwner(userId) && request.resource.data.userId == resource.data.userId;
+
+      // Delete: Only the owner can delete.
       allow delete: if isExistingOwner(userId);
+    }
+
+    /**
+     * @description Controls access to item documents.
+     * @path /items/{itemId}
+     * @allow (get, list) All users can read item details and listing.
+     * @allow (create) User with UID 'user123' can create an item with ownerId 'user123'.
+     * @allow (update, delete) Only the owner of the item can modify or delete it.
+     * @deny (create) User with UID 'user456' cannot create an item with ownerId 'user123'.
+     * @deny (update, delete) User with UID 'user456' cannot modify or delete item owned by 'user123'.
+     * @principle Public read, owner-only writes, enforces document ownership for writes.
+     */
+    match /items/{itemId} {
+      function isSignedIn() {
+        return request.auth != null;
+      }
+      function isOwner(ownerId) {
+        return request.auth.uid == ownerId;
+      }
+      function isExistingOwner(ownerId) {
+          return isOwner(ownerId) && resource != null;
+      }
+
+      // Anyone can read the items
+      allow get, list: if true;
+
+      // Only signed-in users can create an item, and they must be the owner.
+      allow create: if isSignedIn() && isOwner(request.resource.data.ownerId);
+
+      // Only the owner can update the item.
+      allow update: if isExistingOwner(resource.data.ownerId);
+
+      // Only the owner can delete the item.
+      allow delete: if isExistingOwner(resource.data.ownerId);
     }
   }
 }
