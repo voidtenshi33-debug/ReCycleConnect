@@ -1,8 +1,9 @@
 
 "use client"
 
+import { useState, useMemo } from 'react';
 import { ItemCard } from '@/components/item-card';
-import { items, locations, users } from '@/lib/data';
+import { items, locations, users, categories as appCategories } from '@/lib/data';
 import {
   Select,
   SelectContent,
@@ -14,32 +15,42 @@ import { Button } from '@/components/ui/button';
 import { ListFilter } from 'lucide-react';
 import { CategoryScroller } from '@/components/category-scroller';
 import { useUser } from '@/firebase';
-import { useMemo } from 'react';
 
 // Helper function to get seller info
 const getSeller = (sellerId: string) => users.find(u => u.id === sellerId);
 
 export default function HomePage() {
   const { user, isUserLoading } = useUser();
+  const [activeCategory, setActiveCategory] = useState<string>('all');
 
-  // In a real app, this would be a Firestore query.
-  // We're filtering the mock data for now.
+  const handleCategorySelect = (categorySlug: string) => {
+    setActiveCategory(categorySlug);
+  };
+
   const filteredItems = useMemo(() => {
+    let currentItems = items;
     // @ts-ignore - user has no lastKnownLocality
     const userLocation = user?.lastKnownLocality;
-    if (!userLocation || isUserLoading) {
-      // Return all items if no location or still loading
-      // Or maybe show a loader/message
-      return items;
-    }
-    // A real app would also query based on the selected location.
-    // For now we mock it by filtering.
-    const locationData = locations.find(l => l.slug === userLocation);
-    if (!locationData) return items;
 
-    // A bit of a hack to make the mock data seem location-aware
-    return items.filter((item) => item.locality === locationData.slug);
-  }, [user, isUserLoading]);
+    if (userLocation && !isUserLoading) {
+      currentItems = items.filter((item) => item.locality === userLocation);
+    }
+    
+    if (activeCategory === 'all') {
+      return currentItems;
+    }
+
+    const categoryName = appCategories.find(c => c.slug === activeCategory)?.name;
+    return currentItems.filter(item => item.category === categoryName);
+
+  }, [user, isUserLoading, activeCategory]);
+
+  const pageTitle = activeCategory === 'all' 
+    ? 'Featured Items' 
+    : `${appCategories.find(c => c.slug === activeCategory)?.name || 'Items'}`;
+
+  // @ts-ignore
+  const locationName = locations.find(l => l.slug === user?.lastKnownLocality)?.name || '';
 
 
   return (
@@ -47,9 +58,12 @@ export default function HomePage() {
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-headline font-semibold">Explore Categories</h1>
       </div>
-      <CategoryScroller />
+      <CategoryScroller onCategorySelect={handleCategorySelect} activeCategory={activeCategory} />
       <div className="flex items-center justify-between mt-6">
-        <h1 className="text-2xl font-headline font-semibold">Featured Items</h1>
+        <h1 className="text-2xl font-headline font-semibold">
+          {pageTitle}
+          {locationName && <span className="text-muted-foreground text-xl"> in {locationName.replace(', Pune', '')}</span>}
+        </h1>
         <div className="flex items-center gap-2">
           <Select defaultValue="newest">
             <SelectTrigger className="w-auto md:w-[180px] sm:w-[140px]">
