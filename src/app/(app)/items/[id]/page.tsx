@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { notFound } from "next/navigation";
-import { ArrowLeft, ChevronRight, Flag, MessageSquare, Share2, Star, ShieldCheck, Award, Zap, CheckCircle, Wrench, XCircle, Loader2 } from "lucide-react";
+import { ArrowLeft, ChevronRight, Flag, MessageSquare, Share2, Star, ShieldCheck, Award, Zap, CheckCircle, Wrench, XCircle, Loader2, CreditCard } from "lucide-react";
 import { format } from "date-fns";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import { Separator } from "@/components/ui/separator";
@@ -46,8 +46,9 @@ const getConditionIcon = (condition: string) => {
 
 export default function ItemDetailPage({ params }: { params: { id: string } }) {
     const { firestore } = useFirebase();
+    const itemId = params.id;
 
-    const itemRef = useMemoFirebase(() => firestore ? doc(firestore, 'items', params.id) : null, [firestore, params.id]);
+    const itemRef = useMemoFirebase(() => firestore ? doc(firestore, 'items', itemId) : null, [firestore, itemId]);
     const { data: item, isLoading: isItemLoading } = useDoc<Item>(itemRef);
     
     const sellerId = item?.ownerId;
