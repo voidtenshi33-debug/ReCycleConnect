@@ -10,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Textarea } from '@/components/ui/textarea';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { ImageUploadWithAI } from '@/components/image-upload-with-ai';
-import { itemCategories } from '@/lib/data';
+import { itemCategories, locations } from '@/lib/data';
 import type { ItemCondition } from '@/lib/types';
 import { ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
@@ -92,14 +92,21 @@ export default function PostItemPage() {
                             <Textarea id="description" placeholder="Describe your item's condition, features, and any issues." />
                         </div>
                         
-                        <div className="grid gap-2 sm:grid-cols-2">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                            <div className="grid gap-2">
+                                <Label htmlFor="locality">Location</Label>
+                                 <Select required>
+                                    <SelectTrigger id="locality">
+                                        <SelectValue placeholder="Select your locality" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {locations.map(loc => <SelectItem key={loc.slug} value={loc.slug}>{loc.name}</SelectItem>)}
+                                    </SelectContent>
+                                </Select>
+                            </div>
                              <div className="grid gap-2">
                                 <Label htmlFor="price">Price ($)</Label>
                                 <Input id="price" type="number" placeholder="Enter 0 for free items" />
-                            </div>
-                            <div className="grid gap-2">
-                                <Label htmlFor="location">Location</Label>
-                                <Input id="location" placeholder="e.g., San Francisco, CA" />
                             </div>
                         </div>
 

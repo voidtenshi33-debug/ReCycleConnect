@@ -1,6 +1,8 @@
 
+"use client"
+
 import { ItemCard } from '@/components/item-card';
-import { items } from '@/lib/data';
+import { items, locations } from '@/lib/data';
 import {
   Select,
   SelectContent,
@@ -11,8 +13,35 @@ import {
 import { Button } from '@/components/ui/button';
 import { ListFilter } from 'lucide-react';
 import { CategoryScroller } from '@/components/category-scroller';
+import { useUser } from '@/firebase';
+import { useMemo } from 'react';
 
 export default function HomePage() {
+  const { user, isUserLoading } = useUser();
+
+  // In a real app, this would be a Firestore query.
+  // We're filtering the mock data for now.
+  const filteredItems = useMemo(() => {
+    // @ts-ignore - user has no lastKnownLocality
+    const userLocation = user?.lastKnownLocality;
+    if (!userLocation || isUserLoading) {
+      // Return all items if no location or still loading
+      // Or maybe show a loader/message
+      return items;
+    }
+    // A real app would also query based on the selected location.
+    // For now we mock it by filtering.
+    const locationData = locations.find(l => l.slug === userLocation);
+    if (!locationData) return items;
+
+    // A bit of a hack to make the mock data seem location-aware
+    return items.filter((item, index) => {
+        const locIndex = locations.findIndex(l => l.name === item.location);
+        return locIndex !== -1 && locIndex % locations.length === locations.indexOf(locationData);
+    });
+  }, [user, isUserLoading]);
+
+
   return (
     <>
       <div className="flex items-center justify-between">
@@ -42,7 +71,7 @@ export default function HomePage() {
         </div>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 lg:gap-6">
-        {items.map(item => (
+        {filteredItems.map(item => (
           <ItemCard key={item.id} item={item} />
         ))}
       </div>

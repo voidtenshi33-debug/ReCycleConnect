@@ -1,7 +1,8 @@
+
 "use client"
 
 import Link from "next/link"
-import { Bell, CircleUser, Home, Leaf, Menu, Search, Heart, Repeat2, MessageSquare, User as UserIcon, Mic, X } from "lucide-react"
+import { Bell, CircleUser, Home, Leaf, Menu, Search, Heart, Repeat2, MessageSquare, User as UserIcon, Mic, MapPin, ChevronDown } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -23,6 +24,8 @@ import { signOut } from "firebase/auth"
 import { useState, useEffect } from "react"
 import { useSpeechRecognition } from "@/hooks/use-speech-recognition"
 import { Dialog, DialogContent } from "@/components/ui/dialog"
+import { LocationModal } from "../location-modal"
+import { locations } from "@/lib/data"
 
 
 const MobileNavLink = ({ href, icon: Icon, children }: { href: string, icon: React.ElementType, children: React.ReactNode }) => {
@@ -45,6 +48,7 @@ export default function Header() {
   const auth = useAuth();
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");
+  const [isLocationModalOpen, setLocationModalOpen] = useState(false);
 
   const {
     text,
@@ -74,6 +78,8 @@ export default function Header() {
     }
   };
 
+  // @ts-ignore - user is not known to have lastKnownLocality
+  const currentLocation = locations.find(l => l.slug === user?.lastKnownLocality)?.name || "Select Location";
 
   return (
     <header className="flex h-14 items-center gap-4 border-b bg-muted/40 px-4 lg:h-[60px] lg:px-6">
@@ -105,6 +111,13 @@ export default function Header() {
           </nav>
         </SheetContent>
       </Sheet>
+      
+      <Button variant="ghost" className="shrink-0 gap-1.5 text-sm" onClick={() => setLocationModalOpen(true)}>
+        <MapPin className="h-4 w-4" />
+        <span className="hidden md:inline whitespace-nowrap">{currentLocation}</span>
+        <ChevronDown className="h-4 w-4" />
+      </Button>
+
       <div className="w-full flex-1">
         <form onSubmit={handleSearchSubmit}>
           <div className="relative">
@@ -112,11 +125,11 @@ export default function Header() {
             <Input
               type="search"
               placeholder="Search for items..."
-              className="w-full appearance-none bg-background pl-8 shadow-none md:w-2/3 lg:w-1/3 pr-10"
+              className="w-full appearance-none bg-background pl-8 shadow-none md:w-2/3 lg:w-2/3"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
-            {hasRecognitionSupport && (
+             {hasRecognitionSupport && (
                <Button 
                   type="button"
                   variant="ghost" 
@@ -185,6 +198,10 @@ export default function Header() {
           </DialogContent>
         </Dialog>
       )}
+       <LocationModal
+        isOpen={isLocationModalOpen}
+        setIsOpen={setLocationModalOpen}
+      />
     </header>
   )
 }

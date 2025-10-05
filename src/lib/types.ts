@@ -1,3 +1,4 @@
+
 import type { LucideIcon } from "lucide-react";
 
 export type User = {
@@ -34,6 +35,7 @@ export type Item = {
   postedAt: string;
   sellerId: string;
   status: 'Available' | 'In Process' | 'Completed';
+  locality: string;
 };
 
 export type ChatMessage = {
@@ -79,3 +81,8 @@ export type Notification = {
   isRead: boolean;
   createdAt: string;
 };
+
+export type Location = {
+    name: string;
+    slug: string;
+}

@@ -1,19 +1,20 @@
-import type { User, Item, Category, Conversation, ChatMessage, ExchangeRequest, Notification, AppCategory } from './types';
+
+import type { User, Item, Category, Conversation, ChatMessage, ExchangeRequest, Notification, AppCategory, Location } from './types';
 import { Smartphone, Laptop, Keyboard, Monitor, Plug, Cable, Headphones, Speaker, MemoryStick, HardDrive, SquarePlus } from 'lucide-react';
 
 export const users: User[] = [
-  { id: 'user-1', name: 'Jane Doe', avatarUrl: 'https://picsum.photos/seed/user1/100/100', memberSince: '2023-05-15', location: 'San Francisco, CA', rating: 4.8, reviews: 24 },
-  { id: 'user-2', name: 'John Smith', avatarUrl: 'https://picsum.photos/seed/user2/100/100', memberSince: '2022-11-20', location: 'New York, NY', rating: 4.5, reviews: 12 },
-  { id: 'user-3', name: 'Alex Ray', avatarUrl: 'https://picsum.photos/seed/user3/100/100', memberSince: '2024-01-10', location: 'Austin, TX', rating: 5.0, reviews: 8 },
+  { id: 'user-1', name: 'Jane Doe', avatarUrl: 'https://picsum.photos/seed/user1/100/100', memberSince: '2023-05-15', location: 'Kothrud, Pune', rating: 4.8, reviews: 24 },
+  { id: 'user-2', name: 'John Smith', avatarUrl: 'https://picsum.photos/seed/user2/100/100', memberSince: '2022-11-20', location: 'Viman Nagar, Pune', rating: 4.5, reviews: 12 },
+  { id: 'user-3', name: 'Alex Ray', avatarUrl: 'https://picsum.photos/seed/user3/100/100', memberSince: '2024-01-10', location: 'Koregaon Park, Pune', rating: 5.0, reviews: 8 },
 ];
 
 export const items: Item[] = [
-  { id: 'item-1', title: 'MacBook Pro 14"', description: 'Slightly used MacBook Pro with M1 Pro chip. Great condition, comes with charger.', images: ['https://picsum.photos/seed/laptop1/600/400', 'https://picsum.photos/seed/laptop2/600/400'], category: 'Laptops', condition: 'Working', price: 950, isFree: false, location: 'San Francisco, CA', postedAt: '2 days ago', sellerId: 'user-1', status: 'Available' },
-  { id: 'item-2', title: 'iPhone 12 for parts', description: 'Screen is cracked and does not turn on. Good for spare parts.', images: ['https://picsum.photos/seed/phone1/600/400'], category: 'Phones', condition: 'For Spare Parts Only', price: 50, isFree: false, location: 'New York, NY', postedAt: '5 days ago', sellerId: 'user-2', status: 'Available' },
-  { id: 'item-3', title: 'Dell UltraSharp 27" Monitor', description: 'Free monitor, works perfectly but has one dead pixel cluster. Includes stand and power cable.', images: ['https://picsum.photos/seed/monitor1/600/400'], category: 'Monitors', condition: 'Needs Minor Repair', price: 0, isFree: true, location: 'Austin, TX', postedAt: '1 week ago', sellerId: 'user-3', status: 'Available' },
-  { id: 'item-4', title: 'Sony WH-1000XM4 Headphones', description: 'Excellent noise-cancelling headphones. Used for a year, works like new.', images: ['https://picsum.photos/seed/headphones1/600/400'], category: 'Audio', condition: 'Working', price: 150, isFree: false, location: 'San Francisco, CA', postedAt: '1 day ago', sellerId: 'user-1', status: 'Available' },
-  { id: 'item-5', title: 'Canon EOS R6 Camera Body', description: 'Professional full-frame mirrorless camera. Shutter count around 15k. Minor cosmetic wear.', images: ['https://picsum.photos/seed/camera1/600/400'], category: 'Cameras', condition: 'Working', price: 1800, isFree: false, location: 'New York, NY', postedAt: '10 days ago', sellerId: 'user-2', status: 'In Process' },
-  { id: 'item-6', title: 'iPad Air (4th Gen)', description: 'Donating this iPad Air. It has a small dent on the corner but otherwise works perfectly. No charger included.', images: ['https://picsum.photos/seed/tablet1/600/400'], category: 'Tablets', condition: 'Working', price: 0, isFree: true, location: 'Austin, TX', postedAt: '3 days ago', sellerId: 'user-3', status: 'Completed' },
+  { id: 'item-1', title: 'MacBook Pro 14"', description: 'Slightly used MacBook Pro with M1 Pro chip. Great condition, comes with charger.', images: ['https://picsum.photos/seed/laptop1/600/400', 'https://picsum.photos/seed/laptop2/600/400'], category: 'Laptops', condition: 'Working', price: 950, isFree: false, location: 'Kothrud, Pune', postedAt: '2 days ago', sellerId: 'user-1', status: 'Available', locality: 'kothrud' },
+  { id: 'item-2', title: 'iPhone 12 for parts', description: 'Screen is cracked and does not turn on. Good for spare parts.', images: ['https://picsum.photos/seed/phone1/600/400'], category: 'Phones', condition: 'For Spare Parts Only', price: 50, isFree: false, location: 'Viman Nagar, Pune', postedAt: '5 days ago', sellerId: 'user-2', status: 'Available', locality: 'viman-nagar' },
+  { id: 'item-3', title: 'Dell UltraSharp 27" Monitor', description: 'Free monitor, works perfectly but has one dead pixel cluster. Includes stand and power cable.', images: ['https://picsum.photos/seed/monitor1/600/400'], category: 'Monitors', condition: 'Needs Minor Repair', price: 0, isFree: true, location: 'Koregaon Park, Pune', postedAt: '1 week ago', sellerId: 'user-3', status: 'Available', locality: 'koregaon-park' },
+  { id: 'item-4', title: 'Sony WH-1000XM4 Headphones', description: 'Excellent noise-cancelling headphones. Used for a year, works like new.', images: ['https://picsum.photos/seed/headphones1/600/400'], category: 'Audio', condition: 'Working', price: 150, isFree: false, location: 'Deccan Gymkhana, Pune', postedAt: '1 day ago', sellerId: 'user-1', status: 'Available', locality: 'deccan-gymkhana' },
+  { id: 'item-5', title: 'Canon EOS R6 Camera Body', description: 'Professional full-frame mirrorless camera. Shutter count around 15k. Minor cosmetic wear.', images: ['https://picsum.photos/seed/camera1/600/400'], category: 'Cameras', condition: 'Working', price: 1800, isFree: false, location: 'Pimpri-Chinchwad', postedAt: '10 days ago', sellerId: 'user-2', status: 'In Process', locality: 'pimpri-chinchwad' },
+  { id: 'item-6', title: 'iPad Air (4th Gen)', description: 'Donating this iPad Air. It has a small dent on the corner but otherwise works perfectly. No charger included.', images: ['https://picsum.photos/seed/tablet1/600/400'], category: 'Tablets', condition: 'Working', price: 0, isFree: true, location: 'Hadapsar, Pune', postedAt: '3 days ago', sellerId: 'user-3', status: 'Completed', locality: 'hadapsar' },
 ];
 
 export const conversations: (Conversation & { messages: ChatMessage[] })[] = [
@@ -63,3 +64,16 @@ export const categories: AppCategory[] = [
   { id: 'components', name: 'Components', icon: MemoryStick, slug: 'components' },
   { id: 'other', name: 'Other', icon: SquarePlus, slug: 'other-accessories' },
 ];
+
+export const locations: Location[] = [
+    { name: 'Kothrud, Pune', slug: 'kothrud' },
+    { name: 'Viman Nagar, Pune', slug: 'viman-nagar' },
+    { name: 'Koregaon Park, Pune', slug: 'koregaon-park' },
+    { name: 'Deccan Gymkhana, Pune', slug: 'deccan-gymkhana' },
+    { name: 'Pimpri-Chinchwad', slug: 'pimpri-chinchwad' },
+    { name: 'Hadapsar, Pune', slug: 'hadapsar' },
+    { name: 'Hinjawadi, Pune', slug: 'hinjawadi' },
+    { name: 'Baner, Pune', slug: 'baner' },
+    { name: 'Wakad, Pune', slug: 'wakad' },
+    { name: 'Aundh, Pune', slug: 'aundh' },
+]

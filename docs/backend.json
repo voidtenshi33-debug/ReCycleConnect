@@ -1,3 +1,4 @@
+
 {
   "entities": {
     "UserProfile": {
@@ -33,6 +34,10 @@
           "description": "The date the user joined.",
           "format": "date-time"
         },
+        "lastKnownLocality": {
+          "type": "string",
+          "description": "The user's last selected locality for browsing items."
+        },
         "ratingIds": {
           "type": "array",
           "description": "References to Ratings given or received by this user. (Relationship: User 1:N Rating)",
@@ -62,12 +67,34 @@
         "email",
         "createdAt"
       ]
+    },
+    "Item": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Item",
+      "type": "object",
+      "description": "Represents an item listed for exchange on ReCycleConnect.",
+      "properties": {
+        "id": { "type": "string" },
+        "title": { "type": "string" },
+        "description": { "type": "string" },
+        "images": { "type": "array", "items": { "type": "string", "format": "uri" } },
+        "category": { "type": "string" },
+        "condition": { "type": "string", "enum": ["Working", "Needs Minor Repair", "For Spare Parts Only"] },
+        "price": { "type": "number" },
+        "isFree": { "type": "boolean" },
+        "locality": { "type": "string", "description": "The locality slug e.g. 'kothrud'" },
+        "postedAt": { "type": "string", "format": "date-time" },
+        "sellerId": { "type": "string" },
+        "status": { "type": "string", "enum": ["Available", "In Process", "Completed"] }
+      },
+      "required": ["id", "title", "description", "category", "condition", "locality", "postedAt", "sellerId", "status"]
     }
   },
   "auth": {
     "providers": [
       "password",
-      "anonymous"
+      "anonymous",
+      "google.com"
     ]
   },
   "firestore": {
@@ -87,8 +114,24 @@
             }
           ]
         }
+      },
+      {
+        "path": "/items/{itemId}",
+        "definition": {
+          "entityName": "Item",
+          "schema": {
+            "$ref": "#/backend/entities/Item"
+          },
+          "description": "Stores all items listed on the platform.",
+          "params": [
+             {
+              "name": "itemId",
+              "description": "The unique ID for the item."
+            }
+          ]
+        }
       }
     ],
-    "reasoning": "The Firestore data structure is designed to support the ReCycleConnect application's user profiles and related data, focusing on secure access and efficient queries. The primary collection, `users`, stores user profile information. To ensure authorization independence, the `users` collection uses path-based ownership, which simplifies security rules. This structure supports the required QAPs (Queries and Permissions) by segregating user data into a dedicated collection, and access control can be easily managed through Firebase Authentication and security rules. The `userId` is used as document ID. Additionally, the structure denormalizes the relationship between users and ratings, reported items, and wishlist items by storing references (IDs) within the user document itself, avoiding the need for complex joins or subcollection queries when fetching basic user profile information."
+    "reasoning": "The Firestore data structure is designed to support the ReCycleConnect application's user profiles and related data, focusing on secure access and efficient queries. The primary collection, `users`, stores user profile information. To ensure authorization independence, the `users` collection uses path-based ownership, which simplifies security rules. This structure supports the required QAPs (Queries and Permissions) by segregating user data into a dedicated collection, and access control can be easily managed through Firebase Authentication and security rules. The `userId` is used as document ID. Additionally, the structure denormalizes the relationship between users and ratings, reported items, and wishlist items by storing references (IDs) within the user document itself, avoiding the need for complex joins or subcollection queries when fetching basic user profile information. The `items` collection stores all listed items, with a `locality` field to enable efficient location-based filtering."
   }
 }
