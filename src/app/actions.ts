@@ -151,11 +151,12 @@ export async function handleGenerateTitle(images: string[], category: string, br
 const RepairAdviceSchema = z.object({
   deviceName: z.string().min(3, "Device name is required."),
   problemDescription: z.string().min(10, "Please provide a detailed problem description."),
+  images: z.array(z.string().startsWith("data:image/")).optional(),
 });
 
-export async function handleRepairAdvice(deviceName: string, problemDescription: string) {
+export async function handleRepairAdvice(deviceName: string, problemDescription: string, images?: string[]) {
   try {
-    const validatedFields = RepairAdviceSchema.safeParse({ deviceName, problemDescription });
+    const validatedFields = RepairAdviceSchema.safeParse({ deviceName, problemDescription, images });
 
     if (!validatedFields.success) {
       return { error: "Invalid input: Please provide a device name and a description of the problem." };

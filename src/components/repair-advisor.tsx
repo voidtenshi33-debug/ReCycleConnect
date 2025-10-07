@@ -12,6 +12,7 @@ import type { RepairAdviceOutput } from '@/ai/flows/repair-advisor-flow';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Loader2, Sparkles, Wrench, MessageSquare, Star } from 'lucide-react';
 import type { RepairShop } from '@/lib/types';
+import { MultiImageUpload } from './multi-image-upload';
 
 
 const mockRepairShops: RepairShop[] = [
@@ -79,6 +80,7 @@ function RepairResult({ result }: { result: RepairAdviceOutput }) {
 export function RepairAdvisor() {
   const [deviceName, setDeviceName] = useState('');
   const [problemDescription, setProblemDescription] = useState('');
+  const [images, setImages] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<RepairAdviceOutput | null>(null);
@@ -86,7 +88,7 @@ export function RepairAdvisor() {
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     if (!deviceName || !problemDescription) {
-      setError("Please fill out both fields.");
+      setError("Please fill out all fields.");
       return;
     }
     
@@ -94,7 +96,7 @@ export function RepairAdvisor() {
     setError(null);
     setResult(null);
 
-    const adviceResult = await handleRepairAdvice(deviceName, problemDescription);
+    const adviceResult = await handleRepairAdvice(deviceName, problemDescription, images);
 
     if (adviceResult.error) {
       setError(adviceResult.error);
@@ -108,6 +110,7 @@ export function RepairAdvisor() {
   const resetForm = () => {
       setDeviceName('');
       setProblemDescription('');
+      setImages([]);
       setResult(null);
       setError(null);
       setIsLoading(false);
@@ -133,6 +136,11 @@ export function RepairAdvisor() {
                     placeholder="e.g., Apple iPhone 11 Pro"
                     required
                     />
+                </div>
+
+                 <div className="space-y-2">
+                    <Label>Images of Damage (Optional)</Label>
+                    <MultiImageUpload images={images} setImages={setImages} />
                 </div>
 
                 <div className="space-y-2">
