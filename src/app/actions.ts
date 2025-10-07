@@ -1,5 +1,5 @@
 
-"use server"
+'use server';
 
 import { suggestItemCategory } from "@/ai/flows/suggest-item-category";
 import { getLocalityFromCoordinates } from "@/ai/flows/get-locality-from-coords";
@@ -8,6 +8,7 @@ import { evaluateDevice } from "@/ai/flows/device-valuator-flow";
 import { generateDescriptionFromImages } from "@/ai/flows/generate-description-flow";
 import { generateTitle } from "@/ai/flows/generate-title-flow";
 import { getRepairAdvice } from "@/ai/flows/repair-advisor-flow";
+import { checkPartCompatibility } from "@/ai/flows/compatibility-checker-flow";
 import { z } from "zod";
 
 const SuggestCategorySchema = z.object({
@@ -166,4 +167,24 @@ export async function handleRepairAdvice(deviceName: string, problemDescription:
     console.error(e);
     return { error: "Failed to get repair advice. Please try again." };
   }
+}
+
+const PartCompatibilitySchema = z.object({
+  partTitle: z.string(),
+  partDescription: z.string(),
+  userDeviceModel: z.string().min(3, "Please enter your device model."),
+});
+
+export async function handlePartCompatibilityCheck(partTitle: string, partDescription: string, userDeviceModel: string) {
+    try {
+        const validatedFields = PartCompatibilitySchema.safeParse({ partTitle, partDescription, userDeviceModel });
+        if (!validatedFields.success) {
+            return { error: "Invalid input. Please provide all details." };
+        }
+        const result = await checkPartCompatibility(validatedFields.data);
+        return { compatibility: result };
+    } catch (e) {
+        console.error(e);
+        return { error: "Failed to check compatibility. Please try again." };
+    }
 }

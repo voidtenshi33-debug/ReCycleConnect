@@ -1,5 +1,5 @@
 
-'use client'
+'use client';
 
 import Image from "next/image";
 import Link from "next/link";
@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { notFound, useParams } from "next/navigation";
-import { ArrowLeft, ChevronRight, Flag, MessageSquare, Share2, Star, ShieldCheck, Award, Zap, CheckCircle, Wrench, XCircle, Loader2, CreditCard } from "lucide-react";
+import { ArrowLeft, ChevronRight, Flag, MessageSquare, Share2, Star, ShieldCheck, Award, Zap, CheckCircle, Wrench, XCircle, Loader2, CreditCard, Puzzle } from "lucide-react";
 import { format } from "date-fns";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import { Separator } from "@/components/ui/separator";
@@ -17,7 +17,7 @@ import { useDoc, useFirebase } from "@/firebase";
 import { doc } from "firebase/firestore";
 import type { Item, User } from "@/lib/types";
 import { useMemoFirebase } from "@/firebase/provider";
-
+import { CompatibilityChecker } from "@/components/compatibility-checker";
 
 const TrustBadge = ({ icon: Icon, children }: { icon: React.ElementType, children: React.ReactNode }) => (
     <div className="flex items-center gap-2 text-sm text-muted-foreground">
@@ -53,6 +53,7 @@ function ItemDetailContent({ itemId }: { itemId: string }) {
     const sellerRef = useMemoFirebase(() => (firestore && sellerId) ? doc(firestore, 'users', sellerId) : null, [firestore, sellerId]);
     const { data: seller, isLoading: isSellerLoading } = useDoc<User>(sellerRef);
 
+    const isComponent = item && ['Components', 'Gaming', 'Keyboards'].includes(item.category);
 
     if (isItemLoading || isSellerLoading) {
         return (
@@ -181,6 +182,8 @@ function ItemDetailContent({ itemId }: { itemId: string }) {
                         {/* Action Block */}
                         <Card>
                             <CardContent className="p-4 space-y-3">
+                                {isComponent && <CompatibilityChecker item={item} />}
+
                                 {seller?.isTrusted && item.listingType !== 'Donate' ? (
                                     <>
                                         <Button size="lg" className="w-full font-bold">
