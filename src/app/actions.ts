@@ -7,6 +7,7 @@ import { translateText } from "@/ai/flows/translate-text";
 import { evaluateDevice } from "@/ai/flows/device-valuator-flow";
 import { generateDescriptionFromImages } from "@/ai/flows/generate-description-flow";
 import { generateTitle } from "@/ai/flows/generate-title-flow";
+import { getRepairAdvice } from "@/ai/flows/repair-advisor-flow";
 import { z } from "zod";
 
 const SuggestCategorySchema = z.object({
@@ -143,5 +144,26 @@ export async function handleGenerateTitle(images: string[], category: string, br
   } catch (e) {
     console.error(e);
     return { error: "Failed to generate title. Please try again." };
+  }
+}
+
+const RepairAdviceSchema = z.object({
+  deviceName: z.string().min(3, "Device name is required."),
+  problemDescription: z.string().min(10, "Please provide a detailed problem description."),
+});
+
+export async function handleRepairAdvice(deviceName: string, problemDescription: string) {
+  try {
+    const validatedFields = RepairAdviceSchema.safeParse({ deviceName, problemDescription });
+
+    if (!validatedFields.success) {
+      return { error: "Invalid input: Please provide a device name and a description of the problem." };
+    }
+
+    const result = await getRepairAdvice(validatedFields.data);
+    return { advice: result };
+  } catch (e) {
+    console.error(e);
+    return { error: "Failed to get repair advice. Please try again." };
   }
 }

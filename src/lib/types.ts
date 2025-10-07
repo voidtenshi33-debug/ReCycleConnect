@@ -107,3 +107,11 @@ export type Location = {
     name: string;
     slug: string;
 }
+
+export type RepairShop = {
+    id: string;
+    name: string;
+    locality: string;
+    rating: number;
+    services: string[]; // e.g. ["Screen Repair", "Battery Replacement"]
+}
