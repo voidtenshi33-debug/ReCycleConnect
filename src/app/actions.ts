@@ -9,6 +9,7 @@ import { generateDescriptionFromImages } from "@/ai/flows/generate-description-f
 import { generateTitle } from "@/ai/flows/generate-title-flow";
 import { getRepairAdvice } from "@/ai/flows/repair-advisor-flow";
 import { checkPartCompatibility } from "@/ai/flows/compatibility-checker-flow";
+import { generateProblemDescription } from "@/ai/flows/generate-problem-description-flow";
 import { z } from "zod";
 
 const SuggestCategorySchema = z.object({
@@ -188,4 +189,22 @@ export async function handlePartCompatibilityCheck(partTitle: string, partDescri
         console.error(e);
         return { error: "Failed to check compatibility. Please try again." };
     }
+}
+
+const GenerateProblemDescriptionSchema = z.object({
+  images: z.array(z.string().startsWith("data:image/")).min(1, "At least one image is required."),
+});
+
+export async function handleGenerateProblemDescription(images: string[]) {
+  try {
+    const validatedFields = GenerateProblemDescriptionSchema.safeParse({ images });
+    if (!validatedFields.success) {
+      return { error: "Please upload at least one image to generate a description." };
+    }
+    const result = await generateProblemDescription(validatedFields.data);
+    return { description: result.problemDescription };
+  } catch (e) {
+    console.error(e);
+    return { error: "Failed to generate description. Please try again." };
+  }
 }

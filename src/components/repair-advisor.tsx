@@ -7,12 +7,13 @@ import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { handleRepairAdvice } from '@/app/actions';
+import { handleRepairAdvice, handleGenerateProblemDescription } from '@/app/actions';
 import type { RepairAdviceOutput } from '@/ai/flows/repair-advisor-flow';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Loader2, Sparkles, Wrench, MessageSquare, Star } from 'lucide-react';
 import type { RepairShop } from '@/lib/types';
 import { MultiImageUpload } from './multi-image-upload';
+import { useToast } from '@/hooks/use-toast';
 
 
 const mockRepairShops: RepairShop[] = [
@@ -78,12 +79,42 @@ function RepairResult({ result }: { result: RepairAdviceOutput }) {
 }
 
 export function RepairAdvisor() {
+  const { toast } = useToast();
   const [deviceName, setDeviceName] = useState('');
   const [problemDescription, setProblemDescription] = useState('');
   const [images, setImages] = useState<string[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isDiagnosing, setIsDiagnosing] = useState(false);
+  const [isGeneratingDesc, setIsGeneratingDesc] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<RepairAdviceOutput | null>(null);
+
+  const handleGenerateDescriptionClick = async () => {
+        if (images.length === 0) {
+            toast({
+                title: "Upload an Image First",
+                description: "To generate a description, please upload at least one image of the damage.",
+                variant: "destructive"
+            });
+            return;
+        }
+
+        setIsGeneratingDesc(true);
+        const result = await handleGenerateProblemDescription(images);
+        if (result.description) {
+            setProblemDescription(result.description);
+            toast({
+                title: "Description Generated!",
+                description: "The AI has described the visible damage.",
+            });
+        } else if (result.error) {
+            toast({
+                title: "Error",
+                description: result.error,
+                variant: "destructive"
+            });
+        }
+        setIsGeneratingDesc(false);
+    };
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -92,7 +123,7 @@ export function RepairAdvisor() {
       return;
     }
     
-    setIsLoading(true);
+    setIsDiagnosing(true);
     setError(null);
     setResult(null);
 
@@ -104,7 +135,7 @@ export function RepairAdvisor() {
       setResult(adviceResult.advice);
     }
     
-    setIsLoading(false);
+    setIsDiagnosing(false);
   };
   
   const resetForm = () => {
@@ -113,7 +144,8 @@ export function RepairAdvisor() {
       setImages([]);
       setResult(null);
       setError(null);
-      setIsLoading(false);
+      setIsDiagnosing(false);
+      setIsGeneratingDesc(false);
   }
 
   return (
@@ -144,12 +176,18 @@ export function RepairAdvisor() {
                 </div>
 
                 <div className="space-y-2">
-                    <Label htmlFor="problem-description">Problem Description</Label>
+                    <div className="flex justify-between items-center">
+                         <Label htmlFor="problem-description">Problem Description</Label>
+                        <Button type="button" variant="outline" size="sm" onClick={handleGenerateDescriptionClick} disabled={isGeneratingDesc || images.length === 0}>
+                            {isGeneratingDesc ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Sparkles className="mr-2 h-4 w-4" />}
+                            AI Generate
+                        </Button>
+                    </div>
                     <Textarea
                     id="problem-description"
                     value={problemDescription}
                     onChange={(e) => setProblemDescription(e.target.value)}
-                    placeholder="Describe the issue in detail. e.g., The screen is cracked and won't turn on. There are lines across the display."
+                    placeholder="Describe the issue in detail, or let the AI generate it from your images."
                     required
                     rows={5}
                     />
@@ -157,13 +195,13 @@ export function RepairAdvisor() {
                 
                 {error && <p className="text-sm text-destructive">{error}</p>}
                 
-                <Button type="submit" size="lg" className="w-full" disabled={isLoading}>
-                    {isLoading ? (
+                <Button type="submit" size="lg" className="w-full" disabled={isDiagnosing}>
+                    {isDiagnosing ? (
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                     ) : (
                     <Sparkles className="mr-2 h-4 w-4" />
                     )}
-                    {isLoading ? 'Diagnosing...' : 'Get Repair Advice'}
+                    {isDiagnosing ? 'Diagnosing...' : 'Get Repair Advice'}
                 </Button>
             </form>
         )}
