@@ -46,7 +46,7 @@ const getConditionIcon = (condition: string) => {
 function ItemDetailContent({ itemId }: { itemId: string }) {
     const { firestore } = useFirebase();
 
-    const itemRef = useMemoFirebase(() => firestore ? doc(firestore, 'items', itemId) : null, [firestore, itemId]);
+    const itemRef = useMemoFirebase(() => (firestore && itemId) ? doc(firestore, 'items', itemId) : null, [firestore, itemId]);
     const { data: item, isLoading: isItemLoading } = useDoc<Item>(itemRef);
     
     const sellerId = item?.ownerId;
