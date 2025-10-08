@@ -113,7 +113,7 @@ export function ItemCard({ item, showControls = false, onRemove }: ItemCardProps
     }
   }
 
-  const categoryName = typeof item.category === 'string' ? item.category : item.category.name;
+  const categoryName = typeof item.category === 'string' ? item.category : item.category;
 
   return (
     <Card className="w-full overflow-hidden flex flex-col transition-all hover:shadow-lg">
