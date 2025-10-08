@@ -33,7 +33,7 @@ export default function AIToolsPage() {
             </TabsTrigger>
              <TabsTrigger value="compatibility">
                 <Puzzle className="mr-2 h-4 w-4" />
-                Compatibility Checker
+                Scrap Part Checker
             </TabsTrigger>
         </TabsList>
         <TabsContent value="valuator">
@@ -71,10 +71,10 @@ export default function AIToolsPage() {
             <Card>
                  <CardHeader>
                     <CardTitle className="font-headline text-3xl flex items-center gap-2">
-                        <Puzzle className="text-primary" /> AI Compatibility Checker
-                    </CardTitle>
+                        <Puzzle className="text-primary" /> AI Scrap Part Compatibility Checker
+                    </CarTitle>
                     <CardDescription>
-                        Not sure if a spare part will work with your device? Enter the details below and our AI will check for you.
+                        Not sure if a scrap part will work with your device? Or which devices it fits? Just show it to our AI!
                     </CardDescription>
                 </CardHeader>
                  <CardContent>

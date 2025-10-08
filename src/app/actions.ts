@@ -172,14 +172,20 @@ export async function handleRepairAdvice(deviceName: string, problemDescription:
 }
 
 const PartCompatibilitySchema = z.object({
-  partTitle: z.string(),
-  partDescription: z.string(),
-  userDeviceModel: z.string().min(3, "Please enter your device model."),
+  partTitle: z.string().optional(),
+  partDescription: z.string().optional(),
+  images: z.array(z.string().startsWith("data:image/")).optional(),
+  userDeviceModel: z.string().optional(),
 });
 
-export async function handlePartCompatibilityCheck(partTitle: string, partDescription: string, userDeviceModel: string) {
+export async function handlePartCompatibilityCheck(
+    partTitle?: string, 
+    partDescription?: string, 
+    images?: string[],
+    userDeviceModel?: string
+) {
     try {
-        const validatedFields = PartCompatibilitySchema.safeParse({ partTitle, partDescription, userDeviceModel });
+        const validatedFields = PartCompatibilitySchema.safeParse({ partTitle, partDescription, images, userDeviceModel });
         if (!validatedFields.success) {
             return { error: "Invalid input. Please provide all details." };
         }
