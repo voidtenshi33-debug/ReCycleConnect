@@ -7,7 +7,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { notFound, useParams } from "next/navigation";
+import { notFound } from "next/navigation";
 import { ArrowLeft, ChevronRight, MessageSquare, Star, ShieldCheck, Award, Zap, CheckCircle, Wrench, XCircle, Loader2, CreditCard, Bot, Clock, Eye, Heart } from "lucide-react";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import { Separator } from "@/components/ui/separator";
@@ -235,10 +235,9 @@ function ItemDetailContent({ itemId }: { itemId: string }) {
 
 // This is the Server Component wrapper. It safely handles params.
 export default function ItemDetailPage({ params }: { params: { id: string } }) {
-    if (!params.id) {
+    const resolvedParams = use(params);
+    if (!resolvedParams.id) {
         notFound();
     }
-    return <ItemDetailContent itemId={params.id} />;
+    return <ItemDetailContent itemId={resolvedParams.id} />;
 }
-
-    
