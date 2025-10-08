@@ -12,19 +12,19 @@ import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
 
 const PartCompatibilityInputSchema = z.object({
-  partTitle: z.string().describe("The title of the spare part listing, e.g., '8GB DDR4 2400MHz SODIMM RAM'."),
+  partTitle: z.string().describe("The title of the spare part listing, e.g., 'Screen Assembly for Samsung Galaxy M31'."),
   partDescription: z.string().describe("The description of the spare part, which may contain model numbers or specifications."),
-  userDeviceModel: z.string().describe("The full model name of the user's device, e.g., 'HP Pavilion 15-cs0053cl' or 'Dell XPS 13 9380'."),
+  userDeviceModel: z.string().describe("The full model name of the user's device, e.g., 'Samsung Galaxy A51'."),
 });
 export type PartCompatibilityInput = z.infer<typeof PartCompatibilityInputSchema>;
 
 const PartCompatibilityOutputSchema = z.object({
-    verdict: z.enum([
-        "✅ High Compatibility", 
-        "⚠️ Partial Compatibility", 
-        "❌ Incompatible"
+    compatibilityLevel: z.enum([
+        "High", 
+        "Partial", 
+        "Incompatible"
     ]).describe("The final compatibility decision."),
-  reasoning: z.string().describe("A concise, one-sentence explanation for the verdict, explaining why the part is or isn't compatible."),
+  explanation: z.string().describe("A brief, clear explanation for your reasoning."),
 });
 export type PartCompatibilityOutput = z.infer<typeof PartCompatibilityOutputSchema>;
 
@@ -39,26 +39,18 @@ const prompt = ai.definePrompt({
   name: 'compatibilityCheckerPrompt',
   input: { schema: PartCompatibilityInputSchema },
   output: { schema: PartCompatibilityOutputSchema },
-  prompt: `You are an expert computer and electronics technician. Your task is to determine if a given spare part is compatible with a user's device.
+  prompt: `You are an expert electronics repair technician with access to a comprehensive database of device schematics and part numbers.
 
-Analyze the following information:
-- Spare Part Title: {{{partTitle}}}
-- Spare Part Description: {{{partDescription}}}
-- User's Device Model: {{{userDeviceModel}}}
+Task: Determine the compatibility between a spare part and a target device.
+Spare Part: "{{partTitle}}"
+Spare Part Description: "{{partDescription}}"
+Target Device: "{{userDeviceModel}}"
 
-Cross-reference the specifications of the spare part with the known specifications and requirements of the user's device. Consider factors like physical connectors, form factor (e.g., DDR3 vs DDR4 RAM), power requirements, and software/driver compatibility.
+Analyze specifications like screen dimensions, connector types, model numbers, and year of release.
 
-Provide a clear verdict and a simple, one-sentence explanation.
-- If it's a perfect match, use "✅ High Compatibility".
-- If it might work but with limitations (e.g., RAM running at a slower speed), use "⚠️ Partial Compatibility".
-- If it will not work, use "❌ Incompatible".
-
-Example Reasoning:
-- "This DDR4 RAM is compatible with your Dell XPS 13, which uses the same memory type."
-- "This graphics card uses a PCIe x16 slot, which your motherboard supports."
-- "This laptop screen is not compatible because the connector type is different."
-
-Return your response in the specified JSON format.
+Return your response in a JSON object with two keys:
+- "compatibilityLevel": Choose one of 'High', 'Partial', or 'Incompatible'.
+- "explanation": A brief, clear explanation for your reasoning.
 `,
 });
 
