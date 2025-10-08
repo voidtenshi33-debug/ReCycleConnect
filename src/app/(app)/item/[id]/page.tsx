@@ -7,7 +7,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { notFound } from "next/navigation";
+import { notFound, useParams } from "next/navigation";
 import { ArrowLeft, ChevronRight, MessageSquare, Star, ShieldCheck, Award, Zap, CheckCircle, Wrench, XCircle, Loader2, CreditCard, Bot, Clock, Eye, Heart } from "lucide-react";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import { Separator } from "@/components/ui/separator";
@@ -66,7 +66,7 @@ function ItemDetailContent({ itemId }: { itemId: string }) {
     if (!item || !seller) {
         // This will be caught by the notFound() in the parent server component
         // but it's good practice to handle it here as well.
-        return null;
+        notFound();
     }
 
     return (
