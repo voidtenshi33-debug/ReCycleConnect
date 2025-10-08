@@ -7,7 +7,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { notFound, useParams } from "next/navigation";
+import { notFound } from "next/navigation";
 import { ArrowLeft, ChevronRight, Flag, MessageSquare, Share2, Star, ShieldCheck, Award, Zap, CheckCircle, Wrench, XCircle, Loader2, CreditCard, Puzzle } from "lucide-react";
 import { format } from "date-fns";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
