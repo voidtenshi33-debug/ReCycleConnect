@@ -19,24 +19,21 @@ const PartCompatibilityInputSchema = z.object({
 });
 export type PartCompatibilityInput = z.infer<typeof PartCompatibilityInputSchema>;
 
-const DirectCheckOutputSchema = z.object({
+const PartCompatibilityOutputSchema = z.object({
+    partIdentification: z.string().describe("A brief identification of what the scrap part appears to be, e.g., 'a DDR4 laptop RAM stick' or 'a screen assembly.'"),
     compatibilityLevel: z.enum([
         "High", 
         "Partial", 
-        "Incompatible"
-    ]).describe("The final compatibility decision."),
-    explanation: z.string().describe("A brief, clear explanation for your reasoning, written for a non-expert."),
-});
-
-const BroadSearchOutputSchema = z.object({
+        "Incompatible",
+        "Unknown"
+    ]).optional().describe("The final compatibility decision ONLY if a target device is provided. Omit if no target device is given."),
+    explanation: z.string().optional().describe("A brief, clear explanation for your reasoning if a target device is provided. Omit if no target device is given."),
     compatibleDevices: z.array(z.object({
         brand: z.string().describe("The brand of compatible devices, e.g., 'Dell' or 'Apple'."),
         exampleModels: z.array(z.string()).describe("An array of specific model names that are compatible, e.g., ['Inspiron 15 5000', 'Latitude 7490'].")
-    })).describe("A list of device brands and models compatible with the scrap part."),
-     partIdentification: z.string().describe("A brief identification of what the scrap part appears to be, e.g., 'a DDR4 laptop RAM stick'.")
+    })).optional().describe("A list of device brands and models compatible with the scrap part. Provide this if possible."),
 });
 
-const PartCompatibilityOutputSchema = z.union([DirectCheckOutputSchema, BroadSearchOutputSchema]);
 export type PartCompatibilityOutput = z.infer<typeof PartCompatibilityOutputSchema>;
 
 
@@ -52,7 +49,7 @@ const prompt = ai.definePrompt({
   output: { schema: PartCompatibilityOutputSchema },
   prompt: `You are an expert electronics repair technician with access to a comprehensive database of device schematics and part numbers. You can analyze both text descriptions and images.
 
-Task: Determine compatibility based on the provided scrap part details (text and/or image) and a target device (if provided). If no target device is provided, identify compatible brands/models for the scrap part.
+Task: Identify a scrap part and determine its compatibility.
 
 Scrap Part Title: "{{partTitle}}"
 Scrap Part Description: "{{partDescription}}"
@@ -64,16 +61,15 @@ Image {{@index}}: {{media url=this}}
 {{/if}}
 Target Device (Optional): "{{userDeviceModel}}"
 
-Analyze: Use the images to visually identify the part type, connectors, chips, and any visible model numbers. Combine this visual analysis with the text description and your knowledge base.
+1.  **Identify the Part**: First, use the images and text to visually identify the part. Determine its type (e.g., 'RAM stick', 'Wi-Fi card'), connectors, and any visible model numbers. Formulate a brief 'partIdentification'.
 
-If Target Device is PROVIDED (Direct Check):
-Determine the compatibility between the scrap part and the target device.
-Return: JSON object with "compatibilityLevel" ('High', 'Partial', 'Incompatible') and "explanation" (brief, clear reasoning).
+2.  **Find Compatible Devices**: Based on your identification, identify a list of popular device brands and specific example models known to be compatible with this part. Populate the 'compatibleDevices' array.
 
-If Target Device is NOT PROVIDED (Broad Search):
-First, identify the scrap part based on the images and text.
-Then, identify a list of popular device brands and specific example models that are known to be compatible with the scrap part.
-Return: JSON object with "partIdentification" and "compatibleDevices" (an array of objects, each with "brand" and an array of "exampleModels").
+3.  **Perform Direct Check (if applicable)**: If a 'userDeviceModel' is provided, perform a direct compatibility check.
+    *   Determine the compatibility level ('High', 'Partial', 'Incompatible').
+    *   Provide a clear 'explanation' for your reasoning.
+    *   Set the 'compatibilityLevel' and 'explanation' fields in the output. If you cannot determine compatibility, set the level to 'Unknown'.
+    *   If no 'userDeviceModel' is provided, you MUST OMIT the 'compatibilityLevel' and 'explanation' fields.
 `,
 });
 
