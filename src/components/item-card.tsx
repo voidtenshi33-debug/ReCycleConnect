@@ -1,4 +1,5 @@
 
+
 'use client'
 
 import Image from "next/image"
@@ -192,5 +193,3 @@ export function ItemCard({ item, showControls = false, onRemove }: ItemCardProps
     </Card>
   )
 }
-
-    

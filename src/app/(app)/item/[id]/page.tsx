@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import Image from "next/image";
@@ -9,11 +8,9 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { notFound } from "next/navigation";
-import { ArrowLeft, ChevronRight, Flag, MessageSquare, Share2, Star, ShieldCheck, Award, Zap, CheckCircle, Wrench, XCircle, Loader2, CreditCard, Puzzle, Bot, Clock, Eye, Heart } from "lucide-react";
-import { format } from "date-fns";
+import { ArrowLeft, ChevronRight, MessageSquare, Star, ShieldCheck, Award, Zap, CheckCircle, Wrench, XCircle, Loader2, CreditCard, Bot, Clock, Eye, Heart } from "lucide-react";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import { Separator } from "@/components/ui/separator";
-import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useDoc, useFirebase } from "@/firebase";
 import { doc } from "firebase/firestore";
 import type { Item, User } from "@/lib/types";
@@ -46,7 +43,7 @@ const getConditionIcon = (condition: string) => {
 }
 
 function ItemDetailContent({ itemId }: { itemId: string }) {
-    const { firestore } = useFirebase();
+    const { firestore, user } = useFirebase();
 
     const itemRef = useMemoFirebase(() => (firestore && itemId) ? doc(firestore, 'items', itemId) : null, [firestore, itemId]);
     const { data: item, isLoading: isItemLoading } = useDoc<Item>(itemRef);
@@ -66,7 +63,9 @@ function ItemDetailContent({ itemId }: { itemId: string }) {
     }
 
     if (!item || !seller) {
-        notFound();
+        // This will be caught by the notFound() in the parent server component
+        // but it's good practice to handle it here as well.
+        return null;
     }
 
     return (
@@ -200,20 +199,27 @@ function ItemDetailContent({ itemId }: { itemId: string }) {
                         <CardContent className="p-3">
                              {isComponent && <CompatibilityChecker item={item} />}
                             <div className="flex gap-3 mt-3">
-                                {seller?.isTrusted && item.listingType !== 'Donate' ? (
-                                    <>
-                                        <Button size="lg" className="flex-1 font-bold">
-                                            <CreditCard className="mr-2 h-5 w-5" />
-                                            <T>Buy Now</T> - ₹{item.price.toLocaleString()}
+                                {(user && user.uid !== item.ownerId) && (
+                                     seller?.isTrusted && item.listingType !== 'Donate' ? (
+                                        <>
+                                            <Button size="lg" className="flex-1 font-bold">
+                                                <CreditCard className="mr-2 h-5 w-5" />
+                                                <T>Buy Now</T> - ₹{item.price.toLocaleString()}
+                                            </Button>
+                                            <Button size="lg" variant="outline" className="flex-1">
+                                                <MessageSquare className="mr-2 h-5 w-5"/> <T>Message Seller</T>
+                                            </Button>
+                                        </>
+                                    ) : (
+                                        <Button size="lg" className="w-full font-bold">
+                                            <MessageSquare className="mr-2 h-5 w-5"/>
+                                            {item.listingType === 'Donate' ? <T>Request Donation</T> : <T>Message Seller</T>}
                                         </Button>
-                                        <Button size="lg" variant="outline" className="flex-1">
-                                            <MessageSquare className="mr-2 h-5 w-5"/> <T>Message Seller</T>
-                                        </Button>
-                                    </>
-                                ) : (
-                                    <Button size="lg" className="w-full font-bold">
-                                        <MessageSquare className="mr-2 h-5 w-5"/>
-                                        {item.listingType === 'Donate' ? <T>Request Donation</T> : <T>Message Seller</T>}
+                                    )
+                                )}
+                                {(!user || user.uid === item.ownerId) && (
+                                     <Button size="lg" className="w-full font-bold" disabled>
+                                        This is your item
                                     </Button>
                                 )}
                             </div>
@@ -226,6 +232,10 @@ function ItemDetailContent({ itemId }: { itemId: string }) {
     );
 }
 
+// This is the Server Component wrapper. It safely handles params.
 export default function ItemDetailPage({ params }: { params: { id: string } }) {
+    if (!params.id) {
+        notFound();
+    }
     return <ItemDetailContent itemId={params.id} />;
 }
