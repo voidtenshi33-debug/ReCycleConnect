@@ -17,6 +17,7 @@ import type { Item, User } from "@/lib/types";
 import { useMemoFirebase } from "@/firebase/provider";
 import { CompatibilityChecker } from "@/components/compatibility-checker";
 import { T } from "@/components/t";
+import { use } from "react";
 
 const TrustBadge = ({ icon: Icon, children }: { icon: React.ElementType, children: React.ReactNode }) => (
     <div className="flex items-center gap-2 text-sm text-muted-foreground">
@@ -239,3 +240,5 @@ export default function ItemDetailPage({ params }: { params: { id: string } }) {
     }
     return <ItemDetailContent itemId={params.id} />;
 }
+
+    
