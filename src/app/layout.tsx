@@ -1,12 +1,14 @@
+
+'use client';
+
+import Header from '@/components/layout/header';
+import Sidebar from '@/components/layout/sidebar';
+import { FirebaseClientProvider } from '@/firebase/client-provider';
+import { LanguageProvider } from '@/context/language-context';
 import type { Metadata } from 'next';
 import { Toaster } from '@/components/ui/toaster';
 import './globals.css';
 import { cn } from '@/lib/utils';
-
-export const metadata: Metadata = {
-  title: 'ReCycleConnect',
-  description: 'Connecting people to recycle, reuse, and repair electronics.',
-};
 
 export default function RootLayout({
   children,
@@ -21,7 +23,19 @@ export default function RootLayout({
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
       </head>
       <body className={cn('font-body antialiased min-h-screen')}>
-        {children}
+        <FirebaseClientProvider>
+            <LanguageProvider>
+                <div className="grid min-h-screen w-full md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr]">
+                <Sidebar />
+                <div className="flex flex-col">
+                    <Header />
+                    <main className="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6 bg-background">
+                    {children}
+                    </main>
+                </div>
+                </div>
+            </LanguageProvider>
+        </FirebaseClientProvider>
         <Toaster />
       </body>
     </html>
