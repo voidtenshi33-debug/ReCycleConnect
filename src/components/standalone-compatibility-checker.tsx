@@ -11,6 +11,10 @@ import { handlePartCompatibilityCheck } from '@/app/actions';
 import type { PartCompatibilityOutput } from '@/ai/flows/compatibility-checker-flow';
 import { cn } from '@/lib/utils';
 import { Textarea } from './ui/textarea';
+import { Card, CardContent } from './ui/card';
+import { ItemCard } from './item-card';
+import { items as mockItems } from '@/lib/data';
+import Link from 'next/link';
 
 
 function CompatibilityResult({ partInfo, userDevice, result, onReset }: { partInfo: string; userDevice: string; result: PartCompatibilityOutput; onReset: () => void }) {
@@ -22,9 +26,9 @@ function CompatibilityResult({ partInfo, userDevice, result, onReset }: { partIn
     }
 
     const getResultIcon = () => {
-        if (result.compatibilityLevel === 'High') return <CheckCircle className="h-5 w-5" />;
-        if (result.compatibilityLevel === 'Partial') return <AlertTriangle className="h-5 w-5" />;
-        return <XCircle className="h-5 w-5" />;
+        if (result.compatibilityLevel === 'High') return <CheckCircle className="h-8 w-8" />;
+        if (result.compatibilityLevel === 'Partial') return <AlertTriangle className="h-8 w-8" />;
+        return <XCircle className="h-8 w-8" />;
     }
     
     const getVerdictText = () => {
@@ -34,31 +38,60 @@ function CompatibilityResult({ partInfo, userDevice, result, onReset }: { partIn
     }
 
     const variant = getResultVariant();
+    
+    const isCompatible = result.compatibilityLevel !== 'Incompatible';
+
+    const smartUpsellItems = mockItems.filter(item => 
+        isCompatible 
+        ? item.title.toLowerCase().includes(partInfo.split(' ')[1].toLowerCase()) // Simple match for compatible
+        : item.title.toLowerCase().includes(userDevice.split(' ')[1].toLowerCase()) // Simple match for incompatible
+    ).slice(0, 3);
 
   return (
-    <div className="space-y-4">
-       <div className="text-sm p-4 bg-muted/50 rounded-lg space-y-2">
-            <div className="flex justify-between items-start">
-                <span className="text-muted-foreground pt-1">Part:</span>
-                <span className="font-semibold text-right max-w-[70%]">{partInfo}</span>
-            </div>
-            <div className="flex justify-between items-center">
-                <span className="text-muted-foreground">Your Device:</span>
-                <span className="font-semibold text-right">{userDevice}</span>
-            </div>
-        </div>
-      <Alert variant={variant === 'success' ? 'default' : variant} className={cn(
-          'flex flex-col items-center text-center p-6',
-          variant === 'success' && 'border-green-500 bg-green-50 text-green-900', 
-          variant === 'warning' && 'border-amber-500 bg-amber-50 text-amber-900',
-          variant === 'destructive' && 'bg-destructive/10'
-        )}>
-        {getResultIcon()}
-        <AlertTitle className="text-lg font-bold mt-2">{getVerdictText()}</AlertTitle>
-        <AlertDescription className="mt-2 text-base">
-          {result.explanation}
-        </AlertDescription>
-      </Alert>
+    <div className="space-y-6">
+       <Card>
+            <CardContent className="p-4 space-y-4">
+                 <div className={cn(
+                    'flex flex-col items-center text-center p-4 rounded-lg',
+                    variant === 'success' && 'bg-green-50 text-green-900', 
+                    variant === 'warning' && 'bg-amber-50 text-amber-900',
+                    variant === 'destructive' && 'bg-destructive/10 text-destructive'
+                    )}>
+                    {getResultIcon()}
+                    <h3 className="text-xl font-bold mt-2">{getVerdictText()}</h3>
+                </div>
+
+                <div className="text-sm p-4 bg-muted/50 rounded-lg space-y-2">
+                    <div className="flex justify-between items-start">
+                        <span className="text-muted-foreground pt-1">Part:</span>
+                        <span className="font-semibold text-right max-w-[70%]">{partInfo}</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                        <span className="text-muted-foreground">Your Device:</span>
+                        <span className="font-semibold text-right">{userDevice}</span>
+                    </div>
+                </div>
+
+                <div>
+                    <h4 className="font-semibold">AI Analysis:</h4>
+                    <p className="text-muted-foreground">{result.explanation}</p>
+                </div>
+
+            </CardContent>
+        </Card>
+      
+      {smartUpsellItems.length > 0 && (
+         <div className="space-y-4">
+            <h3 className="text-lg font-semibold text-center">
+                {isCompatible ? "Great! Before you buy elsewhere, find a deal on ReCycleConnect!" : `But we found these compatible parts for your ${userDevice}!`}
+            </h3>
+             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {smartUpsellItems.map(item => <ItemCard key={item.id} item={item} />)}
+             </div>
+         </div>
+      )}
+
+
       <Button variant="outline" className="w-full" onClick={onReset}>
         Check Another Part
       </Button>
@@ -151,7 +184,7 @@ export function StandaloneCompatibilityChecker() {
                     ) : (
                         <Sparkles className="mr-2 h-4 w-4" />
                     )}
-                    {isLoading ? 'Checking...' : 'Check Compatibility'}
+                    {isLoading ? 'Analyzing Compatibility... 🧠' : 'Check Compatibility'}
                 </Button>
             </form>
         )}
