@@ -118,7 +118,7 @@ export function ItemCard({ item, showControls = false, onRemove }: ItemCardProps
   return (
     <Card className="w-full overflow-hidden flex flex-col transition-all hover:shadow-lg">
       <CardHeader className="p-0 relative">
-        <Link href={`/items/${item.id}`}>
+        <Link href={`/item/${item.id}`}>
           <div className="relative aspect-[4/3] w-full">
             <Image
               alt={item.title}
@@ -174,7 +174,7 @@ export function ItemCard({ item, showControls = false, onRemove }: ItemCardProps
         </div>
       </CardHeader>
       <CardContent className="p-4 flex-grow grid gap-2">
-         <Link href={`/items/${item.id}`}>
+         <Link href={`/item/${item.id}`}>
             <CardTitle className="font-headline text-lg hover:underline leading-tight"><T>{item.title}</T></CardTitle>
           </Link>
         <div className="text-2xl font-bold text-primary">
@@ -184,7 +184,7 @@ export function ItemCard({ item, showControls = false, onRemove }: ItemCardProps
       </CardContent>
       <CardFooter className="p-0">
         <Button asChild className="w-full rounded-t-none">
-          <Link href={`/items/${item.id}`}>
+          <Link href={`/item/${item.id}`}>
             <T>View Now</T>
           </Link>
         </Button>
@@ -192,3 +192,5 @@ export function ItemCard({ item, showControls = false, onRemove }: ItemCardProps
     </Card>
   )
 }
+
+    
