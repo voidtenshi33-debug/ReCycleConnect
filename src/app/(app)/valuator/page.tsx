@@ -4,12 +4,13 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { WandSparkles, Wrench, ArrowLeft } from 'lucide-react';
+import { WandSparkles, Wrench, ArrowLeft, Puzzle } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { DeviceValuator } from '@/components/device-valuator';
 import { RepairAdvisor } from '@/components/repair-advisor';
+import { StandaloneCompatibilityChecker } from '@/components/standalone-compatibility-checker';
 
 export default function AIToolsPage() {
   const router = useRouter();
@@ -21,7 +22,7 @@ export default function AIToolsPage() {
           Back to home
       </Link>
       <Tabs defaultValue="valuator" className="w-full">
-        <TabsList className="grid w-full grid-cols-2">
+        <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="valuator">
                 <WandSparkles className="mr-2 h-4 w-4" />
                 AI Device Valuator
@@ -29,6 +30,10 @@ export default function AIToolsPage() {
             <TabsTrigger value="repair">
                 <Wrench className="mr-2 h-4 w-4" />
                 AI Repair Advisor
+            </TabsTrigger>
+             <TabsTrigger value="compatibility">
+                <Puzzle className="mr-2 h-4 w-4" />
+                Compatibility Checker
             </TabsTrigger>
         </TabsList>
         <TabsContent value="valuator">
@@ -59,6 +64,21 @@ export default function AIToolsPage() {
                 </CardHeader>
                  <CardContent>
                     <RepairAdvisor />
+                </CardContent>
+            </Card>
+        </TabsContent>
+        <TabsContent value="compatibility">
+            <Card>
+                 <CardHeader>
+                    <CardTitle className="font-headline text-3xl flex items-center gap-2">
+                        <Puzzle className="text-primary" /> AI Compatibility Checker
+                    </CardTitle>
+                    <CardDescription>
+                        Not sure if a spare part will work with your device? Enter the details below and our AI will check for you.
+                    </CardDescription>
+                </CardHeader>
+                 <CardContent>
+                    <StandaloneCompatibilityChecker />
                 </CardContent>
             </Card>
         </TabsContent>
