@@ -72,7 +72,7 @@ export default function AIToolsPage() {
                  <CardHeader>
                     <CardTitle className="font-headline text-3xl flex items-center gap-2">
                         <Puzzle className="text-primary" /> AI Scrap Part Compatibility Checker
-                    </CarTitle>
+                    </CardTitle>
                     <CardDescription>
                         Not sure if a scrap part will work with your device? Or which devices it fits? Just show it to our AI!
                     </CardDescription>
