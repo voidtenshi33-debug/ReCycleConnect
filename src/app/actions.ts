@@ -10,6 +10,7 @@ import { generateTitle } from "@/ai/flows/generate-title-flow";
 import { getRepairAdvice } from "@/ai/flows/repair-advisor-flow";
 import { checkPartCompatibility } from "@/ai/flows/compatibility-checker-flow";
 import { generateProblemDescription } from "@/ai/flows/generate-problem-description-flow";
+import { generatePartDescription } from "@/ai/flows/generate-part-description-flow";
 import { z } from "zod";
 
 const SuggestCategorySchema = z.object({
@@ -209,6 +210,24 @@ export async function handleGenerateProblemDescription(images: string[]) {
     }
     const result = await generateProblemDescription(validatedFields.data);
     return { description: result.problemDescription };
+  } catch (e) {
+    console.error(e);
+    return { error: "Failed to generate description. Please try again." };
+  }
+}
+
+const GeneratePartDescriptionSchema = z.object({
+  images: z.array(z.string().startsWith("data:image/")).min(1, "At least one image is required."),
+});
+
+export async function handleGeneratePartDescription(images: string[]) {
+  try {
+    const validatedFields = GeneratePartDescriptionSchema.safeParse({ images });
+    if (!validatedFields.success) {
+      return { error: "Please upload at least one image to generate a description." };
+    }
+    const result = await generatePartDescription(validatedFields.data);
+    return { description: result.partDescription };
   } catch (e) {
     console.error(e);
     return { error: "Failed to generate description. Please try again." };
