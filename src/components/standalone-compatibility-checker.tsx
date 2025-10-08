@@ -41,11 +41,15 @@ function CompatibilityResult({ partInfo, userDevice, result, onReset }: { partIn
     
     const isCompatible = result.compatibilityLevel !== 'Incompatible';
 
-    const smartUpsellItems = mockItems.filter(item => 
-        isCompatible 
-        ? item.title.toLowerCase().includes(partInfo.split(' ')[1].toLowerCase()) // Simple match for compatible
-        : item.title.toLowerCase().includes(userDevice.split(' ')[1].toLowerCase()) // Simple match for incompatible
-    ).slice(0, 3);
+    // This is a simplified search for the "Smart Upsell" feature.
+    // In a real app, you'd use a more robust search algorithm.
+    const smartUpsellItems = mockItems.filter(item => {
+        const targetSearchTerm = isCompatible
+            ? partInfo.split(' ')[0].toLowerCase() // e.g., 'screen'
+            : userDevice.split(' ')[1].toLowerCase(); // e.g., 'a51'
+
+        return item.title.toLowerCase().includes(targetSearchTerm);
+    }).slice(0, 3);
 
   return (
     <div className="space-y-6">
@@ -81,7 +85,7 @@ function CompatibilityResult({ partInfo, userDevice, result, onReset }: { partIn
         </Card>
       
       {smartUpsellItems.length > 0 && (
-         <div className="space-y-4">
+         <div className="space-y-4 pt-4 border-t">
             <h3 className="text-lg font-semibold text-center">
                 {isCompatible ? "Great! Before you buy elsewhere, find a deal on ReCycleConnect!" : `But we found these compatible parts for your ${userDevice}!`}
             </h3>
@@ -191,3 +195,4 @@ export function StandaloneCompatibilityChecker() {
       </div>
   );
 }
+
