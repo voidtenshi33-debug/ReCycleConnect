@@ -83,6 +83,12 @@ const nextConfig: NextConfig = {
         hostname: "dlcdnwebimgs.asus.com",
         port: "",
         pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "cdn.mos.cms.futurecdn.net",
+        port: "",
+        pathname: "/**",
       }
     ],
   },
