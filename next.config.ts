@@ -59,6 +59,12 @@ const nextConfig: NextConfig = {
         hostname: 'rukminim2.flixcart.com',
         port: '',
         pathname: '/**',
+      },
+      {
+        protocol: "https",
+        hostname: "3dwombat.com",
+        port: "",
+        pathname: "/**",
       }
     ],
   },

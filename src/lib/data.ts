@@ -321,7 +321,7 @@ export const items: Item[] = [
     condition: "Working",
     listingType: "Sell",
     price: 3000,
-    imageUrls: ["https://picsum.photos/seed/item13/600/400"],
+    imageUrls: ["https://3dwombat.com/cblog/wp-content/uploads/2017/11/OCZ_600W_power_supply_unit_resize2.jpg"],
     locality: "pimpri-chinchwad",
     ownerId: "user_01",
     ownerName: "Rohan Kumar",
