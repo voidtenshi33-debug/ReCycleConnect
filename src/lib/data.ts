@@ -378,7 +378,7 @@ export const items: Item[] = [
     condition: "Working",
     listingType: "Sell",
     price: 1200,
-    imageUrls: ["https://picsum.photos/seed/item16/600/400"],
+    imageUrls: ["https://m.media-amazon.com/images/I/81oM9+mefcL.jpg"],
     locality: "viman-nagar",
     ownerId: "user_01",
     ownerName: "Rohan Kumar",

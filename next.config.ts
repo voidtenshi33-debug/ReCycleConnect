@@ -65,6 +65,12 @@ const nextConfig: NextConfig = {
         hostname: "3dwombat.com",
         port: "",
         pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "m.media-amazon.com",
+        port: "",
+        pathname: "/**",
       }
     ],
   },
