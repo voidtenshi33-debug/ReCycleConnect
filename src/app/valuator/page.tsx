@@ -4,13 +4,14 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { WandSparkles, Wrench, ArrowLeft, Puzzle } from 'lucide-react';
+import { WandSparkles, Wrench, ArrowLeft, Puzzle, Database } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { DeviceValuator } from '@/components/device-valuator';
 import { RepairAdvisor } from '@/components/repair-advisor';
 import { StandaloneCompatibilityChecker } from '@/components/standalone-compatibility-checker';
+import { DatabaseSeeder } from '@/components/database-seeder';
 
 export default function AIToolsPage() {
   const router = useRouter();
@@ -22,7 +23,7 @@ export default function AIToolsPage() {
           Back to home
       </Link>
       <Tabs defaultValue="valuator" className="w-full">
-        <TabsList className="grid w-full grid-cols-3">
+        <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="valuator">
                 <WandSparkles className="mr-2 h-4 w-4" />
                 AI Device Valuator
@@ -34,6 +35,10 @@ export default function AIToolsPage() {
              <TabsTrigger value="compatibility">
                 <Puzzle className="mr-2 h-4 w-4" />
                 Scrap Part Checker
+            </TabsTrigger>
+            <TabsTrigger value="seeder">
+                <Database className="mr-2 h-4 w-4" />
+                Seeding
             </TabsTrigger>
         </TabsList>
         <TabsContent value="valuator">
@@ -79,6 +84,21 @@ export default function AIToolsPage() {
                 </CardHeader>
                  <CardContent>
                     <StandaloneCompatibilityChecker />
+                </CardContent>
+            </Card>
+        </TabsContent>
+        <TabsContent value="seeder">
+            <Card>
+                 <CardHeader>
+                    <CardTitle className="font-headline text-3xl flex items-center gap-2">
+                        <Database className="text-primary" /> Database Seeder
+                    </CardTitle>
+                    <CardDescription>
+                       Populate your Firestore database with the mock data from the project. This will overwrite existing data.
+                    </CardDescription>
+                </CardHeader>
+                 <CardContent>
+                    <DatabaseSeeder />
                 </CardContent>
             </Card>
         </TabsContent>

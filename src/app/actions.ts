@@ -12,6 +12,9 @@ import { checkPartCompatibility } from "@/ai/flows/compatibility-checker-flow";
 import { generateProblemDescription } from "@/ai/flows/generate-problem-description-flow";
 import { generatePartDescription } from "@/ai/flows/generate-part-description-flow";
 import { z } from "zod";
+import { initializeFirebase } from "@/firebase/index";
+import { items as mockItems, users as mockUsers } from "@/lib/data";
+import { collection, writeBatch } from "firebase/firestore";
 
 const SuggestCategorySchema = z.object({
   photoDataUri: z.string().startsWith("data:image/"),
@@ -231,5 +234,40 @@ export async function handleGeneratePartDescription(images: string[]) {
   } catch (e) {
     console.error(e);
     return { error: "Failed to generate description. Please try again." };
+  }
+}
+
+
+export async function handleSeedDatabase() {
+  try {
+    const { firestore } = initializeFirebase();
+
+    // Seed Items
+    const itemsBatch = writeBatch(firestore);
+    const itemsCollection = collection(firestore, 'items');
+    mockItems.forEach((item) => {
+      // The mock data has an 'id' field, but in Firestore, this is the document ID.
+      // We will add it as a new document and let Firestore generate the ID.
+      const { id, ...itemData } = item;
+      const docRef = collection(firestore, 'items').doc(id);
+      itemsBatch.set(docRef, itemData);
+    });
+    await itemsBatch.commit();
+
+
+    // Seed Users
+    const usersBatch = writeBatch(firestore);
+    const usersCollection = collection(firestore, 'users');
+    mockUsers.forEach((user) => {
+       const { id, ...userData } = user;
+       const docRef = collection(firestore, 'users').doc(id);
+       usersBatch.set(docRef, userData);
+    });
+    await usersBatch.commit();
+
+    return { success: `Successfully seeded ${mockItems.length} items and ${mockUsers.length} users.` };
+  } catch (e: any) {
+    console.error("Database Seeding Failed:", e);
+    return { error: `Database seeding failed: ${e.message}` };
   }
 }
