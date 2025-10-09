@@ -89,6 +89,12 @@ const nextConfig: NextConfig = {
         hostname: "cdn.mos.cms.futurecdn.net",
         port: "",
         pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "i.ytimg.com",
+        port: "",
+        pathname: "/**",
       }
     ],
   },
