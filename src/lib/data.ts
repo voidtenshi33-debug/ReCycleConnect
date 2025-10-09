@@ -882,3 +882,5 @@ export const mockRepairShops: RepairShop[] = [
     { id: 'shop2', name: 'QuickFix Electronics', locality: 'viman-nagar', rating: 4.6, services: ['Screen Repair', 'Water Damage'] },
     { id: 'shop3', name: 'Gadget Gurus', locality: 'koregaon-park', rating: 4.9, services: ['All Brands', 'Software'] },
 ];
+
+    
