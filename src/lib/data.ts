@@ -60,7 +60,6 @@ export const users: User[] = [
     userId: "user_05",
     displayName: "Rahul Khanna",
     email: "rahul.k@example.com",
-    photoURL: "https://i.pravatar.cc/150?u=rahul",
     createdAt: new Date("2025-09-25T18:20:00"),
     lastKnownLocality: "koregaon-park",
     averageRating: 4.6,
@@ -207,7 +206,7 @@ export const items: Item[] = [
     condition: "Working",
     listingType: "Sell",
     price: 1500,
-    imageUrls: ["https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRzImKy3G2A4JEeP42Kx-L3Bw5u3bF5a3B0vA&s"],
+    imageUrls: ["https://media.rs-online.com/t_large/F1741848-01.jpg"],
     locality: "kothrud",
     ownerId: "user_01",
     ownerName: "Rohan Kumar",
@@ -712,25 +711,6 @@ export const items: Item[] = [
     createdAt: new Date()
   },
   {
-    id: "item-34",
-    title: "Old Nokia Feature Phone",
-    description: "Classic Nokia feature phone. Battery lasts forever. Works perfectly for calls and texts. Great as a backup phone.",
-    category: "mobiles",
-    brand: "Nokia",
-    condition: "Working",
-    listingType: "Donate",
-    price: 0,
-    imageUrls: ["https://images.unsplash.com/photo-1598335623049-51b63c7e4242?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8bm9raWElMjBwaG9uZXxlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&w=800&q=60"],
-    locality: "hadapsar",
-    ownerId: "user_03",
-    ownerName: "Vikram Singh",
-    ownerAvatarUrl: null,
-    ownerRating: 4.5,
-    status: "Available",
-    isFeatured: false,
-    createdAt: new Date()
-  },
-  {
     id: "item-35",
     title: "Broken Laptop Screen (15.6 inch)",
     description: "Screen panel for a 15.6-inch laptop. Physically cracked. Good for salvaging backlight components or other parts.",
@@ -874,7 +854,7 @@ export const locations: Location[] = [
     { name: 'Baner, Pune', slug: 'baner' },
     { name: 'Wakad, Pune', slug: 'wakad' },
     { name: 'Aundh, Pune', slug: 'aundh' },
-]
+];
 
 
 export const mockRepairShops: RepairShop[] = [
