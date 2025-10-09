@@ -96,7 +96,7 @@ export type ExchangeRequest = {
 export type Notification = {
   id: string;
   userId: string;
-  type: 'new_message' | 'request_accepted' | 'item_shipped' | 'new_rating' | 'request_received';
+  type: 'new_message' | 'request_received' | 'request_accepted' | 'item_shipped' | 'new_rating';
   text: string;
   link: string;
   isRead: boolean;
@@ -115,3 +115,5 @@ export type RepairShop = {
     rating: number;
     services: string[]; // e.g. ["Screen Repair", "Battery Replacement"]
 }
+
+```
