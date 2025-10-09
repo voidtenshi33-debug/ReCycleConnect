@@ -71,6 +71,12 @@ const nextConfig: NextConfig = {
         hostname: "m.media-amazon.com",
         port: "",
         pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "www.bhphotovideo.com",
+        port: "",
+        pathname: "/**",
       }
     ],
   },
