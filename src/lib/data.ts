@@ -792,13 +792,15 @@ export const items: Item[] = [
   {
     id: "item-38",
     title: "Dead Laptop Battery (HP)",
-    description: "Original HP laptop battery. Does not hold charge anymore. Good for recycling or for hobbyists who want to salvage cells.",
+    description: "Dead HP laptop battery. Not holding charge, but might be useful for someone needing the casing or individual cells for other projects. Donation for recycling.",
     category: "components",
     brand: "HP",
     condition: "For Spare Parts Only",
     listingType: "Donate",
     price: 0,
-    imageUrls: ["https://picsum.photos/seed/item38/600/400"],
+    imageUrls: [
+      "https://m.media-amazon.com/images/I/61d335zIyJL._UF1000%2C1000_QL80_.jpg"
+    ],
     locality: "kothrud",
     ownerId: "user_01",
     ownerName: "Rohan Kumar",
