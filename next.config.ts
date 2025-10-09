@@ -77,6 +77,12 @@ const nextConfig: NextConfig = {
         hostname: "www.bhphotovideo.com",
         port: "",
         pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "dlcdnwebimgs.asus.com",
+        port: "",
+        pathname: "/**",
       }
     ],
   },
