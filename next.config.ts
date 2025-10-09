@@ -47,6 +47,12 @@ const nextConfig: NextConfig = {
         hostname: 'i.pravatar.cc',
         port: '',
         pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'media.rs-online.com',
+        port: '',
+        pathname: '/**',
       }
     ],
   },
