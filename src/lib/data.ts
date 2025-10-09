@@ -106,18 +106,18 @@ export const items: Item[] = [
   {
     id: 'item-2',
     title: "Apple iPhone X - For Donation",
-    description: "Screen has a crack in the corner but is fully functional. Battery health is at 75%. Good for a spare phone or parts. Giving it away for free.",
+    description: "Apple iPhone X, needs minor repair (e.g., screen crack, battery replacement). Donating for someone to fix or use for parts. Device is unlocked.",
     category: "mobiles",
     brand: "Apple",
     condition: "Needs Minor Repair",
     listingType: "Donate",
     price: 0,
-    imageUrls: ["https://picsum.photos/seed/item2/600/400"],
+    imageUrls: ["https://d57avc95tvxyg.cloudfront.net/images/detailed/2449/full_body_housing_for_apple_iphone_x_256gb_gold_maxbhi_com_52886.jpg?t=1540011330"],
     locality: "viman-nagar",
-    ownerId: "user_02",
-    ownerName: "Anjali Sharma",
-    ownerAvatarUrl: "https://i.pravatar.cc/150?u=anjali",
-    ownerRating: 4.9,
+    ownerId: "user_01",
+    ownerName: "Rohan Kumar",
+    ownerAvatarUrl: "https://i.pravatar.cc/150?u=rohan",
+    ownerRating: 4.8,
     status: "Available",
     isFeatured: true,
     createdAt: new Date("2025-10-04T10:00:00")
@@ -886,6 +886,8 @@ export const mockRepairShops: RepairShop[] = [
     { id: 'shop2', name: 'QuickFix Electronics', locality: 'viman-nagar', rating: 4.6, services: ['Screen Repair', 'Water Damage'] },
     { id: 'shop3', name: 'Gadget Gurus', locality: 'koregaon-park', rating: 4.9, services: ['All Brands', 'Software'] },
 ];
+
+    
 
     
 

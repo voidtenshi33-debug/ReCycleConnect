@@ -101,11 +101,19 @@ const nextConfig: NextConfig = {
         hostname: "www.lenovoservicecenterinhyderabad.in",
         port: "",
         pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "d57avc95tvxyg.cloudfront.net",
+        port: "",
+        pathname: "/**",
       }
     ],
   },
 };
 
 export default nextConfig;
+
+    
 
     
