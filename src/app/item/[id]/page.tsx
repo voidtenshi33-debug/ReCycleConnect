@@ -89,7 +89,6 @@ function ItemDetailContent({ itemId }: { itemId: string }) {
                             </Badge>
                              {item.isFeatured && <Badge variant="default" className="bg-yellow-400 text-yellow-900 gap-1"><Zap className="w-3.5 h-3.5" /> <T>Featured</T></Badge>}
                              {seller.isTrusted && <Badge variant="default" className="gap-1"><ShieldCheck className="w-3.5 h-3.5" /> <T>Verified Seller</T></Badge>}
-                             {item.diagnosticVerified && <Badge variant="default" className="bg-blue-500 hover:bg-blue-600 gap-1"><BrainCircuit className="w-3.5 h-3.5" /> <T>Diagnostic Verified</T></Badge>}
                         </div>
                         <CardTitle className="font-headline text-2xl md:text-4xl font-bold pt-2"><T>{item.title}</T></CardTitle>
                     </CardHeader>
@@ -139,21 +138,6 @@ function ItemDetailContent({ itemId }: { itemId: string }) {
                         </>
                      )}
                 </Carousel>
-
-                 {/* Placeholder for AI Diagnostic Report */}
-                <Card>
-                    <CardHeader>
-                         <CardTitle className="font-headline text-xl md:text-2xl flex items-center gap-2">
-                            <BrainCircuit className="text-primary"/> <T>AI Diagnostic Report</T>
-                        </CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-4 text-muted-foreground">
-                        <p>The seller has not completed the AI-assisted diagnostic for this item yet.</p>
-                        <p>Once completed, this section will show results for screen health, touchscreen responsiveness, audio checks, and a video verification.</p>
-                        <Button variant="link" className="p-0 h-auto"><T>Learn more about AI Diagnostics</T></Button>
-                    </CardContent>
-                </Card>
-
                 
                 {/* Section 3 & 4: AI Snapshot & Description */}
                 <Card>

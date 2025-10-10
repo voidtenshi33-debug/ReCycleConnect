@@ -90,7 +90,6 @@ export default function Sidebar() {
             <NavLink href="/exchanges" icon={Repeat2}><T>Exchanges</T></NavLink>
             <NavLink href="/messages" icon={MessageSquare}><T>Messages</T></NavLink>
             <NavLink href="/valuator" icon={WandSparkles}><T>AI Tools</T></NavLink>
-            <NavLink href="/diagnostics" icon={BrainCircuit}><T>Smart Diagnostics</T></NavLink>
             <NavLink href="/wishlist" icon={Heart}><T>Wishlist</T></NavLink>
             <NavLink href="/profile" icon={UserIcon}><T>Profile</T></NavLink>
           </nav>
