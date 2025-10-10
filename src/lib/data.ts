@@ -699,13 +699,13 @@ export const items: Item[] = [
   {
     id: "item-33",
     title: "Wireless Gaming Mouse (Logitech G502)",
-    description: "Logitech G502 Lightspeed wireless gaming mouse. Used for 1 year, in excellent condition. Comes with charging cable and weights.",
+    description: "Logitech G502 Lightspeed wireless gaming mouse. Used for about a year, in excellent condition with no drift or double-clicking issues. Comes with the charging cable and all original weights.",
     category: "gaming",
     brand: "Logitech",
     condition: "Working",
     listingType: "Sell",
     price: 5500,
-    imageUrls: ["https://picsum.photos/seed/item33/600/400"],
+    imageUrls: ["https://oyster.ignimgs.com/wordpress/stg.ign.com/2019/05/Package1-720x404.jpg"],
     locality: "kothrud",
     ownerId: "user_02",
     ownerName: "Anjali Sharma",
@@ -888,6 +888,8 @@ export const mockRepairShops: RepairShop[] = [
     { id: 'shop2', name: 'QuickFix Electronics', locality: 'viman-nagar', rating: 4.6, services: ['Screen Repair', 'Water Damage'] },
     { id: 'shop3', name: 'Gadget Gurus', locality: 'koregaon-park', rating: 4.9, services: ['All Brands', 'Software'] },
 ];
+
+    
 
     
 

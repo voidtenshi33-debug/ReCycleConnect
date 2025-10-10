@@ -185,9 +185,17 @@ const nextConfig: NextConfig = {
         hostname: "cdn.stamped.io",
         port: "",
         pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "oyster.ignimgs.com",
+        port: "",
+        pathname: "/**",
       }
     ],
   },
 };
 
 export default nextConfig;
+
+    
