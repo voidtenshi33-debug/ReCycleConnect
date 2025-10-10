@@ -116,4 +116,3 @@ export type RepairShop = {
     services: string[]; // e.g. ["Screen Repair", "Battery Replacement"]
 }
 
-```

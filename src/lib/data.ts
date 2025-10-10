@@ -1,6 +1,6 @@
 
 import type { User, Item, Category, Conversation, ChatMessage, ExchangeRequest, Notification, AppCategory, Location, RepairShop } from './types';
-import { Smartphone, Laptop, Keyboard, Monitor, Cable, Headphones, MemoryStick, SquarePlus, Gamepad2, ToyBrick } from 'lucide-react';
+import { Smartphone, Laptop, Keyboard, Monitor, Cable, Headphones, MemoryStick, SquarePlus, Gamepad2, ToyBrick, Router } from 'lucide-react';
 
 export const users: User[] = [
   {
@@ -323,7 +323,7 @@ export const items: Item[] = [
     condition: "Working",
     listingType: "Sell",
     price: 3000,
-    imageUrls: ["https://3dwombat.com/cblog/wp-content/uploads/2017/11/OCZ_600W_power_supply_unit_resize2.jpg"],
+    imageUrls: ["https://images.unsplash.com/photo-1628291416397-185b30617354?q=80&w=2071&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"],
     locality: "pimpri-chinchwad",
     ownerId: "user_01",
     ownerName: "Rohan Kumar",
@@ -399,7 +399,7 @@ export const items: Item[] = [
     condition: "Working",
     listingType: "Sell",
     price: 6000,
-    imageUrls: ["https://www.bhphotovideo.com/images/fb/msi_gtx_1050_ti_gaming_x_4g_geforce_gtx_1050_ti_1292076.jpg"],
+    imageUrls: ["https://images.unsplash.com/photo-1591488330339-2a6835235c63?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"],
     locality: "deccan-gymkhana",
     ownerId: "user_01",
     ownerName: "Rohan Kumar",
@@ -781,7 +781,7 @@ export const items: Item[] = [
     condition: "Working",
     listingType: "Sell",
     price: 500,
-    imageUrls: ["https://microless.com/cdn/products/805e62c8c5a999e64da390dbfdd6b4ff-hi.jpg"],
+    imageUrls: ["https://media.rs-online.com/t_large/F7355988-01.jpg"],
     locality: "pimpri-chinchwad",
     ownerId: "user_06",
     ownerName: "Deepak Patil",
@@ -808,6 +808,111 @@ export const items: Item[] = [
     ownerName: "Rohan Kumar",
     ownerAvatarUrl: "https://i.pravatar.cc/150?u=rohan",
     ownerRating: 4.8,
+    status: "Available",
+    isFeatured: false,
+    createdAt: new Date()
+  },
+  {
+    id: 'item-39',
+    title: "Corsair Vengeance RGB Pro 16GB (2x8GB) Desktop RAM",
+    description: "High-performance DDR4 3200MHz RAM kit. Perfect for a gaming PC build or upgrade. Features customizable RGB lighting. Fully tested and working.",
+    category: "components",
+    brand: "Corsair",
+    condition: "Working",
+    listingType: "Sell",
+    price: 4500,
+    imageUrls: [
+      "https://images.unsplash.com/photo-1593528625349-3a3c35afe2b7"
+    ],
+    locality: "koregaon-park",
+    ownerId: "user_03",
+    ownerName: "Vikram Singh",
+    ownerAvatarUrl: null,
+    ownerRating: 4.5,
+    status: "Available",
+    isFeatured: true,
+    createdAt: new Date()
+  },
+  {
+    id: 'item-40',
+    title: "4GB DDR3 Laptop RAM (SODIMM)",
+    description: "Single 4GB stick of older DDR3 laptop RAM. Speed is 1600MHz. Good for upgrading or repairing older laptops (typically pre-2015 models).",
+    category: "components",
+    brand: "Generic",
+    condition: "Working",
+    listingType: "Sell",
+    price: 600,
+    imageUrls: [
+      "https://images.unsplash.com/photo-1629130713781-d13c70570b68"
+    ],
+    locality: "hadapsar",
+    ownerId: "user_01",
+    ownerName: "Rohan Kumar",
+    ownerAvatarUrl: "https://i.pravatar.cc/150?u=rohan",
+    ownerRating: 4.8,
+    status: "Available",
+    isFeatured: false,
+    createdAt: new Date()
+  },
+  {
+    id: 'item-41',
+    title: "MacBook Pro RAM Upgrade Kit 16GB (2015 model)",
+    description: "Kit of two 8GB RAM sticks for a MacBook Pro (Mid-2015 model). Please check compatibility before buying. Selling as I upgraded my machine.",
+    category: "components",
+    brand: "Apple",
+    condition: "Working",
+    listingType: "Sell",
+    price: 3500,
+    imageUrls: [
+      "https://images.unsplash.com/photo-1606311130366-233de7c90e4f"
+    ],
+    locality: "viman-nagar",
+    ownerId: "user_02",
+    ownerName: "Anjali Sharma",
+    ownerAvatarUrl: "https://i.pravatar.cc/150?u=anjali",
+    ownerRating: 4.9,
+    status: "Available",
+    isFeatured: false,
+    createdAt: new Date()
+  },
+  {
+    id: 'item-42',
+    title: "Old DDR2 Desktop RAM (2x1GB)",
+    description: "Two sticks of very old 1GB DDR2 RAM for ancient desktop PCs. Not worth much, so donating for free to any hobbyist who might need them for a retro build or an art project.",
+    category: "components",
+    brand: "Generic",
+    condition: "For Spare Parts Only",
+    listingType: "Donate",
+    price: 0,
+    imageUrls: [
+      "https://images.unsplash.com/photo-1628292437243-238416b0817c"
+    ],
+    locality: "baner",
+    ownerId: "user_04",
+    ownerName: "Priya Deshmukh",
+    ownerAvatarUrl: "https://i.pravatar.cc/150?u=priya",
+    ownerRating: 4.7,
+    status: "Available",
+    isFeatured: false,
+    createdAt: new Date()
+  },
+  {
+    id: 'item-43',
+    title: "32GB DDR4 ECC Server RAM",
+    description: "Single 32GB stick of ECC Registered RAM for servers and workstations. This is NOT for regular desktops or laptops. Pulled from a working Dell PowerEdge server.",
+    category: "components",
+    brand: "Dell",
+    condition: "Working",
+    listingType: "Sell",
+    price: 8000,
+    imageUrls: [
+      "https://images.unsplash.com/photo-1631521422453-7d8a6f001594"
+    ],
+    locality: "hinjawadi",
+    ownerId: "user_05",
+    ownerName: "Rahul Khanna",
+    ownerAvatarUrl: "https://i.pravatar.cc/150?u=rahul",
+    ownerRating: 4.6,
     status: "Available",
     isFeatured: false,
     createdAt: new Date()
@@ -866,6 +971,7 @@ export const categories: AppCategory[] = [
   { id: 'components', name: 'Components', icon: MemoryStick, slug: 'components' },
   { id: 'gaming', name: 'Gaming', icon: Gamepad2, slug: 'gaming' },
   { id: 'drones', name: 'Drones', icon: ToyBrick, slug: 'drones' },
+  { id: 'networking', name: 'Networking', icon: Router, slug: 'networking' },
   { id: 'other', name: 'Other', icon: SquarePlus, slug: 'other' },
 ];
 
