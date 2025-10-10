@@ -239,6 +239,12 @@ const nextConfig: NextConfig = {
         hostname: "5.imimg.com",
         port: "",
         pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "images.indianexpress.com",
+        port: "",
+        pathname: "/**",
       }
     ],
   },
