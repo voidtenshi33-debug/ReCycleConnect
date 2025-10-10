@@ -98,12 +98,6 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: "https",
-        hostname: "cdn.mos.cms.futurecdn.net",
-        port: "",
-        pathname: "/**",
-      },
-      {
-        protocol: "https",
         hostname: "i.ytimg.com",
         port: "",
         pathname: "/**",
@@ -182,12 +176,6 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: "https",
-        hostname: "cdn.stamped.io",
-        port: "",
-        pathname: "/**",
-      },
-      {
-        protocol: "https",
         hostname: "oyster.ignimgs.com",
         port: "",
         pathname: "/**",
@@ -243,6 +231,18 @@ const nextConfig: NextConfig = {
       {
         protocol: "https",
         hostname: "images.indianexpress.com",
+        port: "",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "cdn.mos.cms.futurecdn.net",
+        port: "",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "cdn.stamped.io",
         port: "",
         pathname: "/**",
       }
