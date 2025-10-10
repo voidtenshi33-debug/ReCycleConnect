@@ -93,7 +93,7 @@ export const items: Item[] = [
     condition: "Working",
     listingType: "Sell",
     price: 35000,
-    imageUrls: ["https://picsum.photos/seed/item1/600/400"],
+    imageUrls: ["https://www.notebookcheck.net/fileadmin/Notebooks/News/_nc4/Dell-XPS-13-9340-laptop.JPG"],
     locality: "kothrud",
     ownerId: "user_01",
     ownerName: "Rohan Kumar",
@@ -894,4 +894,3 @@ export const mockRepairShops: RepairShop[] = [
     
 
     
-
