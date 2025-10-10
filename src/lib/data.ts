@@ -595,7 +595,6 @@ export const items: Item[] = [
     locality: "viman-nagar",
     ownerId: "user_02",
     ownerName: "Anjali Sharma",
-    ownerAvatarUrl: "https://i.pravatar.cc/150?u=anjali",
     ownerRating: 4.9,
     status: "Available",
     isFeatured: false,
@@ -787,6 +786,7 @@ export const items: Item[] = [
     locality: "pimpri-chinchwad",
     ownerId: "user_06",
     ownerName: "Deepak Patil",
+    ownerAvatarUrl: "https://i.pravatar.cc/150?u=deepak",
     ownerRating: 4.6,
     status: "Available",
     isFeatured: false,
@@ -1003,3 +1003,4 @@ export const mockRepairShops: RepairShop[] = [
     
 
     
+
