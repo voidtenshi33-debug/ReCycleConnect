@@ -277,18 +277,20 @@ export const items: Item[] = [
   {
     id: "item-11",
     title: "iPhone 12 Pro Max, GOLDEN edition",
-    description: "256GB Golden iPhone 12 Pro Max. Battery health is 88%. No scratches on the screen or body. Comes with the box but no charger.",
+    description: "iPhone 12 Pro Max in a stunning GOLDEN edition. Fully functional, excellent condition. Selling due to upgrade. Includes original box and charging cable.",
     category: "mobiles",
     brand: "Apple",
     condition: "Working",
     listingType: "Sell",
     price: 42000,
-    imageUrls: ["https://picsum.photos/seed/item11/600/400"],
+    imageUrls: [
+      "https://i.insider.com/5fad82d9343ad40018a93811?width=800&format=jpeg&auto=webp"
+    ],
     locality: "koregaon-park",
-    ownerId: "user_02",
-    ownerName: "Anjali Sharma",
-    ownerAvatarUrl: "https://i.pravatar.cc/150?u=anjali",
-    ownerRating: 4.9,
+    ownerId: "user_01",
+    ownerName: "Rohan Kumar",
+    ownerAvatarUrl: "https://i.pravatar.cc/150?u=rohan",
+    ownerRating: 4.8,
     status: "Available",
     isFeatured: true,
     createdAt: new Date()
@@ -892,3 +894,4 @@ export const mockRepairShops: RepairShop[] = [
     
 
     
+

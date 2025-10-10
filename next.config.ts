@@ -113,6 +113,12 @@ const nextConfig: NextConfig = {
         hostname: "sm.mashable.com",
         port: "",
         pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "i.insider.com",
+        port: "",
+        pathname: "/**",
       }
     ],
   },
@@ -123,3 +129,4 @@ export default nextConfig;
     
 
     
+
