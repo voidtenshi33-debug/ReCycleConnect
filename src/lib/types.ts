@@ -51,6 +51,7 @@ export type Item = {
   status: 'Available' | 'In Process' | 'Completed' | 'Reserved';
   isFeatured: boolean;
   createdAt: Timestamp | Date;
+  diagnosticVerified?: boolean;
 };
 
 
@@ -115,4 +116,5 @@ export type RepairShop = {
     rating: number;
     services: string[]; // e.g. ["Screen Repair", "Battery Replacement"]
 }
+
 
