@@ -566,18 +566,18 @@ export const items: Item[] = [
   {
     id: "item-26",
     title: "MacBook Air M1 (2020) - Silver",
-    description: "8GB RAM, 256GB SSD. Excellent battery health. Minor scuffs on the bottom but screen is flawless. Comes with charger.",
+    description: "Excellent condition MacBook Air M1, 2020 model in Silver. Works flawlessly for creative tasks and daily use. Selling due to upgrade. Comes with original charger and box.",
     category: "laptops",
     brand: "Apple",
     condition: "Working",
     listingType: "Sell",
     price: 65000,
-    imageUrls: ["https://picsum.photos/seed/item26/600/400"],
+    imageUrls: ["https://www.cnet.com/a/img/resize/d93ef048db2ddb3e1a0fe8ee3f0c90f70a3c4150/hub/2020/11/16/a8e0e691-035a-4298-8366-f3b74e1f3792/img-1759.jpg?auto=webp&fit=crop&height=1200&width=1200"],
     locality: "kothrud",
-    ownerId: "user_01",
-    ownerName: "Rohan Kumar",
-    ownerAvatarUrl: "https://i.pravatar.cc/150?u=rohan",
-    ownerRating: 4.8,
+    ownerId: "user_02",
+    ownerName: "Priya Sharma",
+    ownerAvatarUrl: null,
+    ownerRating: 4.9,
     status: "Available",
     isFeatured: true,
     createdAt: new Date()
@@ -894,3 +894,4 @@ export const mockRepairShops: RepairShop[] = [
     
 
     
+
