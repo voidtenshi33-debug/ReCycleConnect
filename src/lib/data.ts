@@ -775,13 +775,13 @@ export const items: Item[] = [
   {
     id: "item-37",
     title: "Old Router (TP-Link N300)",
-    description: "Basic Wi-Fi router. Works well, but it's an older model (N300). Good for basic internet or as an access point.",
-    category: "other",
+    description: "Basic Wi-Fi router (TP-Link N300). Works well for basic internet use or as a network extender. Comes with power adapter.",
+    category: "networking",
     brand: "TP-Link",
     condition: "Working",
     listingType: "Sell",
     price: 500,
-    imageUrls: ["https://picsum.photos/seed/item37/600/400"],
+    imageUrls: ["https://microless.com/cdn/products/805e62c8c5a999e64da390dbfdd6b4ff-hi.jpg"],
     locality: "pimpri-chinchwad",
     ownerId: "user_06",
     ownerName: "Deepak Patil",
@@ -896,3 +896,4 @@ export const mockRepairShops: RepairShop[] = [
     
 
     
+
