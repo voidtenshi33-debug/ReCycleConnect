@@ -107,6 +107,12 @@ const nextConfig: NextConfig = {
         hostname: "d57avc95tvxyg.cloudfront.net",
         port: "",
         pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "sm.mashable.com",
+        port: "",
+        pathname: "/**",
       }
     ],
   },
