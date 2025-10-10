@@ -91,7 +91,7 @@ const nextConfig: NextConfig = {
         pathname: "/**",
       },
       {
-        protocol: "https",
+        protocol: "https,"
         hostname: "i.ytimg.com",
         port: "",
         pathname: "/**",
@@ -123,6 +123,12 @@ const nextConfig: NextConfig = {
       {
         protocol: "https",
         hostname: "telecomtalk.info",
+        port: "",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "cdn.dotpe.in",
         port: "",
         pathname: "/**",
       }

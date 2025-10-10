@@ -718,13 +718,13 @@ export const items: Item[] = [
   {
     id: "item-34",
     title: "Old Nokia Feature Phone",
-    description: "Classic Nokia feature phone. Battery lasts forever. Works perfectly for calls and texts. Great as a backup phone.",
+    description: "Classic Nokia E71 model with QWERTY keypad. Battery still holds a good charge. Perfect as a backup phone or for a digital detox. Comes with original charger.",
     category: "mobiles",
     brand: "Nokia",
     condition: "Working",
     listingType: "Donate",
     price: 0,
-    imageUrls: ["https://picsum.photos/seed/item34/600/400"],
+    imageUrls: ["https://cdn.dotpe.in/longtail/store-items/7994766/OgUrn70U.jpeg"],
     locality: "hadapsar",
     ownerId: "user_03",
     ownerName: "Vikram Singh",
@@ -894,3 +894,4 @@ export const mockRepairShops: RepairShop[] = [
     
 
     
+
