@@ -179,6 +179,12 @@ const nextConfig: NextConfig = {
         hostname: "i.ebayimg.com",
         port: "",
         pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "cdn.stamped.io",
+        port: "",
+        pathname: "/**",
       }
     ],
   },

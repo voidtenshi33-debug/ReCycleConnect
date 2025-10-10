@@ -509,13 +509,13 @@ export const items: Item[] = [
   {
     id: "item-23",
     title: "Xbox Series S Console",
-    description: "Almost new Xbox Series S. Perfect working condition. Comes with one white controller, HDMI, and power cable.",
+    description: "Xbox Series S in excellent, like-new condition. Perfect for digital gaming with Game Pass. Comes with one white controller and all original cables (HDMI and power).",
     category: "gaming",
     brand: "Microsoft",
     condition: "Working",
     listingType: "Sell",
     price: 22000,
-    imageUrls: ["https://picsum.photos/seed/item23/600/400"],
+    imageUrls: ["https://cdn.stamped.io/uploads/photos/79323_6785_c900cbda_7a2e_49cb_93b4_e8bc526a7dc2.jpg?v="],
     locality: "viman-nagar",
     ownerId: "user_04",
     ownerName: "Priya Deshmukh",
@@ -894,4 +894,3 @@ export const mockRepairShops: RepairShop[] = [
     
 
     
-
