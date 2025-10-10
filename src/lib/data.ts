@@ -471,13 +471,13 @@ export const items: Item[] = [
   {
     id: "item-21",
     title: "Nintendo Switch Lite (Blue)",
-    description: "Lightly used Nintendo Switch Lite in turquoise. Comes with charger and a protective case. No games included.",
+    description: "Lightly used Nintendo Switch Lite in the blue/turquoise color. Perfect for handheld gaming. Comes with the original charger and a protective case. No games included.",
     category: "gaming",
     brand: "Nintendo",
     condition: "Working",
     listingType: "Sell",
     price: 14000,
-    imageUrls: ["https://picsum.photos/seed/item21/600/400"],
+    imageUrls: ["https://i.ebayimg.com/images/g/fs8AAOSwy29hh3L-/s-l1200.jpg"],
     locality: "hinjawadi",
     ownerId: "user_02",
     ownerName: "Anjali Sharma",
@@ -894,3 +894,4 @@ export const mockRepairShops: RepairShop[] = [
     
 
     
+

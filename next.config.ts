@@ -173,6 +173,12 @@ const nextConfig: NextConfig = {
         hostname: "akm-img-a-in.tosshub.com",
         port: "",
         pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "i.ebayimg.com",
+        port: "",
+        pathname: "/**",
       }
     ],
   },
