@@ -97,7 +97,7 @@ const nextConfig: NextConfig = {
         pathname: "/**",
       },
       {
-        protocol: "https",
+        protocol: "https,"
         hostname: "i.ytimg.com",
         port: "",
         pathname: "/**",
@@ -164,12 +164,6 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: "https",
-        hostname: "d57avc95tvxyg.cloudfront.net",
-        port: "",
-        pathname: "/**",
-      },
-      {
-        protocol: "https",
         hostname: "akm-img-a-in.tosshub.com",
         port: "",
         pathname: "/**",
@@ -201,6 +195,12 @@ const nextConfig: NextConfig = {
       {
         protocol: "https",
         hostname: "u-mercari-images.mercdn.net",
+        port: "",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "i.gadgets360cdn.com",
         port: "",
         pathname: "/**",
       }
