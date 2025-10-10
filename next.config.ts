@@ -119,6 +119,12 @@ const nextConfig: NextConfig = {
         hostname: "i.insider.com",
         port: "",
         pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "telecomtalk.info",
+        port: "",
+        pathname: "/**",
       }
     ],
   },
@@ -129,4 +135,3 @@ export default nextConfig;
     
 
     
-

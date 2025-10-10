@@ -355,18 +355,18 @@ export const items: Item[] = [
   {
     id: "item-15",
     title: "OnePlus 8 Pro",
-    description: "Glacial Green, 12GB RAM, 256GB storage. Phone is in perfect working condition. No issues at all. Selling because I upgraded.",
+    description: "OnePlus 8 Pro in excellent condition. High-refresh-rate display and powerful performance. Selling due to an upgrade. Includes original box and charger.",
     category: "mobiles",
     brand: "OnePlus",
     condition: "Working",
     listingType: "Sell",
     price: 25000,
-    imageUrls: ["https://picsum.photos/seed/item15/600/400"],
+    imageUrls: ["https://telecomtalk.info/wp-content/uploads/2020/06/oneplus-8-pro-review-2-900x900.jpg"],
     locality: "kothrud",
-    ownerId: "user_03",
-    ownerName: "Vikram Singh",
-    ownerAvatarUrl: null,
-    ownerRating: 4.5,
+    ownerId: "user_01",
+    ownerName: "Rohan Kumar",
+    ownerAvatarUrl: "https://i.pravatar.cc/150?u=rohan",
+    ownerRating: 4.8,
     status: "Available",
     isFeatured: false,
     createdAt: new Date()
@@ -894,4 +894,3 @@ export const mockRepairShops: RepairShop[] = [
     
 
     
-
