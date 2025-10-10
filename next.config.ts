@@ -110,12 +110,6 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: "https",
-        hostname: "d57avc95tvxyg.cloudfront.net",
-        port: "",
-        pathname: "/**",
-      },
-      {
-        protocol: "https",
         hostname: "sm.mashable.com",
         port: "",
         pathname: "/**",
@@ -165,6 +159,18 @@ const nextConfig: NextConfig = {
       {
         protocol: "https",
         hostname: "static.digit.in",
+        port: "",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "d57avc95tvxyg.cloudfront.net",
+        port: "",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "akm-img-a-in.tosshub.com",
         port: "",
         pathname: "/**",
       }
