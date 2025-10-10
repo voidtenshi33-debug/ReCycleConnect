@@ -125,13 +125,13 @@ export const items: Item[] = [
   {
     id: 'item-3',
     title: "Logitech Mechanical Gaming Keyboard",
-    description: "RGB backlit mechanical keyboard. All keys and lights working perfectly. Great for gaming and typing.",
+    description: "Logitech G815 Low Profile Mechanical Gaming Keyboard. Tactile switches. Fully functional, RGB lighting works perfectly. Selling as I'm switching to a smaller keyboard.",
     category: "keyboards",
     brand: "Logitech",
     condition: "Working",
     listingType: "Sell",
     price: 2500,
-    imageUrls: ["https://picsum.photos/seed/item3/600/400"],
+    imageUrls: ["https://i.redd.it/xd1j3t6tqnj31.jpg"],
     locality: "hadapsar",
     ownerId: "user_03",
     ownerName: "Vikram Singh",
@@ -894,4 +894,3 @@ export const mockRepairShops: RepairShop[] = [
     
 
     
-
