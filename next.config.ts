@@ -103,7 +103,7 @@ const nextConfig: NextConfig = {
         pathname: "/**",
       },
       {
-        protocol: "https://",
+        protocol: "https",
         hostname: "d57avc95tvxyg.cloudfront.net",
         port: "",
         pathname: "/**",
@@ -149,8 +149,3 @@ const nextConfig: NextConfig = {
 };
 
 export default nextConfig;
-
-    
-
-    
-
