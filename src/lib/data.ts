@@ -399,7 +399,7 @@ export const items: Item[] = [
     condition: "Working",
     listingType: "Sell",
     price: 6000,
-    imageUrls: ["https://images.unsplash.com/photo-1591488330339-2a6835235c63?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"],
+    imageUrls: ["https://www.bhphotovideo.com/images/images2500x2500/msi_gtx_1050_ti_gaming_1292076.jpg"],
     locality: "deccan-gymkhana",
     ownerId: "user_01",
     ownerName: "Rohan Kumar",
@@ -743,7 +743,9 @@ export const items: Item[] = [
     condition: "For Spare Parts Only",
     listingType: "Donate",
     price: 0,
-    imageUrls: ["https://www.lenovoservicecenterinhyderabad.in/images/screen-broken-reworking.webp"],
+    imageUrls: [
+      "https://www.lenovoservicecenterinhyderabad.in/images/screen-broken-reworking.webp"
+    ],
     locality: "baner",
     ownerId: "user_01",
     ownerName: "Rohan Kumar",
@@ -838,6 +840,7 @@ export const items: Item[] = [
     title: "4GB DDR3 Laptop RAM (SODIMM)",
     description: "Single 4GB stick of older DDR3 laptop RAM. Speed is 1600MHz. Good for upgrading or repairing older laptops (typically pre-2015 models).",
     category: "components",
+    brand: "Samsung",
     condition: "Working",
     listingType: "Sell",
     price: 600,
@@ -858,11 +861,12 @@ export const items: Item[] = [
     title: "MacBook Pro RAM Upgrade Kit 16GB (2015 model)",
     description: "Kit of two 8GB RAM sticks for a MacBook Pro (Mid-2015 model). Please check compatibility before buying. Selling as I upgraded my machine.",
     category: "components",
+    brand: "Crucial",
     condition: "Working",
     listingType: "Sell",
     price: 3500,
     imageUrls: [
-      "https://images.unsplash.com/photo-1606311130366-233de7c90e4f"
+      "https://assets.corsair.com/image/upload/f_auto%2Cq_auto/content/CMSA16GX3M2A1333C9-macmemory-002.png"
     ],
     locality: "viman-nagar",
     ownerId: "user_02",

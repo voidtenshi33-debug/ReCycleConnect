@@ -245,6 +245,12 @@ const nextConfig: NextConfig = {
         hostname: "cdn.stamped.io",
         port: "",
         pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "assets.corsair.com",
+        port: "",
+        pathname: "/**",
       }
     ],
   },
