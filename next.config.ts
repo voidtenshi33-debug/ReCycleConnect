@@ -115,7 +115,7 @@ const nextConfig: NextConfig = {
         pathname: "/**",
       },
       {
-        protocol: "https,"
+        protocol: "https",
         hostname: "sm.mashable.com",
         port: "",
         pathname: "/**",
@@ -231,6 +231,12 @@ const nextConfig: NextConfig = {
       {
         protocol: "https",
         hostname: "microless.com",
+        port: "",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "5.imimg.com",
         port: "",
         pathname: "/**",
       }

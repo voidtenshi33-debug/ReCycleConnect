@@ -298,18 +298,18 @@ export const items: Item[] = [
   {
     id: "item-12",
     title: "Sony PlayStation 5 (PS5) Disc Edition",
-    description: "Almost new PS5 Disc Edition. Used only a handful of times. Comes with one controller and all original cables.",
+    description: "PS5 Disc Edition console in excellent condition. Barely used, comes with one DualSense controller, all original cables, and packaging. No games included.",
     category: "gaming",
     brand: "Sony",
     condition: "Working",
     listingType: "Sell",
     price: 45000,
-    imageUrls: ["https://picsum.photos/seed/item12/600/400"],
+    imageUrls: ["https://5.imimg.com/data5/SELLER/Default/2023/5/305536000/GG/ER/DS/188958556/sony-playstation-5-ps5-disc-edition-825gb-console-plus-2tb-ps-hdd-4x-games-500x500.jpg"],
     locality: "hinjawadi",
-    ownerId: "user_03",
-    ownerName: "Vikram Singh",
-    ownerAvatarUrl: null,
-    ownerRating: 4.5,
+    ownerId: "user_01",
+    ownerName: "Rohan Kumar",
+    ownerAvatarUrl: "https://i.pravatar.cc/150?u=rohan",
+    ownerRating: 4.8,
     status: "Available",
     isFeatured: false,
     createdAt: new Date()
@@ -896,4 +896,3 @@ export const mockRepairShops: RepairShop[] = [
     
 
     
-
