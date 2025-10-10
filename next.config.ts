@@ -44,6 +44,12 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: 'https',
+        hostname: 'd57avc95tvxyg.cloudfront.net',
+        port: '',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
         hostname: 'encrypted-tbn0.gstatic.com',
         port: '',
         pathname: '/**',
@@ -97,7 +103,7 @@ const nextConfig: NextConfig = {
         pathname: "/**",
       },
       {
-        protocol: "https,"
+        protocol: "https",
         hostname: "i.ytimg.com",
         port: "",
         pathname: "/**",
@@ -169,7 +175,7 @@ const nextConfig: NextConfig = {
         pathname: "/**",
       },
       {
-        protocol: "https",
+        protocol: "https,"
         hostname: "i.ebayimg.com",
         port: "",
         pathname: "/**",
@@ -201,6 +207,12 @@ const nextConfig: NextConfig = {
       {
         protocol: "https",
         hostname: "i.gadgets360cdn.com",
+        port: "",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "www.pcgamesn.com",
         port: "",
         pathname: "/**",
       }
