@@ -1,6 +1,7 @@
 
 "use client"
 
+import { useEffect } from "react";
 import { categories } from "@/lib/data";
 import { cn } from "@/lib/utils";
 import { Button } from "./ui/button";
@@ -15,6 +16,25 @@ export function CategoryScroller({ onCategorySelect, activeCategory }: CategoryS
     
     const allCategory = { id: 'all', name: 'All', icon: () => <span className="text-lg">✨</span>, slug: 'all' };
     const displayCategories = [allCategory, ...categories];
+
+    useEffect(() => {
+        // This code now runs only on the client
+        const styleId = 'scrollbar-hide-style';
+        if (document.getElementById(styleId)) return;
+
+        const style = document.createElement('style');
+        style.id = styleId;
+        style.innerHTML = `
+            .scrollbar-hide::-webkit-scrollbar {
+                display: none;
+            }
+            .scrollbar-hide {
+                -ms-overflow-style: none;
+                scrollbar-width: none;
+            }
+        `;
+        document.head.appendChild(style);
+    }, []);
 
     return (
         <div className="flex space-x-2 overflow-x-auto py-2 -mx-4 px-4 scrollbar-hide">
@@ -38,16 +58,3 @@ export function CategoryScroller({ onCategorySelect, activeCategory }: CategoryS
         </div>
     );
 }
-
-// Add a simple utility to hide scrollbars if not already present
-const style = document.createElement('style');
-style.innerHTML = `
-    .scrollbar-hide::-webkit-scrollbar {
-        display: none;
-    }
-    .scrollbar-hide {
-        -ms-overflow-style: none;
-        scrollbar-width: none;
-    }
-`;
-document.head.appendChild(style);
