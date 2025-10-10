@@ -632,6 +632,7 @@ export const items: Item[] = [
     locality: "deccan-gymkhana",
     ownerId: "user_04",
     ownerName: "Priya Deshmukh",
+    ownerAvatarUrl: "https://i.pravatar.cc/150?u=priya",
     ownerRating: 4.7,
     status: "Available",
     isFeatured: false,
@@ -781,7 +782,7 @@ export const items: Item[] = [
     condition: "Working",
     listingType: "Sell",
     price: 500,
-    imageUrls: ["https://media.rs-online.com/t_large/F7363488-01.jpg"],
+    imageUrls: ["https://microless.com/cdn/products/805e62c8c5a999e64da390dbfdd6b4ff-hi.jpg"],
     locality: "pimpri-chinchwad",
     ownerId: "user_06",
     ownerName: "Deepak Patil",
@@ -868,6 +869,7 @@ export const items: Item[] = [
     locality: "viman-nagar",
     ownerId: "user_02",
     ownerName: "Anjali Sharma",
+    ownerAvatarUrl: "https://i.pravatar.cc/150?u=anjali",
     ownerRating: 4.9,
     status: "Available",
     isFeatured: false,
@@ -897,13 +899,13 @@ export const items: Item[] = [
   {
     id: 'item-43',
     title: "32GB DDR4 ECC Server RAM",
-    description: "Single 32GB stick of ECC Registered RAM for servers and workstations. This is NOT for regular desktops or laptops. Pulled from a working Dell PowerEdge server.",
+    description: "Single 32GB stick of ECC Registered RAM, designed for servers and high-performance workstations. This is NOT compatible with regular desktop PCs or laptops. Pulled from a working Dell PowerEdge server.",
     category: "components",
     condition: "Working",
     listingType: "Sell",
     price: 8000,
     imageUrls: [
-      "https://images.unsplash.com/photo-1631521422453-7d8a6f001594"
+      "https://i.ebayimg.com/images/g/YzcAAOSwR~5nYKgT/s-l500.jpg"
     ],
     locality: "hinjawadi",
     ownerId: "user_05",
@@ -999,3 +1001,4 @@ export const mockRepairShops: RepairShop[] = [
     
 
     
+
