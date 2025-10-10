@@ -399,7 +399,7 @@ export const items: Item[] = [
     condition: "Working",
     listingType: "Sell",
     price: 6000,
-    imageUrls: ["https://i.ytimg.com/vi/NOkF4SKSFkM/maxresdefault.jpg"],
+    imageUrls: ["https://www.bhphotovideo.com/images/images2500x2500/msi_gtx_1050_ti_gaming_1292076.jpg"],
     locality: "deccan-gymkhana",
     ownerId: "user_01",
     ownerName: "Rohan Kumar",
@@ -595,6 +595,7 @@ export const items: Item[] = [
     locality: "viman-nagar",
     ownerId: "user_02",
     ownerName: "Anjali Sharma",
+    ownerAvatarUrl: "https://i.pravatar.cc/150?u=anjali",
     ownerRating: 4.9,
     status: "Available",
     isFeatured: false,
@@ -901,6 +902,7 @@ export const items: Item[] = [
     title: "32GB DDR4 ECC Server RAM",
     description: "Single 32GB stick of ECC Registered RAM, designed for servers and high-performance workstations. This is NOT compatible with regular desktop PCs or laptops. Pulled from a working Dell PowerEdge server.",
     category: "components",
+    brand: "Dell",
     condition: "Working",
     listingType: "Sell",
     price: 8000,
@@ -1001,4 +1003,3 @@ export const mockRepairShops: RepairShop[] = [
     
 
     
-
