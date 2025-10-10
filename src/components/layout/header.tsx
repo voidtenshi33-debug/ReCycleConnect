@@ -111,7 +111,7 @@ export default function Header() {
 
   return (
     <>
-    <header className="flex h-14 items-center gap-4 border-b bg-muted/40 px-4 lg:h-[60px] lg:px-6">
+    <header className="flex h-14 items-center gap-2 border-b bg-muted/40 px-2 lg:h-[60px] lg:px-6">
       <Sheet>
         <SheetTrigger asChild>
           <Button
@@ -141,7 +141,7 @@ export default function Header() {
         </SheetContent>
       </Sheet>
       
-      <Button variant="ghost" className="shrink-0 gap-1.5 text-sm" onClick={() => setLocationModalOpen(true)}>
+      <Button variant="ghost" className="shrink-0 gap-1.5 text-sm px-2 md:px-3" onClick={() => setLocationModalOpen(true)}>
         <MapPin className="h-4 w-4" />
         <span className="hidden md:inline whitespace-nowrap">{currentLocation}</span>
         <ChevronDown className="h-4 w-4" />
@@ -153,7 +153,7 @@ export default function Header() {
             <Input
               type="search"
               placeholder="Search products..."
-              className={cn("w-full appearance-none bg-background pl-8 shadow-none md:w-2/3 lg:w-1/3", hasRecognitionSupport && "pr-10")}
+              className={cn("w-full appearance-none bg-background pl-8 shadow-none", hasRecognitionSupport && "pr-10")}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
@@ -173,7 +173,7 @@ export default function Header() {
         
        <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="ghost" size="icon" className="rounded-full">
+          <Button variant="ghost" size="icon" className="rounded-full shrink-0">
             <Languages className="h-5 w-5" />
             <span className="sr-only"><T>Change language</T></span>
           </Button>
@@ -189,7 +189,7 @@ export default function Header() {
         </DropdownMenuContent>
       </DropdownMenu>
 
-       <Button asChild variant="ghost" size="icon" className="rounded-full">
+       <Button asChild variant="ghost" size="icon" className="rounded-full shrink-0">
             <Link href="/notifications">
               <Bell className="h-5 w-5" />
               <span className="sr-only"><T>Toggle notifications</T></span>
@@ -197,7 +197,7 @@ export default function Header() {
        </Button>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="secondary" size="icon" className="rounded-full">
+          <Button variant="secondary" size="icon" className="rounded-full shrink-0">
             {user ? (
               <Avatar className="h-8 w-8">
                 <AvatarImage src={user.photoURL ?? undefined} alt={user.displayName ?? ""} />
@@ -237,5 +237,3 @@ export default function Header() {
     </>
   )
 }
-
-    

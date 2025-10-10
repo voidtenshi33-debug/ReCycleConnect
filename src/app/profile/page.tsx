@@ -49,7 +49,7 @@ function ProfileSkeleton() {
                 </CardHeader>
             </Card>
              <Tabs defaultValue="listings">
-                <TabsList className="grid w-full grid-cols-3">
+                <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3">
                     <TabsTrigger value="listings">Active Listings</TabsTrigger>
                     <TabsTrigger value="ratings">Ratings</TabsTrigger>
                     <TabsTrigger value="settings">Settings</TabsTrigger>
@@ -127,8 +127,8 @@ export default function ProfilePage() {
         <div className="space-y-6">
             <Card>
                 <CardHeader>
-                    <div className="flex flex-col md:flex-row items-start md:items-center gap-4">
-                        <Avatar className="h-24 w-24">
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                        <Avatar className="h-20 w-20 sm:h-24 sm:w-24">
                             <AvatarImage src={userProfile.photoURL ?? undefined} alt={userProfile.displayName} />
                             <AvatarFallback>{(userProfile.displayName || 'U').charAt(0)}</AvatarFallback>
                         </Avatar>
@@ -144,13 +144,13 @@ export default function ProfilePage() {
                                 </div>
                             </div>
                         </div>
-                        <Button>Edit Profile</Button>
+                        <Button className="w-full sm:w-auto">Edit Profile</Button>
                     </div>
                 </CardHeader>
             </Card>
 
             <Tabs defaultValue="listings">
-                <TabsList className="grid w-full grid-cols-3">
+                <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3">
                     <TabsTrigger value="listings">Active Listings</TabsTrigger>
                     <TabsTrigger value="ratings">Ratings</TabsTrigger>
                     <TabsTrigger value="settings">Settings</TabsTrigger>
@@ -168,7 +168,7 @@ export default function ProfilePage() {
                                     <p className="mt-2">Loading your listings...</p>
                                 </div>
                             ) : userItems && userItems.length > 0 ? (
-                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 pt-4">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6 pt-4">
                                     {userItems.map(item => (
                                         <ItemCard 
                                             key={item.id} 
@@ -251,5 +251,3 @@ export default function ProfilePage() {
         </div>
     );
 }
-
-    

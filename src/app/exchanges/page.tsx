@@ -48,7 +48,7 @@ const RequestCard = ({ request }: { request: ExchangeRequest & { id: string } })
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 border-b gap-4">
             <div className="flex items-center gap-4">
                 <Image src={item.imageUrls[0]} alt={item.title} width={64} height={64} className="rounded-md object-cover aspect-square" />
-                <div>
+                <div className="flex-grow">
                     <Link href={`/item/${item.id}`} className="font-semibold hover:underline">{item.title}</Link>
                     <div className="text-sm text-muted-foreground flex items-center gap-2 mt-1">
                         <Avatar className="h-5 w-5">
@@ -69,7 +69,7 @@ const RequestCard = ({ request }: { request: ExchangeRequest & { id: string } })
 }
 
 const EmptyState = ({ title, description, isMyRequests = false }: { title: string, description: string, isMyRequests?: boolean }) => (
-    <div className="p-12 text-center text-muted-foreground flex flex-col items-center">
+    <div className="p-8 md:p-12 text-center text-muted-foreground flex flex-col items-center">
         {isMyRequests ? <ShoppingBag className="h-12 w-12 mb-4" /> : <Repeat2 className="h-12 w-12 mb-4" />}
         <h3 className="text-lg font-semibold text-foreground">{title}</h3>
         <p className="mt-1">{description}</p>

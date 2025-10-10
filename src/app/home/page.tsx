@@ -29,7 +29,7 @@ import { useMemoFirebase } from '@/firebase/provider';
 const ItemCarousel = ({ title, items, link = "#" }: { title: React.ReactNode, items: Item[], link?: string }) => (
   <div className="space-y-4">
     <div className="flex items-center justify-between">
-      <h2 className="text-2xl font-headline font-semibold">{title}</h2>
+      <h2 className="text-xl md:text-2xl font-headline font-semibold">{title}</h2>
       <Button variant="link" asChild>
         <Link href={link}>
           <T>See All</T> <ChevronRight className="h-4 w-4" />
@@ -43,9 +43,9 @@ const ItemCarousel = ({ title, items, link = "#" }: { title: React.ReactNode, it
       }}
       className="w-full"
     >
-      <CarouselContent className="-ml-2">
+      <CarouselContent className="-ml-2 md:-ml-4">
         {items.map((item) => (
-          <CarouselItem key={item.id} className="pl-4 basis-full sm:basis-1/2 md:basis-1/2 lg:basis-1/3 xl:basis-1/4">
+          <CarouselItem key={item.id} className="pl-2 md:pl-4 basis-1/2 sm:basis-1/2 md:basis-1/3 lg:basis-1/4">
             <ItemCard item={item} />
           </CarouselItem>
         ))}
@@ -64,12 +64,13 @@ const HeroSection = () => (
       fill
       className="object-cover"
       data-ai-hint="e-waste pile"
+      priority
     />
     <div className="absolute inset-0 bg-black/50" />
-    <div className="relative h-full flex flex-col items-center justify-center text-center text-white p-4 space-y-4">
+    <div className="relative h-full flex flex-col items-center justify-center text-center text-white p-4 space-y-2 md:space-y-4">
       <h1 className="text-3xl md:text-5xl font-headline font-bold"><T>Give Your Electronics a Second Life.</T></h1>
-      <p className="max-w-2xl text-base md:text-lg text-white/90"><T>The dedicated marketplace for e-waste. Buy, sell, or donate used gadgets and reduce your carbon footprint.</T></p>
-      <Button size="lg" asChild>
+      <p className="max-w-2xl text-sm md:text-lg text-white/90"><T>The dedicated marketplace for e-waste. Buy, sell, or donate used gadgets and reduce your carbon footprint.</T></p>
+      <Button size="lg" asChild className="mt-2">
         <Link href="/post-item">
           <PlusCircle className="mr-2" /> <T>Post Your E-Waste Item</T>
         </Link>
@@ -167,7 +168,7 @@ function HomePageContent() {
       
       <div className="space-y-12">
         <div>
-          <h2 className="text-2xl font-headline font-semibold mb-4"><T>Browse by E-Waste Category</T></h2>
+          <h2 className="text-xl md:text-2xl font-headline font-semibold mb-4"><T>Browse by E-Waste Category</T></h2>
           <CategoryScroller onCategorySelect={handleCategorySelect} activeCategory={activeCategory} />
         </div>
 
@@ -190,7 +191,7 @@ function HomePageContent() {
         )}
 
         <div>
-           <h2 className="text-2xl font-headline font-semibold mb-4">
+           <h2 className="text-xl md:text-2xl font-headline font-semibold mb-4">
              {searchQuery ? <T>Search Results</T> : getHeading()}
           </h2>
           {areItemsLoading && currentItems.length === 0 ? (
@@ -226,5 +227,3 @@ export default function HomePage() {
     </Suspense>
   )
 }
-
-    

@@ -71,7 +71,7 @@ export default function WishlistPage() {
     if (isLoading) {
         return (
              <div className="space-y-6">
-                <h1 className="text-3xl font-headline font-semibold">My Wishlist</h1>
+                <h1 className="text-2xl md:text-3xl font-headline font-semibold">My Wishlist</h1>
                 <WishlistSkeleton />
             </div>
         )
@@ -83,8 +83,8 @@ export default function WishlistPage() {
 
     return (
         <div className="space-y-6">
-            <h1 className="text-3xl font-headline font-semibold">My Wishlist</h1>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 lg:gap-6">
+            <h1 className="text-2xl md:text-3xl font-headline font-semibold">My Wishlist</h1>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 lg:gap-6">
                 {wishlistItems?.map(item => (
                     <ItemCard key={item.id} item={item} />
                 ))}

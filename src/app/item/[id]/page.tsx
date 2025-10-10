@@ -1,3 +1,4 @@
+
 'use client';
 
 import Image from "next/image";
@@ -75,7 +76,7 @@ function ItemDetailContent({ itemId }: { itemId: string }) {
                 <T>Back to listings</T>
             </Link>
 
-            <div className="flex flex-col gap-8">
+            <div className="flex flex-col gap-6 md:gap-8">
                 
                 {/* Section 1: Title & Trust */}
                 <Card>
@@ -89,12 +90,12 @@ function ItemDetailContent({ itemId }: { itemId: string }) {
                              {item.isFeatured && <Badge variant="default" className="bg-yellow-400 text-yellow-900 gap-1"><Zap className="w-3.5 h-3.5" /> <T>Featured</T></Badge>}
                              {seller.isTrusted && <Badge variant="default" className="gap-1"><ShieldCheck className="w-3.5 h-3.5" /> <T>Verified Seller</T></Badge>}
                         </div>
-                        <CardTitle className="font-headline text-3xl md:text-4xl font-bold pt-2"><T>{item.title}</T></CardTitle>
+                        <CardTitle className="font-headline text-2xl md:text-4xl font-bold pt-2"><T>{item.title}</T></CardTitle>
                     </CardHeader>
                     <Separator />
-                     <CardContent className="pt-4">
-                        <Link href={`/users/${seller.id}`} className="block hover:bg-muted -m-4 p-4 rounded-lg">
-                            <div className="flex items-center gap-4">
+                     <CardContent className="pt-4 md:pt-6">
+                        <Link href={`/users/${seller.id}`} className="block hover:bg-muted -m-4 md:-m-6 p-4 md:p-6 rounded-lg">
+                            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
                                 <Avatar className="h-16 w-16">
                                     <AvatarImage src={seller.photoURL ?? undefined} alt={seller.displayName} />
                                     <AvatarFallback>{seller.displayName.charAt(0)}</AvatarFallback>
@@ -111,7 +112,7 @@ function ItemDetailContent({ itemId }: { itemId: string }) {
                                        <TrustBadge icon={Zap}><T>Quick Responder</T></TrustBadge>
                                     </div>
                                 </div>
-                                 <ChevronRight className="w-5 h-5 text-muted-foreground ml-auto" />
+                                 <ChevronRight className="w-5 h-5 text-muted-foreground ml-auto hidden sm:block" />
                             </div>
                         </Link>
                     </CardContent>
@@ -124,7 +125,7 @@ function ItemDetailContent({ itemId }: { itemId: string }) {
                         <CarouselItem key={index}>
                             <Card className="overflow-hidden">
                                 <div className="relative aspect-video w-full">
-                                    <Image src={img} alt={`${item.title} image ${index + 1}`} fill className="object-cover" data-ai-hint="product photo" />
+                                    <Image src={img} alt={`${item.title} image ${index + 1}`} fill className="object-cover" data-ai-hint="product photo" sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" priority={index === 0} />
                                 </div>
                             </Card>
                         </CarouselItem>
@@ -132,8 +133,8 @@ function ItemDetailContent({ itemId }: { itemId: string }) {
                     </CarouselContent>
                      {item.imageUrls.length > 1 && (
                         <>
-                        <CarouselPrevious className="absolute left-4 top-1/2 -translate-y-1/2 hidden md:flex" />
-                        <CarouselNext className="absolute right-4 top-1/2 -translate-y-1/2 hidden md:flex"/>
+                        <CarouselPrevious className="absolute left-2 md:left-4 top-1/2 -translate-y-1/2" />
+                        <CarouselNext className="absolute right-2 md:right-4 top-1/2 -translate-y-1/2"/>
                         </>
                      )}
                 </Carousel>
@@ -141,7 +142,7 @@ function ItemDetailContent({ itemId }: { itemId: string }) {
                 {/* Section 3 & 4: AI Snapshot & Description */}
                 <Card>
                     <CardHeader>
-                        <CardTitle className="font-headline text-2xl">
+                        <CardTitle className="font-headline text-xl md:text-2xl">
                            <T>Details</T>
                         </CardTitle>
                     </CardHeader>
@@ -172,13 +173,13 @@ function ItemDetailContent({ itemId }: { itemId: string }) {
                 {/* Section 5 & 6: Community Metrics & Meetup Zone */}
                 <Card>
                      <CardHeader>
-                        <CardTitle className="font-headline text-2xl">
+                        <CardTitle className="font-headline text-xl md:text-2xl">
                            <T>Community & Location</T>
                         </CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-6">
                          {/* Community Metrics Placeholder */}
-                        <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4 text-sm text-muted-foreground">
                             <div className="flex items-center gap-1.5"><Heart className="w-4 h-4" /> <span><T>Added to 12 wishlists</T></span></div>
                             <div className="flex items-center gap-1.5"><Eye className="w-4 h-4" /> <span><T>Viewed 58 times today</T></span></div>
                         </div>
@@ -194,11 +195,11 @@ function ItemDetailContent({ itemId }: { itemId: string }) {
                 </Card>
                 
                  {/* Section 7: Sticky Action Bar */}
-                 <div className="sticky bottom-4 z-10 w-full">
-                     <Card className="shadow-2xl max-w-lg mx-auto">
+                 <div className="sticky bottom-0 md:bottom-4 z-10 w-full -mx-4 md:mx-0 -mb-4 md:mb-0">
+                     <Card className="shadow-2xl max-w-lg mx-auto rounded-none md:rounded-lg">
                         <CardContent className="p-3">
                              {isComponent && <CompatibilityChecker item={item} />}
-                            <div className="flex gap-3 mt-3">
+                            <div className="flex flex-col sm:flex-row gap-2 mt-3">
                                 {(user && user.uid !== item.ownerId) && (
                                      seller?.isTrusted && item.listingType !== 'Donate' ? (
                                         <>
