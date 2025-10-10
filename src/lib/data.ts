@@ -575,8 +575,8 @@ export const items: Item[] = [
     imageUrls: ["https://www.cnet.com/a/img/resize/d93ef048db2ddb3e1a0fe8ee3f0c90f70a3c4150/hub/2020/11/16/a8e0e691-035a-4298-8366-f3b74e1f3792/img-1759.jpg?auto=webp&fit=crop&height=1200&width=1200"],
     locality: "kothrud",
     ownerId: "user_02",
-    ownerName: "Priya Sharma",
-    ownerAvatarUrl: null,
+    ownerName: "Anjali Sharma",
+    ownerAvatarUrl: "https://i.pravatar.cc/150?u=anjali",
     ownerRating: 4.9,
     status: "Available",
     isFeatured: true,
@@ -822,7 +822,7 @@ export const items: Item[] = [
     listingType: "Sell",
     price: 4500,
     imageUrls: [
-      "https://images.unsplash.com/photo-1593528625349-3a3c35afe2b7"
+      "https://m.media-amazon.com/images/I/71ZHcCripSL.jpg"
     ],
     locality: "koregaon-park",
     ownerId: "user_03",
@@ -869,8 +869,8 @@ export const items: Item[] = [
     locality: "viman-nagar",
     ownerId: "user_02",
     ownerName: "Anjali Sharma",
-    ownerAvatarUrl: "https://i.pravatar.cc/150?u=anjali",
     ownerRating: 4.9,
+    ownerAvatarUrl: "https://i.pravatar.cc/150?u=anjali",
     status: "Available",
     isFeatured: false,
     createdAt: new Date()
