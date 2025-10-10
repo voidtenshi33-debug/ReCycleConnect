@@ -221,6 +221,12 @@ const nextConfig: NextConfig = {
         hostname: "mynexttablet.com",
         port: "",
         pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "root-nation.com",
+        port: "",
+        pathname: "/**",
       }
     ],
   },
