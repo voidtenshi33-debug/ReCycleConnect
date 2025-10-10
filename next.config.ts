@@ -155,6 +155,12 @@ const nextConfig: NextConfig = {
         hostname: "i.redd.it",
         port: "",
         pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "www.shutterstock.com",
+        port: "",
+        pathname: "/**",
       }
     ],
   },
