@@ -145,7 +145,7 @@ const nextConfig: NextConfig = {
         pathname: "/**",
       },
       {
-        protocol: "https`",
+        protocol: "https",
         hostname: "i.redd.it",
         port: "",
         pathname: "/**",
@@ -195,6 +195,12 @@ const nextConfig: NextConfig = {
       {
         protocol: "https",
         hostname: "apollo.olx.in",
+        port: "",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "u-mercari-images.mercdn.net",
         port: "",
         pathname: "/**",
       }
